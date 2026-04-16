@@ -1,8 +1,18 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "w1w_hero": {
       "type": "w1w-hero",
       "settings": {
+        "bg_image": "shopify://shop_images/220831_Eagle_SeatingBowl_InternalView.jpg",
         "badge_text": "Stadium Midnight Edition",
         "headline_line1": "WEAR YOUR",
         "headline_line2": "COUNTRY.",
@@ -18,6 +28,7 @@
       "settings": {
         "label": "New Arrivals",
         "heading": "Featured Kit",
+        "collection": "",
         "view_all_label": "View All Nations",
         "quick_add_label": "Quick Add"
       }
@@ -28,6 +39,7 @@
         "region_europe": {
           "type": "region",
           "settings": {
+            "image": "shopify://shop_images/Europe.jpg",
             "title": "Europe",
             "subtitle": "Explore 24 Nations"
           }
@@ -35,13 +47,23 @@
         "region_south_america": {
           "type": "region",
           "settings": {
+            "image": "shopify://shop_images/statue-Christ-the-Redeemer-Rio-de-Janiero-Brazil.webp",
             "title": "South America",
             "subtitle": "The Core of Passion"
+          }
+        },
+        "region_rJgETK": {
+          "type": "region",
+          "settings": {
+            "image": "shopify://shop_images/New-York-City-USA.jpg",
+            "title": "North America",
+            "subtitle": "Explore 24 Nations"
           }
         },
         "region_africa": {
           "type": "region",
           "settings": {
+            "image": "shopify://shop_images/Moroccan-Landmarks.jpg",
             "title": "Africa",
             "subtitle": "Untamed Energy"
           }
@@ -49,16 +71,27 @@
         "region_asia": {
           "type": "region",
           "settings": {
+            "image": "shopify://shop_images/japan-1200x729.jpg",
             "title": "Asia",
             "subtitle": "The Rising Stars"
+          }
+        },
+        "region_aKGmhR": {
+          "type": "region",
+          "settings": {
+            "image": "shopify://shop_images/Circular-Quay_Charlotte-Karp.jpg",
+            "title": "Australia",
+            "subtitle": "Explore 24 Nations"
           }
         }
       },
       "block_order": [
         "region_europe",
         "region_south_america",
+        "region_rJgETK",
         "region_africa",
-        "region_asia"
+        "region_asia",
+        "region_aKGmhR"
       ],
       "settings": {
         "heading": "Explore Regions"
