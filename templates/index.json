@@ -100,6 +100,7 @@
     "w1w_lifestyle": {
       "type": "w1w-lifestyle",
       "settings": {
+        "bg_image": "shopify://shop_images/68b1d9a4d5f914.63315648.webp",
         "heading": "Match Day Energy",
         "subtext": "More than an accessory. It's a badge of honor for the 90 minutes and beyond.",
         "button_label": "Live the game",
