@@ -1,0 +1,415 @@
+<section class="w1w-col-promo">
+  <div class="w1w-col-promo__inner">
+    <div class="w1w-col-promo__grid">
+
+      <!-- Newsletter card -->
+      <div class="w1w-promo-newsletter">
+        {%- if section.settings.newsletter_bg != blank -%}
+          <div class="w1w-promo-newsletter__bg">
+            {{ section.settings.newsletter_bg | image_url: width: 1000 | image_tag: loading: 'lazy', class: 'w1w-promo-newsletter__bg-img', alt: '' }}
+          </div>
+        {%- endif -%}
+        <div class="w1w-promo-newsletter__content">
+          <h2 class="w1w-promo-newsletter__title">
+            {{ section.settings.newsletter_title_line1 }}<br>
+            <span class="w1w-promo-accent">{{ section.settings.newsletter_title_line2 }}</span>
+          </h2>
+          <p class="w1w-promo-newsletter__desc">{{ section.settings.newsletter_desc }}</p>
+          {%- form 'customer', class: 'w1w-promo-newsletter__form' -%}
+            <input type="hidden" name="contact[tags]" value="newsletter">
+            <div class="w1w-promo-newsletter__form-row">
+              <input
+                type="email"
+                name="contact[email]"
+                placeholder="{{ section.settings.email_placeholder }}"
+                class="w1w-promo-newsletter__input"
+                required
+                autocomplete="email"
+              >
+              <button type="submit" class="w1w-promo-newsletter__submit">
+                {{ section.settings.submit_label }}
+              </button>
+            </div>
+            {%- if form.posted_successfully? -%}
+              <p class="w1w-promo-newsletter__success">{{ section.settings.success_message }}</p>
+            {%- endif -%}
+          {%- endform -%}
+        </div>
+      </div>
+
+      <!-- Feature cards -->
+      <div class="w1w-promo-cards">
+        <div class="w1w-promo-card w1w-promo-card--stadium">
+          <div class="w1w-promo-card__arrow">
+            <span class="material-symbols-outlined">arrow_outward</span>
+          </div>
+          <h3 class="w1w-promo-card__title">
+            {{ section.settings.card1_title_line1 }}<br>
+            {{ section.settings.card1_title_line2 }}
+          </h3>
+          <p class="w1w-promo-card__label">{{ section.settings.card1_label }}</p>
+          {%- if section.settings.card1_link != blank -%}
+            <a href="{{ section.settings.card1_link }}" class="w1w-promo-card__link" aria-label="{{ section.settings.card1_title_line1 }}"></a>
+          {%- endif -%}
+        </div>
+        <div class="w1w-promo-card w1w-promo-card--shipping">
+          <div class="w1w-promo-card__icon">
+            <span class="material-symbols-outlined">public</span>
+          </div>
+          <h3 class="w1w-promo-card__title">
+            {{ section.settings.card2_title_line1 }}<br>
+            {{ section.settings.card2_title_line2 }}
+          </h3>
+          <p class="w1w-promo-card__label">{{ section.settings.card2_label }}</p>
+          {%- if section.settings.card2_link != blank -%}
+            <a href="{{ section.settings.card2_link }}" class="w1w-promo-card__link" aria-label="{{ section.settings.card2_title_line1 }}"></a>
+          {%- endif -%}
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  .w1w-col-promo {
+    background: #0e0e0e;
+    padding: 0 0 96px;
+  }
+  .w1w-col-promo__inner {
+    max-width: 1536px;
+    margin: 0 auto;
+    padding: 0 32px;
+  }
+  .w1w-col-promo__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    min-height: 500px;
+  }
+  /* Newsletter */
+  .w1w-promo-newsletter {
+    position: relative;
+    background: #201f1f;
+    border-radius: 4px;
+    overflow: hidden;
+    padding: 48px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .w1w-promo-newsletter__bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+  .w1w-promo-newsletter__bg-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.2;
+    display: block;
+  }
+  .w1w-promo-newsletter__content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .w1w-promo-newsletter__title {
+    font-family: "Space Grotesk", sans-serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 900;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    margin: 0 0 24px;
+  }
+  .w1w-promo-accent {
+    color: #f3ffca;
+  }
+  .w1w-promo-newsletter__desc {
+    color: #adaaaa;
+    font-family: "Inter", sans-serif;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    max-width: 22rem;
+    margin: 0 0 32px;
+  }
+  .w1w-promo-newsletter__form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .w1w-promo-newsletter__form-row {
+    display: flex;
+  }
+  .w1w-promo-newsletter__input {
+    background: #262626;
+    border: none;
+    color: #fff;
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 16px;
+    flex: 1;
+    outline: none;
+    width: 100%;
+    border-radius: 0;
+  }
+  .w1w-promo-newsletter__input::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+  }
+  .w1w-promo-newsletter__input:focus {
+    outline: 1px solid #f3ffca;
+  }
+  .w1w-promo-newsletter__submit {
+    background: #f3ffca;
+    color: #516700;
+    border: none;
+    padding: 16px 32px;
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 900;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    white-space: nowrap;
+    border-radius: 0;
+    transition: background 0.2s;
+  }
+  .w1w-promo-newsletter__submit:hover {
+    background: #cafd00;
+  }
+  .w1w-promo-newsletter__success {
+    color: #f3ffca;
+    font-size: 0.75rem;
+    margin: 0;
+    font-family: "Inter", sans-serif;
+  }
+  /* Feature cards */
+  .w1w-promo-cards {
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+    gap: 32px;
+  }
+  .w1w-promo-card {
+    position: relative;
+    border-radius: 4px;
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    overflow: hidden;
+    transition: background 0.3s;
+    cursor: pointer;
+  }
+  .w1w-promo-card--stadium {
+    background: #131313;
+  }
+  .w1w-promo-card--shipping {
+    background: #000;
+    border: 1px solid rgba(73, 72, 71, 0.1);
+  }
+  .w1w-promo-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(243, 255, 202, 0.05);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .w1w-promo-card:hover::before {
+    opacity: 1;
+  }
+  .w1w-promo-card__arrow {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 32px;
+  }
+  .w1w-promo-card__arrow .material-symbols-outlined {
+    font-size: 2.5rem;
+    color: #f3ffca;
+    transition: transform 0.3s;
+  }
+  .w1w-promo-card:hover .w1w-promo-card__arrow .material-symbols-outlined {
+    transform: rotate(45deg);
+  }
+  .w1w-promo-card__icon {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 32px;
+  }
+  .w1w-promo-card__icon .material-symbols-outlined {
+    font-size: 2.5rem;
+    color: #f3ffca;
+    transition: transform 0.3s;
+  }
+  .w1w-promo-card:hover .w1w-promo-card__icon .material-symbols-outlined {
+    transform: translateX(4px);
+  }
+  .w1w-promo-card__title {
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin: 0 0 8px;
+    position: relative;
+    z-index: 1;
+  }
+  .w1w-promo-card__label {
+    color: #adaaaa;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin: 0;
+    font-family: "Inter", sans-serif;
+    position: relative;
+    z-index: 1;
+  }
+  .w1w-promo-card__link {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+  }
+  @media (max-width: 990px) {
+    .w1w-col-promo__grid {
+      grid-template-columns: 1fr;
+    }
+    .w1w-promo-cards {
+      grid-template-rows: auto;
+      grid-template-columns: 1fr 1fr;
+    }
+    .w1w-promo-card {
+      min-height: 200px;
+    }
+  }
+  @media (max-width: 480px) {
+    .w1w-col-promo__inner {
+      padding: 0 16px;
+    }
+    .w1w-promo-cards {
+      grid-template-columns: 1fr;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "W1W Collection Promo",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Newsletter card"
+    },
+    {
+      "type": "image_picker",
+      "id": "newsletter_bg",
+      "label": "Background image"
+    },
+    {
+      "type": "text",
+      "id": "newsletter_title_line1",
+      "label": "Title line 1",
+      "default": "Enter the"
+    },
+    {
+      "type": "text",
+      "id": "newsletter_title_line2",
+      "label": "Title line 2 (accent)",
+      "default": "Inner Circle"
+    },
+    {
+      "type": "textarea",
+      "id": "newsletter_desc",
+      "label": "Description",
+      "default": "Join the World 1 World collective for early access to limited edition drops and stadium events."
+    },
+    {
+      "type": "text",
+      "id": "email_placeholder",
+      "label": "Email placeholder",
+      "default": "Your email"
+    },
+    {
+      "type": "text",
+      "id": "submit_label",
+      "label": "Submit label",
+      "default": "Join"
+    },
+    {
+      "type": "text",
+      "id": "success_message",
+      "label": "Success message",
+      "default": "You're in the squad!"
+    },
+    {
+      "type": "header",
+      "content": "Feature card 1"
+    },
+    {
+      "type": "text",
+      "id": "card1_title_line1",
+      "label": "Title line 1",
+      "default": "Stadium"
+    },
+    {
+      "type": "text",
+      "id": "card1_title_line2",
+      "label": "Title line 2",
+      "default": "Pass"
+    },
+    {
+      "type": "text",
+      "id": "card1_label",
+      "label": "Label",
+      "default": "Exclusive Membership"
+    },
+    {
+      "type": "url",
+      "id": "card1_link",
+      "label": "Link"
+    },
+    {
+      "type": "header",
+      "content": "Feature card 2"
+    },
+    {
+      "type": "text",
+      "id": "card2_title_line1",
+      "label": "Title line 1",
+      "default": "Global"
+    },
+    {
+      "type": "text",
+      "id": "card2_title_line2",
+      "label": "Title line 2",
+      "default": "Shipping"
+    },
+    {
+      "type": "text",
+      "id": "card2_label",
+      "label": "Label",
+      "default": "From the pitch to your porch"
+    },
+    {
+      "type": "url",
+      "id": "card2_link",
+      "label": "Link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "W1W Collection Promo"
+    }
+  ]
+}
+{% endschema %}

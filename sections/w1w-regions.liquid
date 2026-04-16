@@ -4,7 +4,20 @@
   </div>
   <div class="w1w-regions__scroll-wrap">
     {%- for block in section.blocks -%}
-      <div class="w1w-region-card" {{ block.shopify_attributes }}>
+      {%- assign card_tag = 'div' -%}
+      {%- assign card_href = '' -%}
+      {%- if block.settings.collection != blank -%}
+        {%- assign card_tag = 'a' -%}
+        {%- assign card_href = block.settings.collection.url -%}
+      {%- elsif block.settings.url != blank -%}
+        {%- assign card_tag = 'a' -%}
+        {%- assign card_href = block.settings.url -%}
+      {%- endif -%}
+      <{{ card_tag }}
+        class="w1w-region-card"
+        {{ block.shopify_attributes }}
+        {%- if card_href != '' -%} href="{{ card_href }}"{%- endif -%}
+      >
         <div class="w1w-region-card__media">
           {%- if block.settings.image != blank -%}
             {{ block.settings.image | image_url: width: 800 | image_tag: loading: 'lazy', class: 'w1w-region-card__img', alt: block.settings.image.alt | escape }}
@@ -16,7 +29,7 @@
             <p class="w1w-region-card__subtitle">{{ block.settings.subtitle }}</p>
           </div>
         </div>
-      </div>
+      </{{ card_tag }}>
     {%- else -%}
       {%- assign placeholder_regions = 'Europe,South America,Africa,Asia' | split: ',' -%}
       {%- for region in placeholder_regions -%}
@@ -71,6 +84,8 @@
     aspect-ratio: 16 / 9;
     position: relative;
     overflow: hidden;
+    text-decoration: none;
+    display: block;
   }
   .w1w-region-card__media {
     width: 100%;
@@ -169,6 +184,16 @@
           "id": "subtitle",
           "label": "Hover subtitle",
           "default": "Explore 24 Nations"
+        },
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Link to collection"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "Custom link (used if no collection selected)"
         }
       ]
     }

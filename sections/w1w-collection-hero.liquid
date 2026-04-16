@@ -1,0 +1,132 @@
+<section class="w1w-col-hero">
+  <div class="w1w-col-hero__bg">
+    {%- if section.settings.bg_image != blank -%}
+      {{ section.settings.bg_image | image_url: width: 1800 | image_tag: loading: 'eager', class: 'w1w-col-hero__bg-img', alt: section.settings.bg_image.alt }}
+    {%- elsif collection.image != blank -%}
+      {{ collection.image | image_url: width: 1800 | image_tag: loading: 'eager', class: 'w1w-col-hero__bg-img', alt: collection.image.alt }}
+    {%- endif -%}
+    <div class="w1w-col-hero__gradient"></div>
+  </div>
+  <div class="w1w-col-hero__content">
+    <div class="w1w-col-hero__inner">
+      {%- if section.settings.label != blank -%}
+        <span class="w1w-col-hero__label">{{ section.settings.label }}</span>
+      {%- endif -%}
+      <h1 class="w1w-col-hero__title">
+        {%- if section.settings.title_line1 != blank -%}
+          {{ section.settings.title_line1 }}<br>
+          <span class="w1w-col-hero__accent">{{ section.settings.title_line2 | default: collection.title }}</span>
+        {%- else -%}
+          {{ collection.title }}
+        {%- endif -%}
+      </h1>
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  .w1w-col-hero {
+    position: relative;
+    height: 409px;
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
+    background: #000;
+    isolation: isolate;
+  }
+  .w1w-col-hero__bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+  .w1w-col-hero__bg-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.4;
+    mix-blend-mode: luminosity;
+    display: block;
+  }
+  .w1w-col-hero__gradient {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, #0e0e0e 0%, transparent 60%);
+  }
+  .w1w-col-hero__content {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    padding: 0 32px 48px;
+  }
+  .w1w-col-hero__inner {
+    max-width: 1536px;
+    margin: 0 auto;
+  }
+  .w1w-col-hero__label {
+    display: block;
+    color: #f3ffca;
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+    margin-bottom: 16px;
+  }
+  .w1w-col-hero__title {
+    font-family: "Space Grotesk", sans-serif;
+    font-size: clamp(3rem, 8vw, 7rem);
+    font-weight: 900;
+    color: rgba(255, 255, 255, 0.9);
+    text-transform: uppercase;
+    letter-spacing: -0.03em;
+    line-height: 0.9;
+    margin: 0;
+  }
+  .w1w-col-hero__accent {
+    color: #f3ffca;
+  }
+  @media (max-width: 768px) {
+    .w1w-col-hero {
+      height: 300px;
+    }
+    .w1w-col-hero__content {
+      padding: 0 16px 32px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "W1W Collection Hero",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "bg_image",
+      "label": "Background image (overrides collection image)"
+    },
+    {
+      "type": "text",
+      "id": "label",
+      "label": "Label above title",
+      "default": "International Edition"
+    },
+    {
+      "type": "text",
+      "id": "title_line1",
+      "label": "Title line 1 (leave blank to use collection title)",
+      "default": "The Nations"
+    },
+    {
+      "type": "text",
+      "id": "title_line2",
+      "label": "Title line 2 (accent, leave blank to use collection title)",
+      "default": "Series"
+    }
+  ],
+  "presets": [
+    {
+      "name": "W1W Collection Hero"
+    }
+  ]
+}
+{% endschema %}
