@@ -1,0 +1,272 @@
+<section class="w1w-products">
+  <div class="w1w-products__inner">
+    <div class="w1w-products__header">
+      <div>
+        {%- if section.settings.label != blank -%}
+          <span class="w1w-products__label">{{ section.settings.label }}</span>
+        {%- endif -%}
+        <h2 class="w1w-products__heading">{{ section.settings.heading }}</h2>
+      </div>
+      {%- if section.settings.view_all_label != blank and section.settings.collection != blank -%}
+        <a href="{{ section.settings.collection.url }}" class="w1w-products__view-all">
+          {{ section.settings.view_all_label }}
+        </a>
+      {%- endif -%}
+    </div>
+    <div class="w1w-products__grid">
+      {%- if section.settings.collection != blank -%}
+        {%- for product in section.settings.collection.products limit: 4 -%}
+          <div class="w1w-product-card">
+            <div class="w1w-product-card__media">
+              {%- if product.featured_image != blank -%}
+                <a href="{{ product.url }}" aria-label="{{ product.title | escape }}">
+                  {{ product.featured_image | image_url: width: 600 | image_tag: loading: 'lazy', class: 'w1w-product-card__img', alt: product.featured_image.alt | escape }}
+                </a>
+              {%- else -%}
+                <a href="{{ product.url }}" aria-label="{{ product.title | escape }}">
+                  {{ 'product-1' | placeholder_svg_tag: 'w1w-product-card__img w1w-product-card__img--placeholder' }}
+                </a>
+              {%- endif -%}
+              <div class="w1w-product-card__overlay"></div>
+              <button class="w1w-product-card__quick-add" data-product-id="{{ product.variants.first.id }}" aria-label="Quick add {{ product.title | escape }}">
+                {{ section.settings.quick_add_label }}
+              </button>
+            </div>
+            <div class="w1w-product-card__info">
+              <div>
+                <h3 class="w1w-product-card__title">
+                  <a href="{{ product.url }}">{{ product.title }}</a>
+                </h3>
+                {%- if product.metafields.custom.subtitle != blank -%}
+                  <p class="w1w-product-card__subtitle">{{ product.metafields.custom.subtitle }}</p>
+                {%- else -%}
+                  <p class="w1w-product-card__subtitle">{{ product.type }}</p>
+                {%- endif -%}
+              </div>
+              <span class="w1w-product-card__price">{{ product.price | money_without_trailing_zeros }}</span>
+            </div>
+          </div>
+        {%- else -%}
+          {%- for i in (1..4) -%}
+            <div class="w1w-product-card">
+              <div class="w1w-product-card__media">
+                {{ 'product-' | append: i | placeholder_svg_tag: 'w1w-product-card__img w1w-product-card__img--placeholder' }}
+                <div class="w1w-product-card__overlay"></div>
+                <button class="w1w-product-card__quick-add">{{ section.settings.quick_add_label }}</button>
+              </div>
+              <div class="w1w-product-card__info">
+                <div>
+                  <h3 class="w1w-product-card__title">Product title</h3>
+                  <p class="w1w-product-card__subtitle">Select Edition</p>
+                </div>
+                <span class="w1w-product-card__price">$45</span>
+              </div>
+            </div>
+          {%- endfor -%}
+        {%- endfor -%}
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  .w1w-products {
+    padding: 96px 0;
+    background: #0e0e0e;
+    background-image: radial-gradient(rgba(243, 255, 202, 0.05) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+  .w1w-products__inner {
+    max-width: 1536px;
+    margin: 0 auto;
+    padding: 0 32px;
+  }
+  .w1w-products__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 64px;
+  }
+  .w1w-products__label {
+    display: block;
+    color: #f3ffca;
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5em;
+    margin-bottom: 16px;
+  }
+  .w1w-products__heading {
+    font-family: "Space Grotesk", sans-serif;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.03em;
+    text-transform: uppercase;
+    margin: 0;
+  }
+  .w1w-products__view-all {
+    color: #f3ffca;
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 0.875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    text-decoration: none;
+    border-bottom: 1px solid #f3ffca;
+    padding-bottom: 4px;
+    white-space: nowrap;
+  }
+  .w1w-products__grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px 24px;
+  }
+  .w1w-product-card {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  .w1w-product-card__media {
+    position: relative;
+    aspect-ratio: 1;
+    background: #000;
+    overflow: hidden;
+  }
+  .w1w-product-card__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.8;
+    transition: transform 0.7s, opacity 0.3s;
+    display: block;
+  }
+  .w1w-product-card__img--placeholder {
+    padding: 24px;
+    opacity: 0.3;
+  }
+  .w1w-product-card:hover .w1w-product-card__img {
+    transform: scale(1.1);
+  }
+  .w1w-product-card__overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(243, 255, 202, 0);
+    transition: background 0.3s;
+    pointer-events: none;
+  }
+  .w1w-product-card:hover .w1w-product-card__overlay {
+    background: rgba(243, 255, 202, 0.05);
+  }
+  .w1w-product-card__quick-add {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #f3ffca;
+    color: #516700;
+    padding: 16px;
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 700;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    border: none;
+    cursor: pointer;
+    transform: translateY(100%);
+    transition: transform 0.3s;
+  }
+  .w1w-product-card:hover .w1w-product-card__quick-add {
+    transform: translateY(0);
+  }
+  .w1w-product-card__info {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 0 8px;
+  }
+  .w1w-product-card__title {
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 700;
+    font-size: 1.125rem;
+    color: #fff;
+    text-transform: uppercase;
+    margin: 0 0 4px;
+  }
+  .w1w-product-card__title a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .w1w-product-card__subtitle {
+    color: #adaaaa;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin: 0;
+  }
+  .w1w-product-card__price {
+    color: #f3ffca;
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    white-space: nowrap;
+  }
+  @media (max-width: 990px) {
+    .w1w-products__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .w1w-products__header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+    }
+  }
+  @media (max-width: 480px) {
+    .w1w-products__inner {
+      padding: 0 16px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "W1W Featured Products",
+  "settings": [
+    {
+      "type": "text",
+      "id": "label",
+      "label": "Label",
+      "default": "New Arrivals"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Featured Kit"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "text",
+      "id": "view_all_label",
+      "label": "View all label",
+      "default": "View All Nations"
+    },
+    {
+      "type": "text",
+      "id": "quick_add_label",
+      "label": "Quick add button label",
+      "default": "Quick Add"
+    }
+  ],
+  "presets": [
+    {
+      "name": "W1W Featured Products"
+    }
+  ]
+}
+{% endschema %}

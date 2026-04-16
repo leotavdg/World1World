@@ -1,0 +1,297 @@
+<section class="w1w-bento">
+  <div class="w1w-bento__inner">
+    <div class="w1w-bento__grid">
+
+      <div class="w1w-bento__card w1w-bento__card--legacy">
+        <div class="w1w-bento__card-content">
+          <h3 class="w1w-bento__card-title">
+            {{ section.settings.legacy_title }}
+          </h3>
+          <p class="w1w-bento__card-desc">{{ section.settings.legacy_desc }}</p>
+        </div>
+        {%- if section.settings.legacy_image != blank -%}
+          {{ section.settings.legacy_image | image_url: width: 600 | image_tag: loading: 'lazy', class: 'w1w-bento__card-bg-img', alt: section.settings.legacy_image.alt }}
+        {%- endif -%}
+        <a href="{{ section.settings.legacy_link }}" class="w1w-bento__card-cta">
+          {{ section.settings.legacy_cta }}
+        </a>
+      </div>
+
+      <div class="w1w-bento__card w1w-bento__card--player">
+        <div class="w1w-bento__card-row">
+          <div>
+            <h3 class="w1w-bento__card-title w1w-bento__card-title--sm">{{ section.settings.player_title }}</h3>
+            <p class="w1w-bento__card-desc">{{ section.settings.player_desc }}</p>
+          </div>
+          <span class="w1w-bento__icon material-symbols-outlined">bolt</span>
+        </div>
+      </div>
+
+      <div class="w1w-bento__card w1w-bento__card--shipping">
+        <span class="w1w-bento__icon material-symbols-outlined">public</span>
+        <h3 class="w1w-bento__card-title w1w-bento__card-title--sm">{{ section.settings.shipping_title }}</h3>
+      </div>
+
+      <div class="w1w-bento__card w1w-bento__card--quality">
+        <span class="w1w-bento__icon w1w-bento__icon--filled material-symbols-outlined">star</span>
+        <h3 class="w1w-bento__card-title w1w-bento__card-title--sm w1w-bento__card-title--dark">
+          {{ section.settings.quality_title }}
+        </h3>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  .w1w-bento {
+    padding: 96px 0;
+    background: #0e0e0e;
+  }
+  .w1w-bento__inner {
+    max-width: 1536px;
+    margin: 0 auto;
+    padding: 0 32px;
+  }
+  .w1w-bento__grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(2, 300px);
+    gap: 24px;
+  }
+  .w1w-bento__card {
+    padding: 48px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+  }
+  .w1w-bento__card--legacy {
+    grid-column: span 2;
+    grid-row: span 2;
+    background: #131313;
+  }
+  .w1w-bento__card--player {
+    grid-column: span 2;
+    background: #201f1f;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 32px;
+  }
+  .w1w-bento__card--shipping {
+    background: #262626;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 32px;
+  }
+  .w1w-bento__card--quality {
+    background: #f3ffca;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 32px;
+  }
+  .w1w-bento__card-content {
+    position: relative;
+    z-index: 10;
+  }
+  .w1w-bento__card-title {
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 2rem;
+    font-weight: 900;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin: 0 0 16px;
+  }
+  .w1w-bento__card-title--sm {
+    font-size: 1.25rem;
+    margin: 0;
+  }
+  .w1w-bento__card-title--dark {
+    color: #516700;
+  }
+  .w1w-bento__card-desc {
+    color: #adaaaa;
+    font-family: "Inter", sans-serif;
+    font-size: 0.9rem;
+    max-width: 18rem;
+    margin: 0;
+    line-height: 1.5;
+  }
+  .w1w-bento__card-bg-img {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 66%;
+    object-fit: contain;
+    transform: translate(40px, 40px);
+    transition: transform 1s;
+    opacity: 0.4;
+  }
+  .w1w-bento__card--legacy:hover .w1w-bento__card-bg-img {
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+  .w1w-bento__card-cta {
+    position: relative;
+    z-index: 10;
+    display: inline-block;
+    color: #f3ffca;
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 700;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    text-decoration: none;
+    border-bottom: 2px solid #f3ffca;
+    padding-bottom: 4px;
+    width: fit-content;
+  }
+  .w1w-bento__icon {
+    font-size: 3rem;
+    color: #f3ffca;
+    transition: transform 0.3s;
+    font-family: "Material Symbols Outlined";
+    font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+  }
+  .w1w-bento__icon--filled {
+    font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 24;
+    color: #516700;
+  }
+  .w1w-bento__card--player:hover .w1w-bento__icon {
+    transform: translateX(8px);
+  }
+  .w1w-bento__card--shipping {
+    text-align: center;
+  }
+  .w1w-bento__card--shipping .w1w-bento__card-title--sm {
+    color: #fff;
+  }
+  .w1w-bento__card--quality {
+    text-align: center;
+  }
+  .w1w-bento__card--player .w1w-bento__card-row {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .w1w-bento__card--player .w1w-bento__card-desc {
+    font-size: 0.8rem;
+    margin-top: 4px;
+    max-width: none;
+  }
+  @media (max-width: 990px) {
+    .w1w-bento__grid {
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto;
+    }
+    .w1w-bento__card--legacy {
+      grid-column: span 2;
+      grid-row: span 1;
+      min-height: 300px;
+    }
+    .w1w-bento__card--player {
+      grid-column: span 2;
+    }
+  }
+  @media (max-width: 480px) {
+    .w1w-bento__grid {
+      grid-template-columns: 1fr;
+    }
+    .w1w-bento__card--legacy,
+    .w1w-bento__card--player {
+      grid-column: span 1;
+    }
+    .w1w-bento__inner {
+      padding: 0 16px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "W1W Bento Grid",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Legacy Series card"
+    },
+    {
+      "type": "text",
+      "id": "legacy_title",
+      "label": "Title",
+      "default": "The World Cup Legacy Series"
+    },
+    {
+      "type": "text",
+      "id": "legacy_desc",
+      "label": "Description",
+      "default": "Commemorating the greatest stages in football history."
+    },
+    {
+      "type": "image_picker",
+      "id": "legacy_image",
+      "label": "Background image"
+    },
+    {
+      "type": "text",
+      "id": "legacy_cta",
+      "label": "CTA label",
+      "default": "Shop Legacy"
+    },
+    {
+      "type": "url",
+      "id": "legacy_link",
+      "label": "CTA link"
+    },
+    {
+      "type": "header",
+      "content": "Player Edition card"
+    },
+    {
+      "type": "text",
+      "id": "player_title",
+      "label": "Title",
+      "default": "Player Edition"
+    },
+    {
+      "type": "text",
+      "id": "player_desc",
+      "label": "Description",
+      "default": "Lightweight. Breathable. Pro-grade."
+    },
+    {
+      "type": "header",
+      "content": "Global Shipping card"
+    },
+    {
+      "type": "text",
+      "id": "shipping_title",
+      "label": "Title",
+      "default": "Global Shipping"
+    },
+    {
+      "type": "header",
+      "content": "Elite Quality card"
+    },
+    {
+      "type": "text",
+      "id": "quality_title",
+      "label": "Title",
+      "default": "Elite Quality"
+    }
+  ],
+  "presets": [
+    {
+      "name": "W1W Bento Grid"
+    }
+  ]
+}
+{% endschema %}

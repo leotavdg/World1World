@@ -1,0 +1,23 @@
+{
+  "type": "footer",
+  "name": "Footer",
+  "sections": {
+    "w1w_footer": {
+      "type": "w1w-footer",
+      "settings": {
+        "tagline": "Supplying technical collectibles for the most beautiful game. Engineered for the floodlit stage.",
+        "shop_heading": "Shop",
+        "support_heading": "Support",
+        "newsletter_heading": "Join the Ranks",
+        "newsletter_desc": "Get early access to drops and exclusive content.",
+        "email_placeholder": "Email address",
+        "submit_label": "Join",
+        "success_message": "Thanks for subscribing!",
+        "copyright_text": "© 2024 World 1 World. Engineered for the Floodlit Stage."
+      }
+    }
+  },
+  "order": [
+    "w1w_footer"
+  ]
+}

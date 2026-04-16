@@ -1,0 +1,97 @@
+{
+  "sections": {
+    "w1w_hero": {
+      "type": "w1w-hero",
+      "settings": {
+        "badge_text": "Stadium Midnight Edition",
+        "headline_line1": "WEAR YOUR",
+        "headline_line2": "COUNTRY.",
+        "subtext": "The global game, distilled onto your wrist. Premium technical collectibles engineered for the modern supporter.",
+        "primary_button_label": "Shop Collection",
+        "primary_button_link": "/collections/all",
+        "secondary_button_label": "The Story",
+        "secondary_button_link": "/pages/about"
+      }
+    },
+    "w1w_featured_products": {
+      "type": "w1w-featured-products",
+      "settings": {
+        "label": "New Arrivals",
+        "heading": "Featured Kit",
+        "view_all_label": "View All Nations",
+        "quick_add_label": "Quick Add"
+      }
+    },
+    "w1w_regions": {
+      "type": "w1w-regions",
+      "blocks": {
+        "region_europe": {
+          "type": "region",
+          "settings": {
+            "title": "Europe",
+            "subtitle": "Explore 24 Nations"
+          }
+        },
+        "region_south_america": {
+          "type": "region",
+          "settings": {
+            "title": "South America",
+            "subtitle": "The Core of Passion"
+          }
+        },
+        "region_africa": {
+          "type": "region",
+          "settings": {
+            "title": "Africa",
+            "subtitle": "Untamed Energy"
+          }
+        },
+        "region_asia": {
+          "type": "region",
+          "settings": {
+            "title": "Asia",
+            "subtitle": "The Rising Stars"
+          }
+        }
+      },
+      "block_order": [
+        "region_europe",
+        "region_south_america",
+        "region_africa",
+        "region_asia"
+      ],
+      "settings": {
+        "heading": "Explore Regions"
+      }
+    },
+    "w1w_lifestyle": {
+      "type": "w1w-lifestyle",
+      "settings": {
+        "heading": "Match Day Energy",
+        "subtext": "More than an accessory. It's a badge of honor for the 90 minutes and beyond.",
+        "button_label": "Live the game",
+        "button_link": "/collections/all"
+      }
+    },
+    "w1w_bento": {
+      "type": "w1w-bento",
+      "settings": {
+        "legacy_title": "The World Cup Legacy Series",
+        "legacy_desc": "Commemorating the greatest stages in football history.",
+        "legacy_cta": "Shop Legacy",
+        "legacy_link": "/collections/all",
+        "player_title": "Player Edition",
+        "player_desc": "Lightweight. Breathable. Pro-grade.",
+        "shipping_title": "Global Shipping",
+        "quality_title": "Elite Quality"
+      }
+    }
+  },
+  "order": [
+    "w1w_hero",
+    "w1w_featured_products",
+    "w1w_regions",
+    "w1w_lifestyle",
+    "w1w_bento"
+  ]
+}

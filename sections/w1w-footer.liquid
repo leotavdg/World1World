@@ -1,0 +1,399 @@
+<footer class="w1w-footer">
+  <div class="w1w-footer__inner">
+    <div class="w1w-footer__grid">
+
+      <div class="w1w-footer__brand">
+        <div class="w1w-footer__logo">{{ shop.name }}</div>
+        <p class="w1w-footer__tagline">{{ section.settings.tagline }}</p>
+        <div class="w1w-footer__social">
+          {%- if section.settings.instagram_url != blank -%}
+            <a href="{{ section.settings.instagram_url }}" class="w1w-footer__social-link" aria-label="Instagram" target="_blank" rel="noopener">
+              <span class="material-symbols-outlined">photo_camera</span>
+            </a>
+          {%- endif -%}
+          {%- if section.settings.twitter_url != blank -%}
+            <a href="{{ section.settings.twitter_url }}" class="w1w-footer__social-link" aria-label="Twitter / X" target="_blank" rel="noopener">
+              <span class="material-symbols-outlined">alternate_email</span>
+            </a>
+          {%- endif -%}
+          {%- if section.settings.tiktok_url != blank -%}
+            <a href="{{ section.settings.tiktok_url }}" class="w1w-footer__social-link" aria-label="TikTok" target="_blank" rel="noopener">
+              <span class="material-symbols-outlined">social_leaderboard</span>
+            </a>
+          {%- endif -%}
+        </div>
+      </div>
+
+      <div class="w1w-footer__links-wrap">
+        <div class="w1w-footer__links-col">
+          <h4 class="w1w-footer__col-heading">{{ section.settings.shop_heading }}</h4>
+          {%- if linklists[section.settings.shop_menu].links.size > 0 -%}
+            {%- for link in linklists[section.settings.shop_menu].links -%}
+              <a href="{{ link.url }}" class="w1w-footer__link">{{ link.title }}</a>
+            {%- endfor -%}
+          {%- else -%}
+            <a href="{{ routes.all_products_collection_url }}" class="w1w-footer__link">New Arrivals</a>
+            <a href="{{ routes.all_products_collection_url }}" class="w1w-footer__link">Best Sellers</a>
+            <a href="{{ routes.collections_url }}" class="w1w-footer__link">Sale</a>
+          {%- endif -%}
+        </div>
+        <div class="w1w-footer__links-col">
+          <h4 class="w1w-footer__col-heading">{{ section.settings.support_heading }}</h4>
+          {%- if linklists[section.settings.support_menu].links.size > 0 -%}
+            {%- for link in linklists[section.settings.support_menu].links -%}
+              <a href="{{ link.url }}" class="w1w-footer__link">{{ link.title }}</a>
+            {%- endfor -%}
+          {%- else -%}
+            <a href="/policies/shipping-policy" class="w1w-footer__link">Shipping</a>
+            <a href="/policies/refund-policy" class="w1w-footer__link">Returns</a>
+            <a href="/pages/faq" class="w1w-footer__link">FAQ</a>
+          {%- endif -%}
+        </div>
+      </div>
+
+      <div class="w1w-footer__newsletter">
+        <h4 class="w1w-footer__col-heading">{{ section.settings.newsletter_heading }}</h4>
+        <p class="w1w-footer__newsletter-desc">{{ section.settings.newsletter_desc }}</p>
+        {%- form 'customer', class: 'w1w-footer__form' -%}
+          <input type="hidden" name="contact[tags]" value="newsletter">
+          <div class="w1w-footer__form-row">
+            <input
+              type="email"
+              name="contact[email]"
+              class="w1w-footer__email-input"
+              placeholder="{{ section.settings.email_placeholder }}"
+              required
+              autocomplete="email"
+            >
+            <button type="submit" class="w1w-footer__submit">
+              {{ section.settings.submit_label }}
+            </button>
+          </div>
+          {%- if form.posted_successfully? -%}
+            <p class="w1w-footer__success">{{ section.settings.success_message }}</p>
+          {%- endif -%}
+        {%- endform -%}
+      </div>
+
+    </div>
+
+    <div class="w1w-footer__bottom">
+      <p class="w1w-footer__copyright">{{ section.settings.copyright_text | replace: '{year}', 'now' | date: '%Y' }}</p>
+      <div class="w1w-footer__bottom-links">
+        {%- for policy in shop.policies -%}
+          {%- if policy != blank -%}
+            <a href="{{ policy.url }}" class="w1w-footer__bottom-link">{{ policy.title }}</a>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+    </div>
+  </div>
+</footer>
+
+{% stylesheet %}
+  .w1w-footer {
+    background: #131313;
+    padding: 48px 0 0;
+    font-family: "Inter", sans-serif;
+  }
+  .w1w-footer__inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 48px;
+  }
+  .w1w-footer__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 48px;
+    padding-bottom: 48px;
+  }
+  .w1w-footer__logo {
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 1.125rem;
+    font-weight: 900;
+    color: #f3ffca;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    margin-bottom: 24px;
+  }
+  .w1w-footer__tagline {
+    color: #d4d4d4;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    max-width: 22rem;
+    margin: 0 0 24px;
+  }
+  .w1w-footer__social {
+    display: flex;
+    gap: 16px;
+  }
+  .w1w-footer__social-link {
+    color: #f3ffca;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+  }
+  .w1w-footer__social-link .material-symbols-outlined {
+    font-size: 1.5rem;
+  }
+  .w1w-footer__links-wrap {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
+  .w1w-footer__col-heading {
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin: 0 0 16px;
+  }
+  .w1w-footer__links-col {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .w1w-footer__link {
+    color: #d4d4d4;
+    text-decoration: none;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    transition: color 0.2s;
+  }
+  .w1w-footer__link:hover {
+    color: #f3ffca;
+  }
+  .w1w-footer__newsletter {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .w1w-footer__newsletter-desc {
+    color: #d4d4d4;
+    font-size: 0.875rem;
+    margin: 0 0 24px;
+    line-height: 1.5;
+  }
+  .w1w-footer__form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .w1w-footer__form-row {
+    display: flex;
+    background: #262626;
+    padding: 4px;
+  }
+  .w1w-footer__email-input {
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 12px 16px;
+    flex: 1;
+    outline: none;
+    font-family: "Inter", sans-serif;
+  }
+  .w1w-footer__email-input::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+  }
+  .w1w-footer__submit {
+    background: #f3ffca;
+    color: #516700;
+    border: none;
+    padding: 12px 24px;
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 700;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: background 0.2s;
+    white-space: nowrap;
+  }
+  .w1w-footer__submit:hover {
+    background: #cafd00;
+  }
+  .w1w-footer__success {
+    color: #f3ffca;
+    font-size: 0.75rem;
+    margin: 0;
+  }
+  .w1w-footer__bottom {
+    border-top: 1px solid rgba(73, 72, 71, 0.1);
+    padding: 32px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .w1w-footer__copyright {
+    color: #d4d4d4;
+    font-size: 0.625rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0;
+  }
+  .w1w-footer__bottom-links {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .w1w-footer__bottom-link {
+    color: #d4d4d4;
+    text-decoration: none;
+    font-size: 0.625rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    transition: color 0.2s;
+  }
+  .w1w-footer__bottom-link:hover {
+    color: #f3ffca;
+  }
+  @media (max-width: 990px) {
+    .w1w-footer__grid {
+      grid-template-columns: 1fr 1fr;
+    }
+    .w1w-footer__brand {
+      grid-column: span 2;
+    }
+    .w1w-footer__inner {
+      padding: 0 24px;
+    }
+  }
+  @media (max-width: 600px) {
+    .w1w-footer__grid {
+      grid-template-columns: 1fr;
+      gap: 32px;
+    }
+    .w1w-footer__brand {
+      grid-column: span 1;
+    }
+    .w1w-footer__bottom {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "W1W Footer",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Brand"
+    },
+    {
+      "type": "textarea",
+      "id": "tagline",
+      "label": "Tagline",
+      "default": "Supplying technical collectibles for the most beautiful game. Engineered for the floodlit stage."
+    },
+    {
+      "type": "header",
+      "content": "Social links"
+    },
+    {
+      "type": "url",
+      "id": "instagram_url",
+      "label": "Instagram URL"
+    },
+    {
+      "type": "url",
+      "id": "twitter_url",
+      "label": "Twitter / X URL"
+    },
+    {
+      "type": "url",
+      "id": "tiktok_url",
+      "label": "TikTok URL"
+    },
+    {
+      "type": "header",
+      "content": "Shop column"
+    },
+    {
+      "type": "text",
+      "id": "shop_heading",
+      "label": "Heading",
+      "default": "Shop"
+    },
+    {
+      "type": "link_list",
+      "id": "shop_menu",
+      "label": "Menu"
+    },
+    {
+      "type": "header",
+      "content": "Support column"
+    },
+    {
+      "type": "text",
+      "id": "support_heading",
+      "label": "Heading",
+      "default": "Support"
+    },
+    {
+      "type": "link_list",
+      "id": "support_menu",
+      "label": "Menu"
+    },
+    {
+      "type": "header",
+      "content": "Newsletter"
+    },
+    {
+      "type": "text",
+      "id": "newsletter_heading",
+      "label": "Heading",
+      "default": "Join the Ranks"
+    },
+    {
+      "type": "text",
+      "id": "newsletter_desc",
+      "label": "Description",
+      "default": "Get early access to drops and exclusive content."
+    },
+    {
+      "type": "text",
+      "id": "email_placeholder",
+      "label": "Email placeholder",
+      "default": "Email address"
+    },
+    {
+      "type": "text",
+      "id": "submit_label",
+      "label": "Submit button label",
+      "default": "Join"
+    },
+    {
+      "type": "text",
+      "id": "success_message",
+      "label": "Success message",
+      "default": "Thanks for subscribing!"
+    },
+    {
+      "type": "header",
+      "content": "Bottom bar"
+    },
+    {
+      "type": "text",
+      "id": "copyright_text",
+      "label": "Copyright text",
+      "default": "© 2024 World 1 World. Engineered for the Floodlit Stage."
+    }
+  ],
+  "presets": [
+    {
+      "name": "W1W Footer"
+    }
+  ]
+}
+{% endschema %}

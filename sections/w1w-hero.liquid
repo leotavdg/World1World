@@ -1,0 +1,277 @@
+<section class="w1w-hero">
+  <div class="w1w-hero__bg">
+    {%- if section.settings.bg_image != blank -%}
+      {{ section.settings.bg_image | image_url: width: 2000 | image_tag: loading: 'eager', class: 'w1w-hero__bg-img', alt: section.settings.bg_image.alt }}
+    {%- endif -%}
+    <div class="w1w-hero__bg-gradient"></div>
+  </div>
+  <div class="w1w-hero__inner">
+    <div class="w1w-hero__content">
+      {%- if section.settings.badge_text != blank -%}
+        <span class="w1w-hero__badge">{{ section.settings.badge_text }}</span>
+      {%- endif -%}
+      <h1 class="w1w-hero__headline">
+        {{ section.settings.headline_line1 }}<br>
+        <span class="w1w-hero__accent">{{ section.settings.headline_line2 }}</span>
+      </h1>
+      {%- if section.settings.subtext != blank -%}
+        <p class="w1w-hero__subtext">{{ section.settings.subtext }}</p>
+      {%- endif -%}
+      <div class="w1w-hero__actions">
+        {%- if section.settings.primary_button_label != blank -%}
+          <a href="{{ section.settings.primary_button_link }}" class="w1w-btn w1w-btn--primary">
+            {{ section.settings.primary_button_label }}
+          </a>
+        {%- endif -%}
+        {%- if section.settings.secondary_button_label != blank -%}
+          <a href="{{ section.settings.secondary_button_link }}" class="w1w-btn w1w-btn--secondary">
+            {{ section.settings.secondary_button_label }}
+          </a>
+        {%- endif -%}
+      </div>
+    </div>
+    {%- if section.settings.product_image != blank -%}
+      <div class="w1w-hero__product-wrap">
+        <div class="w1w-hero__product-glow"></div>
+        {{ section.settings.product_image | image_url: width: 800 | image_tag: loading: 'eager', class: 'w1w-hero__product-img', alt: section.settings.product_image.alt }}
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+{% stylesheet %}
+  .w1w-hero {
+    position: relative;
+    min-height: 900px;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    background: #000;
+  }
+  .w1w-hero__bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+  .w1w-hero__bg-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.4;
+    mix-blend-mode: luminosity;
+  }
+  .w1w-hero__bg-gradient {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, #0e0e0e 0%, transparent 60%);
+  }
+  .w1w-hero__inner {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: 1536px;
+    margin: 0 auto;
+    padding: 80px 48px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    align-items: center;
+  }
+  .w1w-hero__content {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+  .w1w-hero__badge {
+    display: inline-block;
+    padding: 4px 16px;
+    background: #f3ffca;
+    color: #516700;
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 10px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+  }
+  .w1w-hero__headline {
+    font-family: "Space Grotesk", sans-serif;
+    font-size: clamp(3.5rem, 8vw, 9rem);
+    font-weight: 900;
+    color: #fff;
+    line-height: 0.85;
+    letter-spacing: -0.03em;
+    text-shadow: 0 0 15px rgba(243, 255, 202, 0.3);
+    margin: 0;
+  }
+  .w1w-hero__accent {
+    color: #f3ffca;
+  }
+  .w1w-hero__subtext {
+    color: #adaaaa;
+    font-family: "Inter", sans-serif;
+    font-size: 1.125rem;
+    font-weight: 300;
+    line-height: 1.6;
+    max-width: 28rem;
+    margin: 0;
+  }
+  .w1w-hero__actions {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .w1w-btn {
+    display: inline-block;
+    padding: 20px 40px;
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 700;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    text-decoration: none;
+    transition: transform 0.2s, background 0.2s;
+    cursor: pointer;
+    border: none;
+  }
+  .w1w-btn--primary {
+    background: linear-gradient(to bottom, #f3ffca, #cafd00);
+    color: #516700;
+  }
+  .w1w-btn--primary:hover {
+    transform: scale(1.05);
+  }
+  .w1w-btn--secondary {
+    background: #262626;
+    color: #f3ffca;
+    border: 1px solid rgba(243, 255, 202, 0.2);
+  }
+  .w1w-btn--secondary:hover {
+    background: #333;
+  }
+  .w1w-hero__product-wrap {
+    position: relative;
+  }
+  .w1w-hero__product-glow {
+    position: absolute;
+    inset: -40px;
+    background: rgba(243, 255, 202, 0.1);
+    filter: blur(100px);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .w1w-hero__product-img {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    border-radius: 4px;
+    transform: rotate(3deg);
+    transition: transform 0.7s;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+  }
+  .w1w-hero__product-wrap:hover .w1w-hero__product-img {
+    transform: rotate(0deg);
+  }
+  @media (max-width: 990px) {
+    .w1w-hero__inner {
+      grid-template-columns: 1fr;
+      padding: 60px 24px;
+      min-height: auto;
+    }
+    .w1w-hero__product-wrap {
+      display: none;
+    }
+    .w1w-hero {
+      min-height: 700px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "W1W Hero",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Background"
+    },
+    {
+      "type": "image_picker",
+      "id": "bg_image",
+      "label": "Background image"
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "badge_text",
+      "label": "Badge text",
+      "default": "Stadium Midnight Edition"
+    },
+    {
+      "type": "text",
+      "id": "headline_line1",
+      "label": "Headline line 1",
+      "default": "WEAR YOUR"
+    },
+    {
+      "type": "text",
+      "id": "headline_line2",
+      "label": "Headline line 2 (accent color)",
+      "default": "COUNTRY."
+    },
+    {
+      "type": "textarea",
+      "id": "subtext",
+      "label": "Subtext",
+      "default": "The global game, distilled onto your wrist. Premium technical collectibles engineered for the modern supporter."
+    },
+    {
+      "type": "header",
+      "content": "Primary button"
+    },
+    {
+      "type": "text",
+      "id": "primary_button_label",
+      "label": "Label",
+      "default": "Shop Collection"
+    },
+    {
+      "type": "url",
+      "id": "primary_button_link",
+      "label": "Link"
+    },
+    {
+      "type": "header",
+      "content": "Secondary button"
+    },
+    {
+      "type": "text",
+      "id": "secondary_button_label",
+      "label": "Label",
+      "default": "The Story"
+    },
+    {
+      "type": "url",
+      "id": "secondary_button_link",
+      "label": "Link"
+    },
+    {
+      "type": "header",
+      "content": "Product image (right side)"
+    },
+    {
+      "type": "image_picker",
+      "id": "product_image",
+      "label": "Product image"
+    }
+  ],
+  "presets": [
+    {
+      "name": "W1W Hero"
+    }
+  ]
+}
+{% endschema %}
