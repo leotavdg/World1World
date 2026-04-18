@@ -1,6 +1,4 @@
-{%- assign img_left = section.settings.image_position == 'left' -%}
-
-<section class="w1w-sc {% if img_left %}w1w-sc--img-left{% else %}w1w-sc--img-right{% endif %}">
+<section class="w1w-sc {% if section.settings.image_position == 'left' %}w1w-sc--img-left{% else %}w1w-sc--img-right{% endif %}">
   <div class="w1w-sc__inner">
 
     <div class="w1w-sc__media">
