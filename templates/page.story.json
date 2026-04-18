@@ -1,0 +1,84 @@
+{
+  "sections": {
+    "story-hero": {
+      "type": "w1w-story-hero",
+      "settings": {
+        "eyebrow": "Our Story",
+        "headline_line1": "One World.",
+        "headline_line2": "One Game.",
+        "subtext": "Born from the terraces. Built for every nation. World1World is the accessory that travels as far as the beautiful game itself.",
+        "scroll_label": "Scroll"
+      }
+    },
+    "chapter-origin": {
+      "type": "w1w-story-chapter",
+      "settings": {
+        "chapter_label": "01 — Origin",
+        "heading": "Born on the Terraces",
+        "body": "<p>Every great movement starts with a single moment of clarity. Ours came during the 2022 World Cup — watching fans from every corner of the planet wave their colors with unmatched pride.</p><p>We asked ourselves: what if that pride could travel on your wrist every single day?</p>",
+        "image_position": "right"
+      }
+    },
+    "story-values": {
+      "type": "w1w-story-values",
+      "settings": {
+        "eyebrow": "What We Stand For",
+        "heading": "Built on Three Pillars",
+        "subtext": "Every decision we make — from materials to markets — comes back to these core beliefs."
+      },
+      "blocks": {
+        "value-1": {
+          "type": "value",
+          "settings": {
+            "icon": "globe",
+            "title": "Global Community",
+            "description": "Football is the world's language. We make something every fan on every continent can wear with pride."
+          }
+        },
+        "value-2": {
+          "type": "value",
+          "settings": {
+            "icon": "star",
+            "title": "Elite Craft",
+            "description": "Pro-grade paracord. Military-spec hardware. Every bead and knot engineered to outlast the season."
+          }
+        },
+        "value-3": {
+          "type": "value",
+          "settings": {
+            "icon": "bolt",
+            "title": "Match Day Energy",
+            "description": "We don't make jewelry. We make fuel — the wristband you put on before kick-off and never take off."
+          }
+        }
+      },
+      "block_order": ["value-1", "value-2", "value-3"]
+    },
+    "chapter-craft": {
+      "type": "w1w-story-chapter",
+      "settings": {
+        "chapter_label": "02 — The Craft",
+        "heading": "Engineered for the Game",
+        "body": "<p>We obsessed over every millimeter. Military-grade 550 paracord, stainless steel hardware, and color palettes pulled directly from national kits — every World1World bracelet is built to last from the opening whistle to the final tournament.</p><p>Stack them. Mix them. Wear your lineage on your wrist.</p>",
+        "cta_label": "Shop the Collection",
+        "image_position": "left"
+      }
+    },
+    "story-manifesto": {
+      "type": "w1w-story-manifesto",
+      "settings": {
+        "kicker": "The Manifesto",
+        "quote": "The game belongs to everyone. So does the kit. $5 a nation. Stack your squad. Wear the world.",
+        "attribution": "World1World, Est. 2024",
+        "cta_label": "Shop the Collection"
+      }
+    }
+  },
+  "order": [
+    "story-hero",
+    "chapter-origin",
+    "story-values",
+    "chapter-craft",
+    "story-manifesto"
+  ]
+}

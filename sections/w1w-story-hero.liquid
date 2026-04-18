@@ -1,0 +1,230 @@
+<section class="w1w-sh" id="w1wStoryHero">
+  <div class="w1w-sh__bg" id="w1wStoryHeroBg">
+    {%- if section.settings.bg_image != blank -%}
+      {{ section.settings.bg_image | image_url: width: 2400 | image_tag: loading: 'eager', class: 'w1w-sh__bg-img', alt: section.settings.bg_image.alt }}
+    {%- endif -%}
+    <div class="w1w-sh__overlay"></div>
+    <div class="w1w-sh__vignette"></div>
+  </div>
+
+  <div class="w1w-sh__inner">
+    {%- if section.settings.eyebrow != blank -%}
+      <span class="w1w-sh__eyebrow">{{ section.settings.eyebrow }}</span>
+    {%- endif -%}
+
+    <h1 class="w1w-sh__headline">
+      {%- if section.settings.headline_line1 != blank -%}
+        {{ section.settings.headline_line1 }}<br>
+      {%- endif -%}
+      {%- if section.settings.headline_line2 != blank -%}
+        <em class="w1w-sh__accent">{{ section.settings.headline_line2 }}</em>
+      {%- endif -%}
+    </h1>
+
+    {%- if section.settings.subtext != blank -%}
+      <p class="w1w-sh__subtext">{{ section.settings.subtext }}</p>
+    {%- endif -%}
+  </div>
+
+  <div class="w1w-sh__scroll" aria-hidden="true">
+    {%- if section.settings.scroll_label != blank -%}
+      <span class="w1w-sh__scroll-label">{{ section.settings.scroll_label }}</span>
+    {%- endif -%}
+    <div class="w1w-sh__scroll-line"></div>
+  </div>
+</section>
+
+<script>
+(function () {
+  var bg = document.getElementById('w1wStoryHeroBg');
+  if (!bg) return;
+  window.addEventListener('scroll', function () {
+    var y = window.scrollY;
+    if (y < 1400) bg.style.transform = 'translateY(' + (y * 0.18) + 'px)';
+  }, { passive: true });
+})();
+</script>
+
+{% stylesheet %}
+  .w1w-sh {
+    position: relative;
+    min-height: clamp(700px, 96vh, 1080px);
+    overflow: hidden;
+    background: #060606;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    isolation: isolate;
+  }
+
+  /* Background */
+  .w1w-sh__bg {
+    position: absolute;
+    inset: 0;
+    will-change: transform;
+    z-index: 0;
+  }
+  .w1w-sh__bg-img {
+    width: 100%;
+    height: 115%;
+    object-fit: cover;
+    display: block;
+    opacity: 0.5;
+    mix-blend-mode: luminosity;
+  }
+  .w1w-sh__overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(6, 6, 6, 0.55);
+  }
+  .w1w-sh__vignette {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 70% 50% at 50% 50%, transparent 40%, rgba(6, 6, 6, 0.85) 100%),
+      linear-gradient(0deg, #060606 0%, transparent 30%, transparent 70%, #060606 100%);
+  }
+
+  /* Content */
+  .w1w-sh__inner {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    max-width: 1000px;
+    padding: 0 clamp(24px, 5vw, 80px);
+    padding-top: 120px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+  .w1w-sh__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: #f3ffca;
+    margin-bottom: 32px;
+  }
+  .w1w-sh__eyebrow::before,
+  .w1w-sh__eyebrow::after {
+    content: '';
+    display: block;
+    width: 32px;
+    height: 1px;
+    background: #f3ffca;
+    opacity: 0.5;
+  }
+  .w1w-sh__headline {
+    font-family: "Space Grotesk", sans-serif;
+    font-size: clamp(56px, 11vw, 160px);
+    font-weight: 900;
+    color: #fff;
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+    text-transform: uppercase;
+    margin: 0 0 40px;
+  }
+  .w1w-sh__accent {
+    font-style: italic;
+    color: #f3ffca;
+  }
+  .w1w-sh__subtext {
+    font-family: "Inter", sans-serif;
+    font-size: clamp(1rem, 2vw, 1.25rem);
+    color: rgba(255, 255, 255, 0.65);
+    font-weight: 300;
+    line-height: 1.7;
+    max-width: 560px;
+    margin: 0;
+  }
+
+  /* Scroll indicator */
+  .w1w-sh__scroll {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+  .w1w-sh__scroll-label {
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.35);
+  }
+  .w1w-sh__scroll-line {
+    width: 1px;
+    height: 48px;
+    background: linear-gradient(180deg, rgba(243, 255, 202, 0.6), transparent);
+    animation: w1w-sh-scrollPulse 2s ease-in-out infinite;
+  }
+  @keyframes w1w-sh-scrollPulse {
+    0%, 100% { opacity: 0.4; transform: scaleY(1); }
+    50% { opacity: 1; transform: scaleY(1.15); }
+  }
+
+  @media (max-width: 768px) {
+    .w1w-sh__inner { padding-top: 80px; }
+    .w1w-sh__scroll { bottom: 24px; }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "W1W Story Hero",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "bg_image",
+      "label": "Background image"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow label",
+      "default": "Our Story"
+    },
+    {
+      "type": "text",
+      "id": "headline_line1",
+      "label": "Headline line 1",
+      "default": "One World."
+    },
+    {
+      "type": "text",
+      "id": "headline_line2",
+      "label": "Headline line 2 (accent + italic)",
+      "default": "One Game."
+    },
+    {
+      "type": "textarea",
+      "id": "subtext",
+      "label": "Subtext",
+      "default": "Born from the terraces. Built for every nation. World1World is the accessory that travels as far as the beautiful game itself."
+    },
+    {
+      "type": "text",
+      "id": "scroll_label",
+      "label": "Scroll indicator label",
+      "default": "Scroll"
+    }
+  ],
+  "presets": [
+    {
+      "name": "W1W Story Hero"
+    }
+  ]
+}
+{% endschema %}

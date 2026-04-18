@@ -1,0 +1,241 @@
+<section class="w1w-sm">
+  {%- if section.settings.bg_image != blank -%}
+    <div class="w1w-sm__bg">
+      {{ section.settings.bg_image | image_url: width: 2000 | image_tag: loading: 'lazy', class: 'w1w-sm__bg-img', alt: section.settings.bg_image.alt }}
+      <div class="w1w-sm__bg-overlay"></div>
+    </div>
+  {%- endif -%}
+
+  <div class="w1w-sm__inner">
+    {%- if section.settings.kicker != blank -%}
+      <span class="w1w-sm__kicker">{{ section.settings.kicker }}</span>
+    {%- endif -%}
+
+    {%- if section.settings.quote != blank -%}
+      <blockquote class="w1w-sm__quote">
+        <span class="w1w-sm__quote-mark" aria-hidden="true">"</span>
+        {{ section.settings.quote }}
+      </blockquote>
+    {%- endif -%}
+
+    {%- if section.settings.attribution != blank -%}
+      <p class="w1w-sm__attribution">— {{ section.settings.attribution }}</p>
+    {%- endif -%}
+
+    {%- if section.settings.cta_label != blank -%}
+      <div class="w1w-sm__actions">
+        <a href="{{ section.settings.cta_link }}" class="w1w-btn w1w-btn--primary w1w-btn--lg">
+          {{ section.settings.cta_label }}
+        </a>
+        {%- if section.settings.secondary_label != blank -%}
+          <a href="{{ section.settings.secondary_link }}" class="w1w-btn w1w-btn--ghost w1w-btn--lg">
+            {{ section.settings.secondary_label }}
+          </a>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+{% stylesheet %}
+  .w1w-sm {
+    position: relative;
+    background: #060606;
+    padding: 140px 0;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .w1w-sm__bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+  .w1w-sm__bg-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    opacity: 0.3;
+    mix-blend-mode: luminosity;
+  }
+  .w1w-sm__bg-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, #060606 0%, rgba(6, 6, 6, 0.55) 40%, rgba(6, 6, 6, 0.55) 60%, #060606 100%);
+  }
+  .w1w-sm__inner {
+    position: relative;
+    z-index: 2;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 clamp(24px, 5vw, 80px);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+  .w1w-sm__kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: #f3ffca;
+    margin-bottom: 48px;
+    opacity: 0.7;
+  }
+  .w1w-sm__kicker::before,
+  .w1w-sm__kicker::after {
+    content: '';
+    display: block;
+    width: 48px;
+    height: 1px;
+    background: #f3ffca;
+    opacity: 0.4;
+  }
+  .w1w-sm__quote {
+    font-family: "Space Grotesk", sans-serif;
+    font-size: clamp(1.75rem, 4.5vw, 3.25rem);
+    font-weight: 700;
+    font-style: italic;
+    color: #fff;
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+    margin: 0 0 32px;
+    position: relative;
+  }
+  .w1w-sm__quote-mark {
+    position: absolute;
+    top: -0.4em;
+    left: -0.25em;
+    font-size: 5em;
+    color: #f3ffca;
+    opacity: 0.08;
+    font-style: normal;
+    line-height: 1;
+    pointer-events: none;
+    user-select: none;
+  }
+  .w1w-sm__attribution {
+    font-family: "Inter", sans-serif;
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.35);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin: 0 0 56px;
+  }
+  .w1w-sm__actions {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 8px;
+  }
+
+  /* Shared button styles (mirrors w1w-hero) */
+  .w1w-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 18px 32px;
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    border: 1px solid transparent;
+    transition: transform 0.12s ease, background 0.18s ease, border-color 0.18s ease, color 0.18s ease, filter 0.18s ease;
+    cursor: pointer;
+    white-space: nowrap;
+    text-decoration: none;
+  }
+  .w1w-btn:active { transform: translateY(1px); }
+  .w1w-btn--primary {
+    background: linear-gradient(180deg, #f3ffca 0%, #cafd00 100%);
+    color: #516700;
+  }
+  .w1w-btn--primary:hover { filter: brightness(1.05); }
+  .w1w-btn--ghost {
+    background: #262626;
+    border-color: rgba(243, 255, 202, 0.2);
+    color: #f3ffca;
+  }
+  .w1w-btn--ghost:hover { border-color: #f3ffca; }
+  .w1w-btn--lg { padding: 22px 44px; font-size: 14px; letter-spacing: 0.14em; }
+
+  @media (max-width: 600px) {
+    .w1w-sm { padding: 96px 0; }
+    .w1w-sm__actions { flex-direction: column; width: 100%; }
+    .w1w-sm__actions .w1w-btn { width: 100%; }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "W1W Story Manifesto",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "bg_image",
+      "label": "Background image (optional)"
+    },
+    {
+      "type": "text",
+      "id": "kicker",
+      "label": "Kicker label",
+      "default": "The Manifesto"
+    },
+    {
+      "type": "textarea",
+      "id": "quote",
+      "label": "Quote / manifesto text",
+      "default": "The game belongs to everyone. So does the kit. $5 a nation. Stack your squad. Wear the world."
+    },
+    {
+      "type": "text",
+      "id": "attribution",
+      "label": "Attribution",
+      "default": "World1World, Est. 2024"
+    },
+    {
+      "type": "header",
+      "content": "Primary CTA"
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "Button label",
+      "default": "Shop the Collection"
+    },
+    {
+      "type": "url",
+      "id": "cta_link",
+      "label": "Button link"
+    },
+    {
+      "type": "header",
+      "content": "Secondary CTA"
+    },
+    {
+      "type": "text",
+      "id": "secondary_label",
+      "label": "Button label"
+    },
+    {
+      "type": "url",
+      "id": "secondary_link",
+      "label": "Button link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "W1W Story Manifesto"
+    }
+  ]
+}
+{% endschema %}
