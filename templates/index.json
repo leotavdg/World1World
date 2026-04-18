@@ -1,35 +1,41 @@
-/*
- * ------------------------------------------------------------
- * IMPORTANT: The contents of this file are auto-generated.
- *
- * This file may be updated by the Shopify admin theme editor
- * or related systems. Please exercise caution as any changes
- * made to this file may be overwritten.
- * ------------------------------------------------------------
- */
 {
   "sections": {
     "w1w_hero": {
       "type": "w1w-hero",
       "settings": {
         "bg_image": "shopify://shop_images/220831_Eagle_SeatingBowl_InternalView.jpg",
-        "badge_text": "Stadium Midnight Edition",
+        "badge_text": "Stadium Midnight Edition · Drop 03",
         "headline_line1": "WEAR YOUR",
         "headline_line2": "COUNTRY.",
-        "subtext": "The global game, distilled onto your wrist. Premium technical collectibles engineered for the modern supporter.",
+        "subtext": "The global game, distilled onto your wrist. Paracord collectibles engineered for the modern supporter — $5 a nation, stack the squad.",
         "primary_button_label": "Shop Collection",
         "primary_button_link": "/collections/all",
         "secondary_button_label": "The Story",
-        "secondary_button_link": "/pages/about"
+        "secondary_button_link": "/pages/about",
+        "corner_tl": "N° 2026",
+        "corner_br": "$5 · 50+ NATIONS",
+        "stat1_label": "50+ Nations",
+        "stat1_value": "6 Confederations",
+        "stat2_label": "Ship Worldwide",
+        "stat2_value": "73 Countries",
+        "stat3_label": "Kick-Off",
+        "stat3_value": "June 11, 2026"
+      }
+    },
+    "w1w_marquee_1": {
+      "type": "w1w-marquee",
+      "settings": {
+        "text": "WEAR YOUR COUNTRY",
+        "style": "primary"
       }
     },
     "w1w_featured_products": {
       "type": "w1w-featured-products",
       "settings": {
-        "label": "New Arrivals",
-        "heading": "Featured Kit",
+        "label": "New Arrivals · Drop 03",
+        "heading": "FEATURED KIT",
         "collection": "",
-        "view_all_label": "View All Nations",
+        "view_all_label": "VIEW ALL 50 NATIONS",
         "quick_add_label": "Quick Add"
       }
     },
@@ -41,7 +47,11 @@
           "settings": {
             "image": "shopify://shop_images/Europe.jpg",
             "title": "Europe",
-            "subtitle": "Explore 24 Nations"
+            "tag": "THE ENGINE",
+            "confederation": "UEFA",
+            "blurb": "Tactical, technical, relentless. The modern machine.",
+            "nations_count": "16",
+            "editions_count": "16"
           }
         },
         "region_south_america": {
@@ -49,7 +59,11 @@
           "settings": {
             "image": "shopify://shop_images/statue-Christ-the-Redeemer-Rio-de-Janiero-Brazil.webp",
             "title": "South America",
-            "subtitle": "The Core of Passion"
+            "tag": "THE CORE",
+            "confederation": "CONMEBOL",
+            "blurb": "Where the game was perfected. Pure rhythm.",
+            "nations_count": "6",
+            "editions_count": "6"
           }
         },
         "region_rJgETK": {
@@ -57,7 +71,11 @@
           "settings": {
             "image": "shopify://shop_images/New-York-City-USA.jpg",
             "title": "North America",
-            "subtitle": "Explore 24 Nations"
+            "tag": "HOSTS",
+            "confederation": "CONCACAF",
+            "blurb": "Home soil. The continent that lifts the curtain.",
+            "nations_count": "6",
+            "editions_count": "6"
           }
         },
         "region_africa": {
@@ -65,7 +83,11 @@
           "settings": {
             "image": "shopify://shop_images/Moroccan-Landmarks.jpg",
             "title": "Africa",
-            "subtitle": "Untamed Energy"
+            "tag": "UNTAMED",
+            "confederation": "CAF",
+            "blurb": "Raw speed. Rising force. Nothing fears nothing.",
+            "nations_count": "9",
+            "editions_count": "9"
           }
         },
         "region_asia": {
@@ -73,15 +95,23 @@
           "settings": {
             "image": "shopify://shop_images/japan-1200x729.jpg",
             "title": "Asia",
-            "subtitle": "The Rising Stars"
+            "tag": "RISING",
+            "confederation": "AFC",
+            "blurb": "Discipline meets dream. The fastest-climbing continent.",
+            "nations_count": "9",
+            "editions_count": "9"
           }
         },
         "region_aKGmhR": {
           "type": "region",
           "settings": {
             "image": "shopify://shop_images/Circular-Quay_Charlotte-Karp.jpg",
-            "title": "Australia",
-            "subtitle": "Explore 24 Nations"
+            "title": "Oceania",
+            "tag": "FRONTIER",
+            "confederation": "OFC",
+            "blurb": "The long journey. Every tournament earned twice over.",
+            "nations_count": "1",
+            "editions_count": "1"
           }
         }
       },
@@ -94,28 +124,44 @@
         "region_aKGmhR"
       ],
       "settings": {
-        "heading": "Explore Regions"
+        "heading": "EXPLORE REGIONS",
+        "description": "Every confederation represented. Pick a continent, pick a side."
       }
     },
     "w1w_lifestyle": {
       "type": "w1w-lifestyle",
       "settings": {
         "bg_image": "shopify://shop_images/68b1d9a4d5f914.63315648.webp",
-        "heading": "Match Day Energy",
-        "subtext": "More than an accessory. It's a badge of honor for the 90 minutes and beyond.",
-        "button_label": "Live the game",
-        "button_link": "/collections/all"
+        "heading": "MATCH DAY ENERGY.",
+        "subtext": "More than an accessory. A badge of honor for the 90 minutes and beyond.",
+        "button_label": "Live the Game",
+        "button_link": "/collections/all",
+        "sb1_label": "Kit",
+        "sb1_value": "W1W",
+        "sb2_label": "Price",
+        "sb2_value": "$5",
+        "sb3_label": "Stack",
+        "sb3_value": "3+",
+        "sb4_label": "Ships",
+        "sb4_value": "24H"
+      }
+    },
+    "w1w_marquee_2": {
+      "type": "w1w-marquee",
+      "settings": {
+        "text": "CANADA · MEXICO · USA  ·  ARGENTINA · BRAZIL · URUGUAY  ·  ENGLAND · FRANCE · GERMANY  ·  FOR THE BEAUTIFUL GAME",
+        "style": "secondary"
       }
     },
     "w1w_bento": {
       "type": "w1w-bento",
       "settings": {
         "legacy_title": "The World Cup Legacy Series",
-        "legacy_desc": "Commemorating the greatest stages in football history.",
-        "legacy_cta": "Shop Legacy",
+        "legacy_desc": "Commemorating the greatest stages in football history. Every winning nation, every final — one continuous thread.",
+        "legacy_cta": "Shop Legacy →",
         "legacy_link": "/collections/all",
         "player_title": "Player Edition",
-        "player_desc": "Lightweight. Breathable. Pro-grade.",
+        "player_desc": "Lightweight. Breathable. Pro-grade paracord built for on-field wear.",
         "shipping_title": "Global Shipping",
         "quality_title": "Elite Quality"
       }
@@ -123,9 +169,11 @@
   },
   "order": [
     "w1w_hero",
+    "w1w_marquee_1",
     "w1w_featured_products",
     "w1w_regions",
     "w1w_lifestyle",
+    "w1w_marquee_2",
     "w1w_bento"
   ]
 }

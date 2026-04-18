@@ -3,13 +3,17 @@
     <div class="w1w-products__header">
       <div>
         {%- if section.settings.label != blank -%}
-          <span class="w1w-products__label">{{ section.settings.label }}</span>
+          <span class="w1w-eyebrow" style="margin-bottom:12px;display:block">{{ section.settings.label }}</span>
         {%- endif -%}
         <h2 class="w1w-products__heading">{{ section.settings.heading }}</h2>
       </div>
-      {%- if section.settings.view_all_label != blank and section.settings.collection != blank -%}
-        <a href="{{ section.settings.collection.url }}" class="w1w-products__view-all">
-          {{ section.settings.view_all_label }}
+      {%- assign view_all_url = '/collections/all' -%}
+      {%- if section.settings.collection != blank -%}
+        {%- assign view_all_url = section.settings.collection.url -%}
+      {%- endif -%}
+      {%- if section.settings.view_all_label != blank -%}
+        <a href="{{ view_all_url }}" class="w1w-btn w1w-btn--outline">
+          {{ section.settings.view_all_label }} →
         </a>
       {%- endif -%}
     </div>
@@ -27,6 +31,10 @@
                   {{ 'product-1' | placeholder_svg_tag: 'w1w-product-card__img w1w-product-card__img--placeholder' }}
                 </a>
               {%- endif -%}
+              <span class="w1w-product-card__badge">
+                {%- if product.tags contains 'featured' -%}FEATURED
+                {%- else -%}NEW{%- endif -%}
+              </span>
               <div class="w1w-product-card__overlay"></div>
               <button class="w1w-product-card__quick-add" data-product-id="{{ product.variants.first.id }}" aria-label="Quick add {{ product.title | escape }}">
                 {{ section.settings.quick_add_label }}
@@ -71,10 +79,10 @@
 
 {% stylesheet %}
   .w1w-products {
-    padding: 96px 0;
-    background: #0e0e0e;
-    background-image: radial-gradient(rgba(243, 255, 202, 0.05) 1px, transparent 1px);
-    background-size: 40px 40px;
+    padding: 120px 0;
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(243, 255, 202, 0.04), transparent 40%),
+      #0e0e0e;
   }
   .w1w-products__inner {
     max-width: 1536px;
@@ -106,22 +114,24 @@
     text-transform: uppercase;
     margin: 0;
   }
-  .w1w-products__view-all {
-    color: #f3ffca;
+  .w1w-product-card__badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    padding: 4px 8px;
+    background: #f3ffca;
+    color: #516700;
     font-family: "Space Grotesk", sans-serif;
-    font-size: 0.875rem;
     font-weight: 700;
+    font-size: 10px;
+    letter-spacing: 0.2em;
     text-transform: uppercase;
-    letter-spacing: 0.15em;
-    text-decoration: none;
-    border-bottom: 1px solid #f3ffca;
-    padding-bottom: 4px;
-    white-space: nowrap;
+    z-index: 1;
   }
   .w1w-products__grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 24px 24px;
+    gap: 8px;
   }
   .w1w-product-card {
     display: flex;

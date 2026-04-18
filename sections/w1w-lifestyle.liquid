@@ -15,6 +15,39 @@
         {{ section.settings.button_label }}
       </a>
     {%- endif -%}
+
+    {%- assign has_scoreboard = false -%}
+    {%- if section.settings.sb1_label != blank or section.settings.sb2_label != blank or section.settings.sb3_label != blank or section.settings.sb4_label != blank -%}
+      {%- assign has_scoreboard = true -%}
+    {%- endif -%}
+    {%- if has_scoreboard -%}
+      <div class="w1w-scoreboard">
+        {%- if section.settings.sb1_label != blank -%}
+          <div class="w1w-sb-cell">
+            <span class="w1w-sb-cell__k">{{ section.settings.sb1_label }}</span>
+            <span class="w1w-sb-cell__v">{{ section.settings.sb1_value }}</span>
+          </div>
+        {%- endif -%}
+        {%- if section.settings.sb2_label != blank -%}
+          <div class="w1w-sb-cell">
+            <span class="w1w-sb-cell__k">{{ section.settings.sb2_label }}</span>
+            <span class="w1w-sb-cell__v">{{ section.settings.sb2_value }}</span>
+          </div>
+        {%- endif -%}
+        {%- if section.settings.sb3_label != blank -%}
+          <div class="w1w-sb-cell">
+            <span class="w1w-sb-cell__k">{{ section.settings.sb3_label }}</span>
+            <span class="w1w-sb-cell__v">{{ section.settings.sb3_value }}</span>
+          </div>
+        {%- endif -%}
+        {%- if section.settings.sb4_label != blank -%}
+          <div class="w1w-sb-cell">
+            <span class="w1w-sb-cell__k">{{ section.settings.sb4_label }}</span>
+            <span class="w1w-sb-cell__v">{{ section.settings.sb4_value }}</span>
+          </div>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
   </div>
 </section>
 
@@ -91,12 +124,49 @@
   .w1w-lifestyle__btn:hover {
     transform: scale(1.1);
   }
+  /* Scoreboard */
+  .w1w-scoreboard {
+    display: inline-flex;
+    gap: 2px;
+    margin-top: 48px;
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 700;
+  }
+  .w1w-sb-cell {
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    padding: 16px 24px;
+    border: 1px solid rgba(243, 255, 202, 0.15);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .w1w-sb-cell__k {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: #737373;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 4px;
+  }
+  .w1w-sb-cell__v {
+    font-size: 32px;
+    letter-spacing: -0.02em;
+    color: #f3ffca;
+    display: block;
+  }
+
   @media (max-width: 768px) {
     .w1w-lifestyle {
       min-height: 600px;
     }
     .w1w-lifestyle__content {
       padding: 0 24px;
+    }
+    .w1w-scoreboard {
+      flex-wrap: wrap;
+      justify-content: center;
     }
   }
 {% endstylesheet %}
@@ -132,6 +202,58 @@
       "type": "url",
       "id": "button_link",
       "label": "Button link"
+    },
+    {
+      "type": "header",
+      "content": "Scoreboard stats"
+    },
+    {
+      "type": "text",
+      "id": "sb1_label",
+      "label": "Stat 1 label",
+      "default": "Kit"
+    },
+    {
+      "type": "text",
+      "id": "sb1_value",
+      "label": "Stat 1 value",
+      "default": "W1W"
+    },
+    {
+      "type": "text",
+      "id": "sb2_label",
+      "label": "Stat 2 label",
+      "default": "Price"
+    },
+    {
+      "type": "text",
+      "id": "sb2_value",
+      "label": "Stat 2 value",
+      "default": "$5"
+    },
+    {
+      "type": "text",
+      "id": "sb3_label",
+      "label": "Stat 3 label",
+      "default": "Stack"
+    },
+    {
+      "type": "text",
+      "id": "sb3_value",
+      "label": "Stat 3 value",
+      "default": "3+"
+    },
+    {
+      "type": "text",
+      "id": "sb4_label",
+      "label": "Stat 4 label",
+      "default": "Ships"
+    },
+    {
+      "type": "text",
+      "id": "sb4_value",
+      "label": "Stat 4 value",
+      "default": "24H"
     }
   ],
   "presets": [

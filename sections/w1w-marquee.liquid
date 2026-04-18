@@ -1,0 +1,81 @@
+<div class="w1w-strip w1w-strip--{{ section.settings.style }}">
+  <div class="w1w-strip__track">
+    {%- for i in (1..8) -%}
+      <span>{{ section.settings.text }}</span>
+    {%- endfor -%}
+  </div>
+</div>
+
+{% stylesheet %}
+  .w1w-strip {
+    border-top: 1px solid rgba(243, 255, 202, 0.12);
+    border-bottom: 1px solid rgba(243, 255, 202, 0.12);
+    padding: 18px 0;
+    overflow: hidden;
+    background: #0e0e0e;
+    white-space: nowrap;
+  }
+  .w1w-strip__track {
+    display: inline-flex;
+    gap: 48px;
+    animation: w1w-ticker 50s linear infinite;
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 700;
+    font-size: clamp(24px, 3vw, 40px);
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    color: #fff;
+  }
+  .w1w-strip--secondary .w1w-strip__track {
+    animation-direction: reverse;
+    animation-duration: 60s;
+    color: #737373;
+  }
+  .w1w-strip__track span {
+    display: inline-flex;
+    align-items: center;
+    gap: 48px;
+    flex-shrink: 0;
+  }
+  .w1w-strip__track span::after {
+    content: '●';
+    color: #f3ffca;
+    font-size: 12px;
+  }
+  .w1w-strip--secondary .w1w-strip__track span::after {
+    color: #737373;
+  }
+  @keyframes w1w-ticker {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "W1W Marquee Strip",
+  "settings": [
+    {
+      "type": "text",
+      "id": "text",
+      "label": "Text",
+      "default": "WEAR YOUR COUNTRY"
+    },
+    {
+      "type": "select",
+      "id": "style",
+      "label": "Style",
+      "options": [
+        { "value": "primary", "label": "Primary (white, forward)" },
+        { "value": "secondary", "label": "Secondary (dim, reverse)" }
+      ],
+      "default": "primary"
+    }
+  ],
+  "presets": [
+    {
+      "name": "W1W Marquee Strip"
+    }
+  ]
+}
+{% endschema %}

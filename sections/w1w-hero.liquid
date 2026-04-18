@@ -1,10 +1,13 @@
-<section class="w1w-hero">
-  <div class="w1w-hero__bg">
+<section class="w1w-hero" id="w1wHero">
+  <div class="w1w-hero__bg" id="w1wHeroBg">
     {%- if section.settings.bg_image != blank -%}
       {{ section.settings.bg_image | image_url: width: 2000 | image_tag: loading: 'eager', class: 'w1w-hero__bg-img', alt: section.settings.bg_image.alt }}
     {%- endif -%}
     <div class="w1w-hero__bg-gradient"></div>
   </div>
+  <div class="w1w-hero__flood"></div>
+  <div class="w1w-hero__smoke"></div>
+
   <div class="w1w-hero__inner">
     <div class="w1w-hero__content">
       {%- if section.settings.badge_text != blank -%}
@@ -19,172 +22,320 @@
       {%- endif -%}
       <div class="w1w-hero__actions">
         {%- if section.settings.primary_button_label != blank -%}
-          <a href="{{ section.settings.primary_button_link }}" class="w1w-btn w1w-btn--primary">
+          <a href="{{ section.settings.primary_button_link }}" class="w1w-btn w1w-btn--primary w1w-btn--lg">
             {{ section.settings.primary_button_label }}
           </a>
         {%- endif -%}
         {%- if section.settings.secondary_button_label != blank -%}
-          <a href="{{ section.settings.secondary_button_link }}" class="w1w-btn w1w-btn--secondary">
+          <a href="{{ section.settings.secondary_button_link }}" class="w1w-btn w1w-btn--ghost w1w-btn--lg">
             {{ section.settings.secondary_button_label }}
           </a>
         {%- endif -%}
       </div>
     </div>
+
     {%- if section.settings.product_image != blank -%}
       <div class="w1w-hero__product-wrap">
         <div class="w1w-hero__product-glow"></div>
+        {%- if section.settings.corner_tl != blank -%}
+          <span class="w1w-hero__corner w1w-hero__corner--tl">{{ section.settings.corner_tl }}</span>
+        {%- endif -%}
         {{ section.settings.product_image | image_url: width: 800 | image_tag: loading: 'eager', class: 'w1w-hero__product-img', alt: section.settings.product_image.alt }}
+        {%- if section.settings.corner_br != blank -%}
+          <span class="w1w-hero__corner w1w-hero__corner--br">{{ section.settings.corner_br }}</span>
+        {%- endif -%}
       </div>
     {%- endif -%}
   </div>
+
+  {%- if section.settings.stat1_label != blank or section.settings.stat2_label != blank or section.settings.stat3_label != blank -%}
+    <div class="w1w-hero__meta">
+      {%- if section.settings.stat1_label != blank -%}
+        <div class="w1w-hero__stat">
+          {{ section.settings.stat1_label }}<strong>{{ section.settings.stat1_value }}</strong>
+        </div>
+      {%- endif -%}
+      {%- if section.settings.stat2_label != blank -%}
+        <div class="w1w-hero__stat">
+          {{ section.settings.stat2_label }}<strong>{{ section.settings.stat2_value }}</strong>
+        </div>
+      {%- endif -%}
+      {%- if section.settings.stat3_label != blank -%}
+        <div class="w1w-hero__stat">
+          {{ section.settings.stat3_label }}<strong>{{ section.settings.stat3_value }}</strong>
+        </div>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
 </section>
+
+<script>
+(function () {
+  var heroBg = document.getElementById('w1wHeroBg');
+  if (!heroBg) return;
+  window.addEventListener('scroll', function () {
+    var y = window.scrollY;
+    if (y < 1200) heroBg.style.transform = 'translateY(' + (y * 0.15) + 'px)';
+  }, { passive: true });
+})();
+</script>
 
 {% stylesheet %}
   .w1w-hero {
     position: relative;
-    min-height: 900px;
-    display: flex;
-    align-items: center;
+    min-height: clamp(680px, 92vh, 920px);
     overflow: hidden;
     background: #000;
     isolation: isolate;
   }
+
+  /* Background image */
   .w1w-hero__bg {
     position: absolute;
     inset: 0;
     z-index: 0;
+    will-change: transform;
   }
   .w1w-hero__bg-img {
     width: 100%;
-    height: 100%;
+    height: 115%;
     object-fit: cover;
-    opacity: 0.4;
+    opacity: 0.42;
     mix-blend-mode: luminosity;
+    display: block;
   }
   .w1w-hero__bg-gradient {
     position: absolute;
     inset: 0;
-    background: linear-gradient(to top, #0e0e0e 0%, transparent 60%);
+    background:
+      radial-gradient(ellipse 60% 40% at 80% 50%, rgba(243, 255, 202, 0.07), transparent),
+      linear-gradient(180deg, rgba(14, 14, 14, 0.7) 0%, rgba(14, 14, 14, 0.15) 40%, rgba(14, 14, 14, 0.1) 60%, #0e0e0e 100%);
   }
+
+  /* Flood sweep */
+  .w1w-hero__flood {
+    position: absolute;
+    top: -10%;
+    width: 120%;
+    height: 120%;
+    left: -10%;
+    background: conic-gradient(
+      from 210deg at 50% 0%,
+      transparent 340deg,
+      rgba(243, 255, 202, 0.07) 355deg,
+      rgba(243, 255, 202, 0.13) 360deg,
+      rgba(243, 255, 202, 0.07) 365deg,
+      transparent 380deg
+    );
+    animation: w1w-floodSweep 12s ease-in-out infinite alternate;
+    pointer-events: none;
+    mix-blend-mode: screen;
+    z-index: 1;
+  }
+  @keyframes w1w-floodSweep {
+    from { transform: rotate(-8deg); }
+    to   { transform: rotate(8deg); }
+  }
+
+  /* Smoke drift */
+  .w1w-hero__smoke {
+    position: absolute;
+    bottom: -20%;
+    left: -10%;
+    right: -10%;
+    height: 60%;
+    background:
+      radial-gradient(ellipse at 30% 80%, rgba(243, 255, 202, 0.05), transparent 50%),
+      radial-gradient(ellipse at 70% 60%, rgba(255, 255, 255, 0.03), transparent 60%);
+    animation: w1w-smokeDrift 18s ease-in-out infinite alternate;
+    pointer-events: none;
+    z-index: 1;
+  }
+  @keyframes w1w-smokeDrift {
+    from { transform: translate(-4%, 2%) scale(1); }
+    to   { transform: translate(4%, -3%) scale(1.15); }
+  }
+
+  /* Inner grid */
   .w1w-hero__inner {
     position: relative;
-    z-index: 1;
-    width: 100%;
-    max-width: 1536px;
+    z-index: 2;
+    max-width: 1440px;
     margin: 0 auto;
-    padding: 80px 48px;
+    padding: 96px clamp(24px, 4vw, 64px);
+    padding-bottom: 120px;
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1.05fr 1fr;
     gap: 48px;
     align-items: center;
   }
-  .w1w-hero__content {
-    display: flex;
-    flex-direction: column;
-    gap: 32px;
-  }
+
+  /* Content */
   .w1w-hero__badge {
-    display: inline-block;
-    padding: 4px 16px;
+    display: inline-flex;
     background: #f3ffca;
     color: #516700;
+    padding: 6px 10px;
     font-family: "Space Grotesk", sans-serif;
+    font-weight: 700;
     font-size: 10px;
-    font-weight: 900;
-    text-transform: uppercase;
     letter-spacing: 0.3em;
+    text-transform: uppercase;
+    margin-bottom: 32px;
   }
   .w1w-hero__headline {
     font-family: "Space Grotesk", sans-serif;
-    font-size: clamp(3.5rem, 8vw, 9rem);
-    font-weight: 900;
+    font-size: clamp(72px, 11vw, 160px);
+    font-weight: 700;
     color: #fff;
-    line-height: 0.85;
-    letter-spacing: -0.03em;
-    text-shadow: 0 0 15px rgba(243, 255, 202, 0.3);
-    margin: 0;
+    line-height: 0.88;
+    letter-spacing: -0.04em;
+    margin: 0 0 32px;
   }
-  .w1w-hero__accent {
-    color: #f3ffca;
-  }
+  .w1w-hero__accent { color: #f3ffca; }
   .w1w-hero__subtext {
-    color: #adaaaa;
+    color: #d4d4d4;
     font-family: "Inter", sans-serif;
-    font-size: 1.125rem;
-    font-weight: 300;
+    font-size: 18px;
+    font-weight: 400;
     line-height: 1.6;
-    max-width: 28rem;
-    margin: 0;
+    max-width: 440px;
+    margin: 0 0 40px;
   }
-  .w1w-hero__actions {
-    display: flex;
-    gap: 16px;
-    flex-wrap: wrap;
-  }
+  .w1w-hero__actions { display: flex; gap: 16px; flex-wrap: wrap; }
+
+  /* Buttons (shared across W1W sections) */
   .w1w-btn {
-    display: inline-block;
-    padding: 20px 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 18px 32px;
     font-family: "Space Grotesk", sans-serif;
     font-weight: 700;
-    font-size: 0.875rem;
+    font-size: 13px;
     text-transform: uppercase;
-    letter-spacing: 0.15em;
-    text-decoration: none;
-    transition: transform 0.2s, background 0.2s;
+    letter-spacing: 0.1em;
+    border: 1px solid transparent;
+    transition: transform 0.12s ease, background 0.18s ease, border-color 0.18s ease, color 0.18s ease, filter 0.18s ease;
     cursor: pointer;
-    border: none;
+    white-space: nowrap;
+    text-decoration: none;
   }
+  .w1w-btn:active { transform: translateY(1px); }
   .w1w-btn--primary {
-    background: linear-gradient(to bottom, #f3ffca, #cafd00);
+    background: linear-gradient(180deg, #f3ffca 0%, #cafd00 100%);
     color: #516700;
   }
-  .w1w-btn--primary:hover {
-    transform: scale(1.05);
-  }
-  .w1w-btn--secondary {
+  .w1w-btn--primary:hover { filter: brightness(1.05); }
+  .w1w-btn--ghost {
     background: #262626;
+    border-color: rgba(243, 255, 202, 0.2);
     color: #f3ffca;
-    border: 1px solid rgba(243, 255, 202, 0.2);
   }
-  .w1w-btn--secondary:hover {
-    background: #333;
+  .w1w-btn--ghost:hover { border-color: #f3ffca; }
+  .w1w-btn--outline {
+    background: transparent;
+    border-color: #f3ffca;
+    color: #f3ffca;
   }
+  .w1w-btn--outline:hover { background: #f3ffca; color: #516700; }
+  .w1w-btn--lg { padding: 22px 44px; font-size: 14px; letter-spacing: 0.14em; }
+  .w1w-btn--sm { padding: 12px 20px; font-size: 11px; }
+  .w1w-btn--block { width: 100%; justify-content: center; }
+
+  /* Product image */
   .w1w-hero__product-wrap {
     position: relative;
+    aspect-ratio: 4 / 5;
+    max-width: 560px;
+    justify-self: end;
+    transform: rotate(3deg);
+    transform-origin: center;
+  }
+  .w1w-hero__product-wrap::before {
+    content: '';
+    position: absolute;
+    inset: -20px;
+    background: rgba(243, 255, 202, 0.07);
+    backdrop-filter: blur(8px);
+    z-index: -1;
   }
   .w1w-hero__product-glow {
     position: absolute;
-    inset: -40px;
-    background: rgba(243, 255, 202, 0.1);
-    filter: blur(100px);
+    inset: -60px;
+    background: rgba(243, 255, 202, 0.08);
+    filter: blur(60px);
     border-radius: 50%;
     pointer-events: none;
+    z-index: -1;
   }
   .w1w-hero__product-img {
-    position: relative;
     width: 100%;
-    aspect-ratio: 4 / 5;
+    height: 100%;
     object-fit: cover;
-    border-radius: 4px;
-    transform: rotate(3deg);
-    transition: transform 0.7s;
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+    display: block;
+    box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.7);
   }
-  .w1w-hero__product-wrap:hover .w1w-hero__product-img {
-    transform: rotate(0deg);
+  .w1w-hero__corner {
+    position: absolute;
+    padding: 6px 10px;
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 700;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
   }
-  @media (max-width: 990px) {
+  .w1w-hero__corner--tl {
+    top: -12px;
+    left: -12px;
+    background: #131313;
+    color: #f3ffca;
+    border: 1px solid rgba(243, 255, 202, 0.25);
+  }
+  .w1w-hero__corner--br {
+    bottom: -12px;
+    right: -12px;
+    background: #f3ffca;
+    color: #516700;
+  }
+
+  /* Stats bar */
+  .w1w-hero__meta {
+    position: absolute;
+    left: clamp(24px, 4vw, 64px);
+    bottom: 32px;
+    display: flex;
+    gap: 48px;
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: #737373;
+    text-transform: uppercase;
+    z-index: 3;
+  }
+  .w1w-hero__stat { display: flex; flex-direction: column; }
+  .w1w-hero__stat strong {
+    color: #f3ffca;
+    display: block;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 0;
+    margin-top: 4px;
+  }
+
+  /* Responsive */
+  @media (max-width: 960px) {
     .w1w-hero__inner {
       grid-template-columns: 1fr;
-      padding: 60px 24px;
-      min-height: auto;
+      gap: 32px;
+      padding-bottom: 96px;
     }
-    .w1w-hero__product-wrap {
-      display: none;
-    }
-    .w1w-hero {
-      min-height: 700px;
-    }
+    .w1w-hero__product-wrap { max-width: 100%; }
+    .w1w-hero__meta { gap: 24px; }
+  }
+  @media (max-width: 600px) {
+    .w1w-hero__meta { display: none; }
   }
 {% endstylesheet %}
 
@@ -209,7 +360,7 @@
       "type": "text",
       "id": "badge_text",
       "label": "Badge text",
-      "default": "Stadium Midnight Edition"
+      "default": "Stadium Midnight Edition · Drop 03"
     },
     {
       "type": "text",
@@ -227,7 +378,7 @@
       "type": "textarea",
       "id": "subtext",
       "label": "Subtext",
-      "default": "The global game, distilled onto your wrist. Premium technical collectibles engineered for the modern supporter."
+      "default": "The global game, distilled onto your wrist. Paracord collectibles engineered for the modern supporter — $5 a nation, stack the squad."
     },
     {
       "type": "header",
@@ -267,6 +418,58 @@
       "type": "image_picker",
       "id": "product_image",
       "label": "Product image"
+    },
+    {
+      "type": "text",
+      "id": "corner_tl",
+      "label": "Top-left corner label",
+      "default": "N° 2026"
+    },
+    {
+      "type": "text",
+      "id": "corner_br",
+      "label": "Bottom-right corner label",
+      "default": "$5 · 50+ NATIONS"
+    },
+    {
+      "type": "header",
+      "content": "Stats bar"
+    },
+    {
+      "type": "text",
+      "id": "stat1_label",
+      "label": "Stat 1 label",
+      "default": "50+ Nations"
+    },
+    {
+      "type": "text",
+      "id": "stat1_value",
+      "label": "Stat 1 value",
+      "default": "6 Confederations"
+    },
+    {
+      "type": "text",
+      "id": "stat2_label",
+      "label": "Stat 2 label",
+      "default": "Ship Worldwide"
+    },
+    {
+      "type": "text",
+      "id": "stat2_value",
+      "label": "Stat 2 value",
+      "default": "73 Countries"
+    },
+    {
+      "type": "text",
+      "id": "stat3_label",
+      "label": "Stat 3 label",
+      "default": "Kick-Off"
+    },
+    {
+      "type": "text",
+      "id": "stat3_value",
+      "label": "Stat 3 value",
+      "default": "June 11, 2026"
     }
   ],
   "presets": [

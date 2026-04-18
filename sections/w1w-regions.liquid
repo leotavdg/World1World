@@ -1,152 +1,357 @@
-<section class="w1w-regions">
-  <div class="w1w-regions__header">
-    <h2 class="w1w-regions__heading">{{ section.settings.heading }}</h2>
-  </div>
-  <div class="w1w-regions__scroll-wrap">
-    {%- for block in section.blocks -%}
-      {%- assign card_tag = 'div' -%}
-      {%- assign card_href = '' -%}
-      {%- if block.settings.collection != blank -%}
-        {%- assign card_tag = 'a' -%}
-        {%- assign card_href = block.settings.collection.url -%}
-      {%- elsif block.settings.url != blank -%}
-        {%- assign card_tag = 'a' -%}
-        {%- assign card_href = block.settings.url -%}
+<section class="w1w-regions" id="regions">
+  <div class="w1w-regions__inner">
+    <div class="w1w-regions__sec-head">
+      <div>
+        <span class="w1w-eyebrow">Shop by Continent</span>
+        <h2 class="w1w-regions__heading">{{ section.settings.heading }}</h2>
+      </div>
+      {%- if section.settings.description != blank -%}
+        <p class="w1w-regions__desc">{{ section.settings.description }}</p>
       {%- endif -%}
-      <{{ card_tag }}
-        class="w1w-region-card"
-        {{ block.shopify_attributes }}
-        {%- if card_href != '' -%} href="{{ card_href }}"{%- endif -%}
-      >
-        <div class="w1w-region-card__media">
-          {%- if block.settings.image != blank -%}
-            {{ block.settings.image | image_url: width: 800 | image_tag: loading: 'lazy', class: 'w1w-region-card__img', alt: block.settings.image.alt | escape }}
-          {%- else -%}
-            {{ 'collection-1' | placeholder_svg_tag: 'w1w-region-card__img w1w-region-card__img--placeholder' }}
-          {%- endif -%}
-          <div class="w1w-region-card__content">
-            <h3 class="w1w-region-card__title">{{ block.settings.title }}</h3>
-            <p class="w1w-region-card__subtitle">{{ block.settings.subtitle }}</p>
-          </div>
-        </div>
-      </{{ card_tag }}>
-    {%- else -%}
-      {%- assign placeholder_regions = 'Europe,South America,Africa,Asia' | split: ',' -%}
-      {%- for region in placeholder_regions -%}
-        <div class="w1w-region-card">
-          <div class="w1w-region-card__media">
-            {{ 'collection-1' | placeholder_svg_tag: 'w1w-region-card__img w1w-region-card__img--placeholder' }}
-            <div class="w1w-region-card__content">
-              <h3 class="w1w-region-card__title">{{ region }}</h3>
+    </div>
+
+    <div class="w1w-regions__tabs">
+
+      <!-- Left: Region list -->
+      <div class="w1w-regions__list" id="w1wRegionList">
+        {%- for block in section.blocks -%}
+          <button
+            class="w1w-region-row{% if forloop.first %} w1w-region-row--active{% endif %}"
+            data-region-idx="{{ forloop.index0 }}"
+            type="button"
+            {{ block.shopify_attributes }}
+          >
+            <span class="w1w-region-row__idx">0{{ forloop.index }}</span>
+            <div class="w1w-region-row__info">
+              <span class="w1w-region-row__name">{{ block.settings.title | upcase }}</span>
+              {%- if block.settings.confederation != blank -%}
+                <span class="w1w-region-row__conf">{{ block.settings.confederation }}</span>
+              {%- endif -%}
+            </div>
+            {%- if block.settings.tag != blank -%}
+              <span class="w1w-region-row__tag">{{ block.settings.tag }}</span>
+            {%- endif -%}
+            <span class="w1w-region-row__arrow">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="m9 6 6 6-6 6"/></svg>
+            </span>
+          </button>
+        {%- endfor -%}
+      </div>
+
+      <!-- Right: Region panel -->
+      <div class="w1w-region-panel" id="w1wRegionPanel">
+        {%- for block in section.blocks -%}
+          <div
+            class="w1w-region-panel__slide{% if forloop.first %} w1w-region-panel__slide--active{% endif %}"
+            data-panel-idx="{{ forloop.index0 }}"
+          >
+            {%- if block.settings.image != blank -%}
+              <div class="w1w-region-panel__bg">
+                {{ block.settings.image | image_url: width: 1200 | image_tag: loading: 'lazy', class: 'w1w-region-panel__bg-img', alt: block.settings.image.alt | escape }}
+              </div>
+            {%- endif -%}
+            <div class="w1w-region-panel__meta">
+              {%- if block.settings.tag != blank -%}
+                <div class="w1w-eyebrow">{{ block.settings.tag }}</div>
+              {%- endif -%}
+              <h3 class="w1w-region-panel__name">{{ block.settings.title | upcase }}</h3>
+              {%- if block.settings.blurb != blank -%}
+                <p class="w1w-region-panel__blurb">{{ block.settings.blurb }}</p>
+              {%- endif -%}
+              <div class="w1w-region-panel__stats">
+                {%- if block.settings.nations_count != blank -%}
+                  <div class="w1w-region-stat">
+                    <span class="w1w-region-stat__label">Nations</span>
+                    <strong class="w1w-region-stat__value">{{ block.settings.nations_count }}</strong>
+                  </div>
+                {%- endif -%}
+                {%- if block.settings.confederation != blank -%}
+                  <div class="w1w-region-stat">
+                    <span class="w1w-region-stat__label">Confed.</span>
+                    <strong class="w1w-region-stat__value">{{ block.settings.confederation }}</strong>
+                  </div>
+                {%- endif -%}
+                {%- if block.settings.editions_count != blank -%}
+                  <div class="w1w-region-stat">
+                    <span class="w1w-region-stat__label">Editions</span>
+                    <strong class="w1w-region-stat__value">{{ block.settings.editions_count }}</strong>
+                  </div>
+                {%- endif -%}
+              </div>
+              {%- assign region_href = '' -%}
+              {%- if block.settings.collection != blank -%}
+                {%- assign region_href = block.settings.collection.url -%}
+              {%- elsif block.settings.url != blank -%}
+                {%- assign region_href = block.settings.url -%}
+              {%- endif -%}
+              {%- if region_href != '' -%}
+                <a href="{{ region_href }}" class="w1w-btn w1w-btn--outline">
+                  Explore {{ block.settings.confederation | default: block.settings.title }} →
+                </a>
+              {%- endif -%}
             </div>
           </div>
-        </div>
-      {%- endfor -%}
-    {%- endfor -%}
+        {%- else -%}
+          <!-- Placeholder when no blocks added -->
+          <div class="w1w-region-panel__slide w1w-region-panel__slide--active">
+            <div class="w1w-region-panel__meta">
+              <div class="w1w-eyebrow">THE ENGINE</div>
+              <h3 class="w1w-region-panel__name">EUROPE</h3>
+              <p class="w1w-region-panel__blurb">Tactical, technical, relentless. The modern machine.</p>
+            </div>
+          </div>
+        {%- endfor -%}
+      </div>
+
+    </div>
   </div>
 </section>
 
+<script>
+(function () {
+  var rows = document.querySelectorAll('.w1w-region-row');
+  var panels = document.querySelectorAll('.w1w-region-panel__slide');
+  function activate(idx) {
+    rows.forEach(function (r) {
+      r.classList.toggle('w1w-region-row--active', r.dataset.regionIdx === idx);
+    });
+    panels.forEach(function (p) {
+      p.classList.toggle('w1w-region-panel__slide--active', p.dataset.panelIdx === idx);
+    });
+  }
+  rows.forEach(function (row) {
+    row.addEventListener('click', function () { activate(row.dataset.regionIdx); });
+    row.addEventListener('mouseenter', function () { activate(row.dataset.regionIdx); });
+  });
+})();
+</script>
+
 {% stylesheet %}
+  .w1w-eyebrow {
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 500;
+    font-size: 12px;
+    letter-spacing: 0.5em;
+    text-transform: uppercase;
+    color: #f3ffca;
+    display: block;
+  }
+
   .w1w-regions {
-    padding: 96px 0 0;
+    padding: 120px 0;
     background: #131313;
+    position: relative;
     overflow: hidden;
   }
-  .w1w-regions__header {
-    max-width: 1536px;
+  .w1w-regions::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 20% 30%, rgba(243, 255, 202, 0.03), transparent 40%),
+      radial-gradient(circle at 80% 70%, rgba(243, 255, 202, 0.03), transparent 40%);
+    pointer-events: none;
+  }
+  .w1w-regions__inner {
+    max-width: 1440px;
     margin: 0 auto;
-    padding: 0 32px;
+    padding: 0 clamp(24px, 4vw, 64px);
+    position: relative;
+    z-index: 1;
+  }
+  .w1w-regions__sec-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 24px;
     margin-bottom: 48px;
+    flex-wrap: wrap;
   }
   .w1w-regions__heading {
     font-family: "Space Grotesk", sans-serif;
-    font-size: clamp(2rem, 4vw, 2.5rem);
+    font-size: clamp(32px, 4vw, 60px);
     font-weight: 700;
     color: #fff;
     text-transform: uppercase;
     letter-spacing: -0.03em;
+    line-height: 0.95;
+    margin: 12px 0 0;
+  }
+  .w1w-regions__desc {
+    max-width: 320px;
+    color: #adaaaa;
+    font-size: 14px;
+    line-height: 1.6;
     margin: 0;
   }
-  .w1w-regions__scroll-wrap {
+
+  /* Two-column tabs layout */
+  .w1w-regions__tabs {
+    display: grid;
+    grid-template-columns: 1.1fr 2fr;
+    gap: 64px;
+    align-items: stretch;
+  }
+
+  /* Left list */
+  .w1w-regions__list {
     display: flex;
-    gap: 24px;
-    overflow-x: auto;
-    padding: 0 32px 32px;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
+    flex-direction: column;
+    gap: 2px;
   }
-  .w1w-regions__scroll-wrap::-webkit-scrollbar {
-    display: none;
+  .w1w-region-row {
+    display: grid;
+    grid-template-columns: 28px 1fr auto auto;
+    gap: 16px;
+    align-items: center;
+    padding: 20px 0;
+    border-top: 1px solid rgba(243, 255, 202, 0.12);
+    cursor: pointer;
+    background: none;
+    border-left: 0;
+    border-right: 0;
+    border-bottom: 0;
+    color: #fff;
+    text-align: left;
+    transition: color 0.15s ease, padding-left 0.15s ease;
+    width: 100%;
   }
-  .w1w-region-card {
-    flex: none;
-    width: 400px;
-    aspect-ratio: 16 / 9;
+  .w1w-region-row:last-child {
+    border-bottom: 1px solid rgba(243, 255, 202, 0.12);
+  }
+  .w1w-region-row:hover { padding-left: 8px; }
+  .w1w-region-row__idx {
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 11px;
+    color: #737373;
+    letter-spacing: 0.1em;
+  }
+  .w1w-region-row__name {
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 700;
+    font-size: 22px;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+    display: block;
+  }
+  .w1w-region-row__conf {
+    font-size: 12px;
+    color: #737373;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    display: block;
+    margin-top: 2px;
+  }
+  .w1w-region-row__tag {
+    font-family: "Inter", sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: #f3ffca;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .w1w-region-row__arrow {
+    color: #737373;
+    transition: transform 0.15s ease, color 0.15s ease;
+    display: flex;
+    align-items: center;
+  }
+  .w1w-region-row--active .w1w-region-row__name { color: #f3ffca; }
+  .w1w-region-row--active .w1w-region-row__arrow {
+    color: #f3ffca;
+    transform: translateX(4px);
+  }
+
+  /* Right panel */
+  .w1w-region-panel {
     position: relative;
+    min-height: 460px;
+    background: #1c1c1c;
+    border: 1px solid rgba(243, 255, 202, 0.12);
     overflow: hidden;
-    text-decoration: none;
-    display: block;
   }
-  .w1w-region-card__media {
-    width: 100%;
-    height: 100%;
-    position: relative;
-  }
-  .w1w-region-card__img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    filter: grayscale(1);
-    transition: filter 0.7s;
-    display: block;
-  }
-  .w1w-region-card__img--placeholder {
-    background: #262626;
-    filter: grayscale(1);
-  }
-  .w1w-region-card:hover .w1w-region-card__img {
-    filter: grayscale(0);
-  }
-  .w1w-region-card__content {
+  .w1w-region-panel__slide {
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.4);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.35s ease;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-    padding: 32px;
+    padding: 48px;
   }
-  .w1w-region-card__title {
+  .w1w-region-panel__slide--active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .w1w-region-panel__bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+  .w1w-region-panel__bg-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.35;
+    filter: grayscale(1) contrast(1.1);
+    display: block;
+  }
+  .w1w-region-panel__meta {
+    position: relative;
+    z-index: 1;
+    background: linear-gradient(180deg, transparent, rgba(14, 14, 14, 0.9) 40%);
+    margin: -48px;
+    padding: 64px 48px 0;
+    margin-top: auto;
+  }
+  .w1w-region-panel__name {
     font-family: "Space Grotesk", sans-serif;
-    font-size: 1.875rem;
-    font-weight: 900;
+    font-size: clamp(40px, 6vw, 72px);
+    font-weight: 700;
+    letter-spacing: -0.03em;
     color: #fff;
     text-transform: uppercase;
-    font-style: italic;
-    letter-spacing: -0.03em;
-    margin: 0 0 4px;
+    margin: 8px 0;
+    line-height: 1;
   }
-  .w1w-region-card__subtitle {
-    color: #f3ffca;
-    font-size: 0.75rem;
+  .w1w-region-panel__blurb {
+    color: #d4d4d4;
+    font-size: 16px;
+    max-width: 480px;
+    margin: 0 0 24px;
+    line-height: 1.6;
+  }
+  .w1w-region-panel__stats {
+    display: flex;
+    gap: 48px;
+    margin-bottom: 32px;
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.2em;
     text-transform: uppercase;
-    letter-spacing: 0.15em;
-    margin: 0;
-    opacity: 0;
-    transition: opacity 0.3s;
+    color: #adaaaa;
   }
-  .w1w-region-card:hover .w1w-region-card__subtitle {
-    opacity: 1;
+  .w1w-region-stat { display: flex; flex-direction: column; }
+  .w1w-region-stat__label { font-size: 11px; letter-spacing: 0.2em; }
+  .w1w-region-stat__value {
+    display: block;
+    color: #f3ffca;
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: 0;
+    margin-top: 4px;
   }
-  @media (max-width: 768px) {
-    .w1w-region-card {
-      width: 280px;
+
+  /* Responsive */
+  @media (max-width: 960px) {
+    .w1w-regions__tabs {
+      grid-template-columns: 1fr;
+      gap: 32px;
     }
-    .w1w-regions__scroll-wrap {
-      padding: 0 16px 32px;
-    }
-    .w1w-regions__header {
-      padding: 0 16px;
+    .w1w-region-panel {
+      min-height: 360px;
     }
   }
 {% endstylesheet %}
@@ -160,7 +365,13 @@
       "type": "text",
       "id": "heading",
       "label": "Heading",
-      "default": "Explore Regions"
+      "default": "EXPLORE REGIONS"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "Every confederation represented. Pick a continent, pick a side."
     }
   ],
   "blocks": [
@@ -171,19 +382,43 @@
         {
           "type": "image_picker",
           "id": "image",
-          "label": "Image"
+          "label": "Background image"
         },
         {
           "type": "text",
           "id": "title",
-          "label": "Title",
+          "label": "Region name",
           "default": "Europe"
         },
         {
           "type": "text",
-          "id": "subtitle",
-          "label": "Hover subtitle",
-          "default": "Explore 24 Nations"
+          "id": "tag",
+          "label": "Tag / eyebrow",
+          "default": "THE ENGINE"
+        },
+        {
+          "type": "text",
+          "id": "confederation",
+          "label": "Confederation (e.g. UEFA)",
+          "default": "UEFA"
+        },
+        {
+          "type": "textarea",
+          "id": "blurb",
+          "label": "Short description",
+          "default": "Tactical, technical, relentless. The modern machine."
+        },
+        {
+          "type": "text",
+          "id": "nations_count",
+          "label": "Number of nations",
+          "default": "16"
+        },
+        {
+          "type": "text",
+          "id": "editions_count",
+          "label": "Editions count",
+          "default": "16"
         },
         {
           "type": "collection",
@@ -206,28 +441,66 @@
           "type": "region",
           "settings": {
             "title": "Europe",
-            "subtitle": "Explore 24 Nations"
+            "tag": "THE ENGINE",
+            "confederation": "UEFA",
+            "blurb": "Tactical, technical, relentless. The modern machine.",
+            "nations_count": "16",
+            "editions_count": "16"
           }
         },
         {
           "type": "region",
           "settings": {
             "title": "South America",
-            "subtitle": "The Core of Passion"
+            "tag": "THE CORE",
+            "confederation": "CONMEBOL",
+            "blurb": "Where the game was perfected. Pure rhythm.",
+            "nations_count": "6",
+            "editions_count": "6"
+          }
+        },
+        {
+          "type": "region",
+          "settings": {
+            "title": "North America",
+            "tag": "HOSTS",
+            "confederation": "CONCACAF",
+            "blurb": "Home soil. The continent that lifts the curtain.",
+            "nations_count": "6",
+            "editions_count": "6"
           }
         },
         {
           "type": "region",
           "settings": {
             "title": "Africa",
-            "subtitle": "Untamed Energy"
+            "tag": "UNTAMED",
+            "confederation": "CAF",
+            "blurb": "Raw speed. Rising force. Nothing fears nothing.",
+            "nations_count": "9",
+            "editions_count": "9"
           }
         },
         {
           "type": "region",
           "settings": {
             "title": "Asia",
-            "subtitle": "The Rising Stars"
+            "tag": "RISING",
+            "confederation": "AFC",
+            "blurb": "Discipline meets dream. The fastest-climbing continent.",
+            "nations_count": "9",
+            "editions_count": "9"
+          }
+        },
+        {
+          "type": "region",
+          "settings": {
+            "title": "Oceania",
+            "tag": "FRONTIER",
+            "confederation": "OFC",
+            "blurb": "The long journey. Every tournament earned twice over.",
+            "nations_count": "1",
+            "editions_count": "1"
           }
         }
       ]
