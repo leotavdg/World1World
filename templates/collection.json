@@ -1,8 +1,18 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "w1w_col_hero": {
       "type": "w1w-collection-hero",
       "settings": {
+        "bg_image": "shopify://shop_images/220831_Eagle_SeatingBowl_InternalView.jpg",
         "label": "International Edition",
         "title_line1": "The Nations",
         "title_line2": "Series"
@@ -28,9 +38,11 @@
         "card1_title_line1": "Stadium",
         "card1_title_line2": "Pass",
         "card1_label": "Exclusive Membership",
+        "card1_link": "",
         "card2_title_line1": "Global",
         "card2_title_line2": "Shipping",
-        "card2_label": "From the pitch to your porch"
+        "card2_label": "From the pitch to your porch",
+        "card2_link": ""
       }
     }
   },
