@@ -43,18 +43,63 @@
     {{ content_for_header }}
     {% # theme-check-enable RemoteAsset %}
     <style>
-      body { background: #0e0e0e !important; }
+      /* ── Global dark foundation ── */
+      html, body {
+        background-color: #0e0e0e !important;
+        color: #ffffff;
+        font-family: "Inter", sans-serif;
+      }
+      /* Wipe any white/light section backgrounds injected by the theme framework */
+      .shopify-section,
+      .section-background,
+      .color-scheme-1,
+      .color-scheme-2 {
+        background-color: transparent !important;
+      }
+      /* Force page containers dark */
+      .content-for-layout,
+      main#MainContent {
+        background-color: #0e0e0e !important;
+      }
+
+      /* ── Scrollbar ── */
+      ::-webkit-scrollbar { width: 4px; }
+      ::-webkit-scrollbar-track { background: #0e0e0e; }
+      ::-webkit-scrollbar-thumb { background: #262626; border-radius: 10px; }
+
+      /* ── Material Symbols ── */
       .material-symbols-outlined {
         font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
       }
-      /* Header glassmorphism override */
+
+      /* ── Header glassmorphism ── */
       #header-group header-component header,
       #header-group .header-section {
-        background: linear-gradient(180deg, rgba(20, 20, 20, 0.85) 0%, rgba(20, 20, 20, 0.6) 100%) !important;
+        background: rgba(20, 20, 20, 0.75) !important;
         backdrop-filter: blur(20px) !important;
         -webkit-backdrop-filter: blur(20px) !important;
         border-bottom: 1px solid rgba(243, 255, 202, 0.05) !important;
       }
+
+      /* ── Footer dark tonal ── */
+      footer .shopify-section,
+      footer section {
+        background-color: #131313 !important;
+      }
+
+      /* ── Selection color ── */
+      ::selection {
+        background: #cafd00;
+        color: #3a4a00;
+      }
+
+      /* ── Text color normalization ── */
+      p, li, span, div {
+        color: inherit;
+      }
+
+      /* ── Link normalization ── */
+      a { color: inherit; }
     </style>
   </head>
 

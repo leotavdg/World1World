@@ -1,0 +1,800 @@
+{%- liquid
+  assign current_variant = product.selected_or_first_available_variant
+  assign featured_image = current_variant.featured_image | default: product.featured_image
+  assign second_image = product.images[1]
+  assign third_image = product.images[2]
+-%}
+
+<script
+  src="{{ 'product-recommendations.js' | asset_url }}"
+  type="module"
+  fetchpriority="low"
+></script>
+
+<div class="w1w-pdp" id="w1w-pdp-{{ product.id }}">
+  <div class="w1w-pdp__inner">
+
+    <!-- ── Gallery ─────────────────────────────────── -->
+    <div class="w1w-pdp__gallery">
+      <div class="w1w-pdp__gallery-main">
+        <a href="{{ featured_image | image_url: width: 1600 }}" class="w1w-pdp__zoom-link" data-pswp-width="{{ featured_image.width }}" data-pswp-height="{{ featured_image.height }}">
+          {{
+            featured_image
+            | image_url: width: 1200
+            | image_tag:
+              loading: 'eager',
+              class: 'w1w-pdp__main-img',
+              id: 'w1wMainImg',
+              alt: featured_image.alt | default: product.title | escape,
+              widths: '600, 900, 1200',
+              sizes: '(max-width: 768px) 100vw, 55vw'
+          }}
+        </a>
+        <div class="w1w-pdp__main-overlay"></div>
+        {%- if product.tags contains 'limited' or product.tags contains 'Limited Edition' -%}
+          <span class="w1w-pdp__badge">Limited Edition</span>
+        {%- elsif product.tags contains 'new' or product.tags contains 'New' -%}
+          <span class="w1w-pdp__badge">New Arrival</span>
+        {%- endif -%}
+      </div>
+
+      {%- if product.images.size > 1 -%}
+        <div class="w1w-pdp__gallery-thumbs">
+          {%- for image in product.images offset: 1 limit: 2 -%}
+            <button class="w1w-pdp__thumb-btn" data-src="{{ image | image_url: width: 1200 }}" aria-label="View image {{ forloop.index | plus: 1 }}">
+              {{
+                image
+                | image_url: width: 600
+                | image_tag:
+                  loading: 'lazy',
+                  class: 'w1w-pdp__thumb-img',
+                  alt: image.alt | default: product.title | escape,
+                  widths: '300, 600',
+                  sizes: '(max-width: 768px) 50vw, 25vw'
+              }}
+            </button>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+    </div>
+
+    <!-- ── Product Info ──────────────────────────────── -->
+    <div class="w1w-pdp__info">
+
+      <!-- Eyebrow -->
+      <div class="w1w-pdp__eyebrow">
+        <span class="material-symbols-outlined w1w-pdp__eyebrow-icon">star</span>
+        {%- if product.metafields.custom.series != blank -%}
+          {{ product.metafields.custom.series }}
+        {%- else -%}
+          Official Stadium Series
+        {%- endif -%}
+      </div>
+
+      <!-- Title -->
+      <h1 class="w1w-pdp__title">
+        {%- assign title_parts = product.title | split: ':' -%}
+        {%- if title_parts.size > 1 -%}
+          {{ title_parts[0] }}<br>
+          <span class="w1w-pdp__title-accent">{{ title_parts[1] | strip }}</span>
+        {%- else -%}
+          {{ product.title }}
+        {%- endif -%}
+      </h1>
+
+      <!-- Price -->
+      <div class="w1w-pdp__price-row">
+        <span class="w1w-pdp__price">{{ current_variant.price | money }}</span>
+        {%- if current_variant.compare_at_price > current_variant.price -%}
+          <span class="w1w-pdp__price-compare">{{ current_variant.compare_at_price | money }}</span>
+        {%- endif -%}
+      </div>
+
+      <!-- Purchase shell -->
+      <div class="w1w-pdp__shell">
+        {%- unless product.has_only_default_variant -%}
+          {%- for option in product.options_with_values -%}
+            <div class="w1w-pdp__option-group">
+              <label class="w1w-pdp__option-label">Select {{ option.name }}</label>
+              <div class="w1w-pdp__option-btns">
+                {%- for value in option.values -%}
+                  {%- assign option_disabled = true -%}
+                  {%- for variant in product.variants -%}
+                    {%- if variant.available -%}
+                      {%- case option.position -%}
+                        {%- when 1 -%}{%- if variant.option1 == value -%}{%- assign option_disabled = false -%}{%- endif -%}
+                        {%- when 2 -%}{%- if variant.option2 == value -%}{%- assign option_disabled = false -%}{%- endif -%}
+                        {%- when 3 -%}{%- if variant.option3 == value -%}{%- assign option_disabled = false -%}{%- endif -%}
+                      {%- endcase -%}
+                    {%- endif -%}
+                  {%- endfor -%}
+                  <button
+                    class="w1w-pdp__option-btn{% if current_variant.options contains value %} w1w-pdp__option-btn--active{% endif %}{% if option_disabled %} w1w-pdp__option-btn--disabled{% endif %}"
+                    data-option-position="{{ option.position }}"
+                    data-option-value="{{ value | escape }}"
+                    {% if option_disabled %}aria-disabled="true"{% endif %}
+                  >
+                    {{ value }}
+                  </button>
+                {%- endfor -%}
+              </div>
+            </div>
+          {%- endfor -%}
+        {%- endunless -%}
+
+        <!-- Add to cart -->
+        {%- form 'product', product, id: 'w1w-pdp-form', data-type: 'add-to-cart-form' -%}
+          <input type="hidden" name="id" value="{{ current_variant.id }}" id="w1w-variant-id">
+          <input type="hidden" name="quantity" value="1">
+          <button
+            type="submit"
+            class="w1w-pdp__atc-btn{% unless current_variant.available %} w1w-pdp__atc-btn--sold-out{% endunless %}"
+            {% unless current_variant.available %}disabled{% endunless %}
+          >
+            {%- if current_variant.available -%}
+              Add to Cart
+            {%- else -%}
+              Sold Out
+            {%- endif -%}
+          </button>
+        {%- endform -%}
+
+        <!-- Dynamic checkout buttons -->
+        <div class="w1w-pdp__dynamic-checkout">
+          {{ form | payment_button }}
+        </div>
+
+      </div><!-- /.w1w-pdp__shell -->
+
+      <!-- Feature callouts -->
+      <div class="w1w-pdp__features">
+        {%- if section.settings.feature_1_icon != blank or section.settings.feature_1_title != blank -%}
+          <div class="w1w-pdp__feature">
+            <span class="material-symbols-outlined w1w-pdp__feature-icon">{{ section.settings.feature_1_icon | default: 'verified_user' }}</span>
+            <div>
+              <h4 class="w1w-pdp__feature-title">{{ section.settings.feature_1_title | default: 'COMFORT-FIT TECH' }}</h4>
+              <p class="w1w-pdp__feature-desc">{{ section.settings.feature_1_desc | default: 'Dual-weave nylon designed for moisture-wicking under peak performance conditions.' }}</p>
+            </div>
+          </div>
+        {%- else -%}
+          <div class="w1w-pdp__feature">
+            <span class="material-symbols-outlined w1w-pdp__feature-icon">verified_user</span>
+            <div>
+              <h4 class="w1w-pdp__feature-title">COMFORT-FIT TECH</h4>
+              <p class="w1w-pdp__feature-desc">Dual-weave nylon designed for moisture-wicking under peak performance conditions.</p>
+            </div>
+          </div>
+        {%- endif -%}
+
+        {%- if section.settings.feature_2_icon != blank or section.settings.feature_2_title != blank -%}
+          <div class="w1w-pdp__feature">
+            <span class="material-symbols-outlined w1w-pdp__feature-icon">{{ section.settings.feature_2_icon | default: 'auto_awesome' }}</span>
+            <div>
+              <h4 class="w1w-pdp__feature-title">{{ section.settings.feature_2_title | default: 'RIO ENERGY SOUL' }}</h4>
+              <p class="w1w-pdp__feature-desc">{{ section.settings.feature_2_desc | default: 'Signature 5-star embroidery celebrating the legacy of world football icons.' }}</p>
+            </div>
+          </div>
+        {%- else -%}
+          <div class="w1w-pdp__feature">
+            <span class="material-symbols-outlined w1w-pdp__feature-icon">auto_awesome</span>
+            <div>
+              <h4 class="w1w-pdp__feature-title">RIO ENERGY SOUL</h4>
+              <p class="w1w-pdp__feature-desc">Signature 5-star embroidery celebrating the legacy of world football icons.</p>
+            </div>
+          </div>
+        {%- endif -%}
+      </div><!-- /.w1w-pdp__features -->
+
+    </div><!-- /.w1w-pdp__info -->
+
+  </div><!-- /.w1w-pdp__inner -->
+
+  <!-- ── Product Description ─────────────────────── -->
+  {%- if product.description != blank -%}
+    <div class="w1w-pdp__desc-wrap">
+      <div class="w1w-pdp__desc rte">{{ product.description }}</div>
+    </div>
+  {%- endif -%}
+
+</div><!-- /.w1w-pdp -->
+
+
+<!-- ── Fans Also Bought ─────────────────────────── -->
+<product-recommendations
+  id="w1w-recs-{{ section.id }}"
+  class="w1w-recs"
+  data-url="{{ routes.product_recommendations_url }}?limit=4&intent=related"
+  data-section-id="{{ section.id }}"
+  data-product-id="{{ product.id }}"
+  data-intent="related"
+  data-recommendations-performed="{{ recommendations.performed }}"
+>
+  {%- if recommendations.performed and recommendations.products_count > 0 -%}
+    <div class="w1w-recs__inner">
+      <div class="w1w-recs__header">
+        <div>
+          <span class="w1w-eyebrow">The Kit</span>
+          <h2 class="w1w-recs__heading">Fans Also Bought</h2>
+        </div>
+      </div>
+      <div class="w1w-recs__grid">
+        {%- for rec in recommendations.products -%}
+          <a href="{{ rec.url }}" class="w1w-rec-card">
+            <div class="w1w-rec-card__media">
+              {%- if rec.featured_image != blank -%}
+                {{
+                  rec.featured_image
+                  | image_url: width: 600
+                  | image_tag:
+                    loading: 'lazy',
+                    class: 'w1w-rec-card__img',
+                    alt: rec.featured_image.alt | default: rec.title | escape,
+                    widths: '300, 600',
+                    sizes: '(max-width: 768px) 50vw, 25vw'
+                }}
+              {%- else -%}
+                {{ 'product-1' | placeholder_svg_tag: 'w1w-rec-card__img' }}
+              {%- endif -%}
+            </div>
+            <div class="w1w-rec-card__info">
+              <h3 class="w1w-rec-card__title">{{ rec.title }}</h3>
+              <p class="w1w-rec-card__price">{{ rec.price_min | money }}</p>
+            </div>
+          </a>
+        {%- endfor -%}
+      </div>
+    </div>
+  {%- endif -%}
+</product-recommendations>
+
+
+<script>
+(function () {
+  /* ── Image switcher ─── */
+  var thumbBtns = document.querySelectorAll('.w1w-pdp__thumb-btn');
+  var mainImg   = document.getElementById('w1wMainImg');
+  if (mainImg) {
+    thumbBtns.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var src = btn.dataset.src;
+        mainImg.src = src.replace(/&width=\d+/, '&width=1200');
+        thumbBtns.forEach(function (b) { b.classList.remove('w1w-pdp__thumb-btn--active'); });
+        btn.classList.add('w1w-pdp__thumb-btn--active');
+      });
+    });
+  }
+
+  /* ── Variant option selector ─── */
+  var optionBtns = document.querySelectorAll('.w1w-pdp__option-btn');
+  var variantInput = document.getElementById('w1w-variant-id');
+  var variants = {{ product.variants | json }};
+
+  optionBtns.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      if (btn.getAttribute('aria-disabled') === 'true') return;
+
+      var pos = parseInt(btn.dataset.optionPosition, 10);
+      var val = btn.dataset.optionValue;
+
+      // Deactivate siblings in same option group
+      document.querySelectorAll('[data-option-position="' + pos + '"]').forEach(function (b) {
+        b.classList.remove('w1w-pdp__option-btn--active');
+      });
+      btn.classList.add('w1w-pdp__option-btn--active');
+
+      // Collect current selections
+      var selections = {};
+      document.querySelectorAll('.w1w-pdp__option-btn--active').forEach(function (b) {
+        selections[parseInt(b.dataset.optionPosition, 10)] = b.dataset.optionValue;
+      });
+
+      // Find matching variant
+      var matched = variants.find(function (v) {
+        return Object.keys(selections).every(function (p) {
+          return v['option' + p] === selections[p];
+        });
+      });
+
+      if (matched && variantInput) {
+        variantInput.value = matched.id;
+
+        // Update price
+        var priceEl = document.querySelector('.w1w-pdp__price');
+        var compareEl = document.querySelector('.w1w-pdp__price-compare');
+        if (priceEl) priceEl.textContent = formatMoney(matched.price);
+        if (compareEl) {
+          if (matched.compare_at_price > matched.price) {
+            compareEl.textContent = formatMoney(matched.compare_at_price);
+            compareEl.style.display = '';
+          } else {
+            compareEl.style.display = 'none';
+          }
+        }
+
+        // Update ATC button
+        var atcBtn = document.querySelector('.w1w-pdp__atc-btn');
+        if (atcBtn) {
+          if (matched.available) {
+            atcBtn.disabled = false;
+            atcBtn.classList.remove('w1w-pdp__atc-btn--sold-out');
+            atcBtn.textContent = 'Add to Cart';
+          } else {
+            atcBtn.disabled = true;
+            atcBtn.classList.add('w1w-pdp__atc-btn--sold-out');
+            atcBtn.textContent = 'Sold Out';
+          }
+        }
+
+        // Update featured image
+        if (matched.featured_image && mainImg) {
+          mainImg.src = matched.featured_image.src + '&width=1200';
+        }
+      }
+    });
+  });
+
+  function formatMoney(cents) {
+    return '$' + (cents / 100).toFixed(2);
+  }
+})();
+</script>
+
+
+{% stylesheet %}
+
+/* ─────────────────────────────────────────────
+   W1W Product Page
+───────────────────────────────────────────── */
+
+.w1w-pdp {
+  padding: 48px clamp(16px, 4vw, 64px) 80px;
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+/* ── Two-column grid ── */
+.w1w-pdp__inner {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 48px;
+}
+@media (min-width: 1024px) {
+  .w1w-pdp__inner {
+    grid-template-columns: 7fr 5fr;
+    gap: 64px;
+  }
+}
+
+/* ── Gallery ── */
+.w1w-pdp__gallery {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.w1w-pdp__gallery-main {
+  position: relative;
+  overflow: hidden;
+  background: #131313;
+  aspect-ratio: 4 / 5;
+}
+.w1w-pdp__main-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.7s ease;
+}
+.w1w-pdp__gallery-main:hover .w1w-pdp__main-img {
+  transform: scale(1.04);
+}
+.w1w-pdp__main-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(14, 14, 14, 0.35), transparent 50%);
+  pointer-events: none;
+}
+.w1w-pdp__zoom-link {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.w1w-pdp__badge {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  background: #f3ffca;
+  color: #3a4a00;
+  padding: 6px 12px;
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 900;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  z-index: 2;
+}
+
+.w1w-pdp__gallery-thumbs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.w1w-pdp__thumb-btn {
+  aspect-ratio: 1;
+  overflow: hidden;
+  background: #131313;
+  border: 1px solid transparent;
+  padding: 0;
+  cursor: pointer;
+  transition: border-color 0.2s ease, opacity 0.2s ease;
+}
+.w1w-pdp__thumb-btn:hover,
+.w1w-pdp__thumb-btn--active {
+  border-color: #f3ffca;
+  opacity: 1;
+}
+.w1w-pdp__thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+}
+.w1w-pdp__thumb-btn:hover .w1w-pdp__thumb-img,
+.w1w-pdp__thumb-btn--active .w1w-pdp__thumb-img {
+  opacity: 1;
+}
+
+/* ── Info panel ── */
+.w1w-pdp__info {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.w1w-pdp__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #f3ffca;
+}
+.w1w-pdp__eyebrow-icon {
+  font-size: 16px;
+  font-variation-settings: 'FILL' 1, 'wght' 400;
+}
+
+.w1w-pdp__title {
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 900;
+  font-size: clamp(44px, 6vw, 72px);
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+  color: #ffffff;
+  margin: 0;
+}
+.w1w-pdp__title-accent {
+  color: #beee00;
+  opacity: 0.9;
+}
+
+.w1w-pdp__price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+}
+.w1w-pdp__price {
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 700;
+  font-size: 36px;
+  color: #ffffff;
+}
+.w1w-pdp__price-compare {
+  font-family: "Inter", sans-serif;
+  font-weight: 300;
+  font-size: 18px;
+  color: #777575;
+  text-decoration: line-through;
+}
+
+/* ── Purchase shell ── */
+.w1w-pdp__shell {
+  background: #131313;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.w1w-pdp__option-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.w1w-pdp__option-label {
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 900;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #adaaaa;
+}
+.w1w-pdp__option-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.w1w-pdp__option-btn {
+  flex: 1;
+  min-width: 80px;
+  padding: 16px 24px;
+  background: #262626;
+  border: 1px solid rgba(243, 255, 202, 0);
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  color: #d4d4d4;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: background 0.18s, border-color 0.18s, color 0.18s;
+}
+.w1w-pdp__option-btn:hover {
+  background: #1a1919;
+}
+.w1w-pdp__option-btn--active {
+  border-color: rgba(243, 255, 202, 0.4);
+  color: #f3ffca;
+}
+.w1w-pdp__option-btn--disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  text-decoration: line-through;
+}
+
+.w1w-pdp__atc-btn {
+  width: 100%;
+  padding: 20px 32px;
+  background: linear-gradient(180deg, #f3ffca 0%, #cafd00 100%);
+  color: #516700;
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 900;
+  font-size: 13px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  border: none;
+  cursor: pointer;
+  transition: filter 0.18s ease, transform 0.1s ease;
+}
+.w1w-pdp__atc-btn:hover { filter: brightness(1.08); }
+.w1w-pdp__atc-btn:active { transform: scale(0.985); }
+.w1w-pdp__atc-btn--sold-out {
+  background: #262626;
+  color: #777575;
+  cursor: not-allowed;
+  filter: none;
+}
+
+.w1w-pdp__dynamic-checkout {
+  display: grid;
+  gap: 12px;
+}
+.w1w-pdp__dynamic-checkout .shopify-payment-button {
+  width: 100%;
+}
+
+/* ── Feature callouts ── */
+.w1w-pdp__features {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(73, 72, 71, 0.15);
+}
+.w1w-pdp__feature {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+.w1w-pdp__feature-icon {
+  color: #f3ffca;
+  font-size: 22px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+.w1w-pdp__feature-title {
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #ffffff;
+  margin: 0 0 4px;
+}
+.w1w-pdp__feature-desc {
+  font-family: "Inter", sans-serif;
+  font-size: 13px;
+  color: #adaaaa;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ── Description ── */
+.w1w-pdp__desc-wrap {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 clamp(16px, 4vw, 64px) 48px;
+}
+.w1w-pdp__desc {
+  max-width: 720px;
+  font-family: "Inter", sans-serif;
+  font-size: 15px;
+  line-height: 1.8;
+  color: #adaaaa;
+}
+.w1w-pdp__desc p { margin-bottom: 1em; }
+
+/* ─────────────────────────────────────────────
+   Recommendations
+───────────────────────────────────────────── */
+.w1w-recs {
+  display: block;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 clamp(16px, 4vw, 64px) 96px;
+}
+
+.w1w-recs__inner {
+  margin-top: 80px;
+}
+
+.w1w-recs__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 40px;
+}
+
+.w1w-recs__heading {
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 900;
+  font-size: clamp(28px, 4vw, 40px);
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: #ffffff;
+  margin: 8px 0 0;
+}
+
+.w1w-recs__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+@media (min-width: 640px) {
+  .w1w-recs__grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.w1w-rec-card {
+  display: block;
+  background: #000000;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.2s ease;
+}
+.w1w-rec-card:hover { transform: translateY(-2px); }
+
+.w1w-rec-card__media {
+  aspect-ratio: 1;
+  overflow: hidden;
+  background: #131313;
+}
+.w1w-rec-card__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.5s ease;
+}
+.w1w-rec-card:hover .w1w-rec-card__img {
+  transform: scale(1.08);
+}
+.w1w-rec-card__info {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.w1w-rec-card__title {
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: #ffffff;
+  margin: 0;
+}
+.w1w-rec-card__price {
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  color: #beee00;
+  margin: 0;
+}
+
+/* Eyebrow shared util */
+.w1w-eyebrow {
+  display: inline-block;
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 900;
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: #f3ffca;
+}
+
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "W1W Product Page",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Feature Callout 1"
+    },
+    {
+      "type": "text",
+      "id": "feature_1_icon",
+      "label": "Material Symbol name",
+      "default": "verified_user"
+    },
+    {
+      "type": "text",
+      "id": "feature_1_title",
+      "label": "Title",
+      "default": "COMFORT-FIT TECH"
+    },
+    {
+      "type": "textarea",
+      "id": "feature_1_desc",
+      "label": "Description",
+      "default": "Dual-weave nylon designed for moisture-wicking under peak performance conditions."
+    },
+    {
+      "type": "header",
+      "content": "Feature Callout 2"
+    },
+    {
+      "type": "text",
+      "id": "feature_2_icon",
+      "label": "Material Symbol name",
+      "default": "auto_awesome"
+    },
+    {
+      "type": "text",
+      "id": "feature_2_title",
+      "label": "Title",
+      "default": "RIO ENERGY SOUL"
+    },
+    {
+      "type": "textarea",
+      "id": "feature_2_desc",
+      "label": "Description",
+      "default": "Signature 5-star embroidery celebrating the legacy of world football icons."
+    }
+  ],
+  "presets": [
+    {
+      "name": "W1W Product Page"
+    }
+  ]
+}
+{% endschema %}
