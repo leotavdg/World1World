@@ -12,33 +12,9 @@
   "name": "Header",
   "sections": {
     "header_announcements_9jGBFp": {
-      "type": "header-announcements",
-      "blocks": {
-        "announcement_BxgCk9": {
-          "type": "_announcement",
-          "settings": {
-            "text": "Welcome to World1World",
-            "link": "",
-            "font": "var(--font-subheading--family)",
-            "font_size": "0.75rem",
-            "weight": "",
-            "letter_spacing": "normal",
-            "case": "none"
-          },
-          "blocks": {}
-        }
-      },
-      "block_order": [
-        "announcement_BxgCk9"
-      ],
-      "name": "t:names.announcement_bar",
+      "type": "w1w-announcement",
       "settings": {
-        "speed": 5,
-        "section_width": "page-width",
-        "color_scheme": "scheme-1",
-        "divider_width": 1,
-        "padding-block-start": 15,
-        "padding-block-end": 15
+        "messages": "FREE WORLDWIDE SHIPPING OVER $35 | DROP 03 — HOST NATIONS LIVE NOW | STACK 3 FOR 10% OFF · 5 FOR 15% · 8 FOR 20% | WORN IN 73 COUNTRIES | KICK-OFF: 2026"
       }
     },
     "header_section": {

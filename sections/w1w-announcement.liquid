@@ -1,0 +1,75 @@
+<div class="w1w-announce">
+  <div class="w1w-announce__ticker">
+    {%- assign messages = section.settings.messages | split: '|' -%}
+    {%- comment -%}Repeat 3× for seamless loop{%- endcomment -%}
+    {%- for i in (1..3) -%}
+      {%- for msg in messages -%}
+        <span>{{ msg | strip }}</span>
+      {%- endfor -%}
+    {%- endfor -%}
+  </div>
+</div>
+
+{% stylesheet %}
+.w1w-announce {
+  background: #F3FFCA;
+  color: #516700;
+  height: 40px;
+  overflow: hidden;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  position: relative;
+  z-index: 51;
+}
+.w1w-announce__ticker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  animation: w1wAnnounceTick 50s linear infinite;
+  white-space: nowrap;
+}
+.w1w-announce__ticker span {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 24px;
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #516700;
+}
+.w1w-announce__ticker span::after {
+  content: '★';
+  margin-left: 24px;
+  color: rgba(81,103,0,0.5);
+  font-size: 8px;
+}
+@keyframes w1wAnnounceTick {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-33.333%); }
+}
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "W1W Announcement Bar",
+  "settings": [
+    {
+      "type": "textarea",
+      "id": "messages",
+      "label": "Messages (separate with |)",
+      "default": "FREE WORLDWIDE SHIPPING OVER $35 | DROP 03 — HOST NATIONS LIVE NOW | STACK 3 FOR 10% OFF · 5 FOR 15% · 8 FOR 20% | WORN IN 73 COUNTRIES | KICK-OFF: 2026"
+    }
+  ],
+  "enabled_on": {
+    "groups": ["header"]
+  },
+  "presets": [
+    {
+      "name": "W1W Announcement Bar"
+    }
+  ]
+}
+{% endschema %}

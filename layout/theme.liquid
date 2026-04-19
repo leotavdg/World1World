@@ -7,31 +7,25 @@
 >
   <head>
     {%- if settings.favicon != blank -%}
-      <link
-        rel="icon"
-        type="image/png"
-        href="{{ settings.favicon | image_url: width: 32, height: 32 }}"
-      >
+      <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 32, height: 32 }}">
     {%- endif -%}
 
     {% # theme-check-disable RemoteAsset %}
-    {% comment %} This a way to wait for main content to load when navigating to a new page so that the view transitions can work consistently {% endcomment %}
     {% if settings.transition_to_main_product or settings.page_transition_enabled %}
-      <link
-        rel="expect"
-        href="#MainContent"
-        blocking="render"
-        id="view-transition-render-blocker"
-      >
+      <link rel="expect" href="#MainContent" blocking="render" id="view-transition-render-blocker">
     {% endif %}
 
     {%- render 'meta-tags' -%}
     {%- render 'stylesheets' -%}
     {%- render 'fonts' -%}
+
+    {{- 'w1w.css' | asset_url | stylesheet_tag -}}
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+
     {%- render 'scripts' -%}
     {%- render 'theme-styles-variables' -%}
     {%- render 'color-schemes' -%}
@@ -42,91 +36,126 @@
 
     {{ content_for_header }}
     {% # theme-check-enable RemoteAsset %}
+
     <style>
-      /* ── Global dark foundation ── */
+      /* ── W1W Global Overrides (after framework CSS) ── */
+
+      /* Force dark everywhere the framework tries to inject light colors */
       html, body {
-        background-color: #0e0e0e !important;
-        color: #ffffff;
-        font-family: "Inter", sans-serif;
+        background: #0E0E0E !important;
+        color: #FFFFFF !important;
       }
-      /* Wipe any white/light section backgrounds injected by the theme framework */
-      .shopify-section,
-      .section-background,
-      .color-scheme-1,
-      .color-scheme-2 {
-        background-color: transparent !important;
-      }
-      /* Force page containers dark */
+
+      /* Nuke light scheme backgrounds */
+      .shopify-section > .section-background,
       .content-for-layout,
       main#MainContent {
-        background-color: #0e0e0e !important;
+        background-color: transparent !important;
       }
 
-      /* ── Scrollbar ── */
-      ::-webkit-scrollbar { width: 4px; }
-      ::-webkit-scrollbar-track { background: #0e0e0e; }
-      ::-webkit-scrollbar-thumb { background: #262626; border-radius: 10px; }
+      /* Override ALL Shopify color scheme CSS vars to be dark */
+      :root {
+        --color-background: 14,14,14;
+        --color-foreground: 255,255,255;
+        --color-base-background-1: 14,14,14;
+        --color-base-background-2: 19,19,19;
+        --color-base-text: 255,255,255;
+        --color-base-border-1: rgba(243,255,202,0.12);
+        --color-base-border-2: rgba(243,255,202,0.25);
+        --color-border: rgba(243,255,202,0.12);
+        --colors-solid-button-labels: 81,103,0;
+        --color-button: #F3FFCA;
+        --color-button-text: #516700;
+        --color-link: #F3FFCA;
+        --color-header-background: rgba(14,14,14,0.85);
+      }
 
-      /* ── Material Symbols ── */
+      /* Force any computed background in scheme containers */
+      [class*="color-scheme-"] {
+        background-color: transparent !important;
+        color: #FFFFFF !important;
+      }
+
+      /* Kill pure white injected backgrounds */
+      [style*="background-color: rgb(255, 255, 255)"],
+      [style*="background-color:rgb(255,255,255)"],
+      [style*="background: rgb(255, 255, 255)"],
+      [style*="background: white"] {
+        background-color: #0E0E0E !important;
+      }
+
+      /* Header: glassmorphism */
+      #header-group header-component,
+      #header-group header-component header,
+      #header-group .header-section {
+        background: rgba(14,14,14,0.88) !important;
+        backdrop-filter: blur(16px) !important;
+        -webkit-backdrop-filter: blur(16px) !important;
+        border-bottom: 1px solid rgba(243,255,202,0.12) !important;
+        color: #FFFFFF !important;
+      }
+
+      /* Force header links/text white */
+      #header-group .header *,
+      #header-group header-component * {
+        color: #FFFFFF;
+      }
+      #header-group .header__heading-link,
+      #header-group .nav-brand-text {
+        color: #F3FFCA !important;
+      }
+
+      /* Announcement bar: lime forced */
+      .announcement-bar,
+      .shopify-section .announcement-bar,
+      aside.announcement-bar {
+        background: #F3FFCA !important;
+        color: #516700 !important;
+      }
+      .announcement-bar *,
+      .announcement-bar__text {
+        color: #516700 !important;
+        font-weight: 700 !important;
+        letter-spacing: 0.18em !important;
+        text-transform: uppercase !important;
+      }
+      /* Hide framework's slideshow arrows in announcement bar */
+      .announcement-bar slideshow-arrows,
+      .announcement-bar .slideshow-control { display: none !important; }
+
+      /* Footer dark */
+      footer,
+      footer .shopify-section,
+      .w1w-footer { background: #131313 !important; color: #FFFFFF !important; }
+
+      /* Material symbols */
       .material-symbols-outlined {
         font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
       }
 
-      /* ── Header glassmorphism ── */
-      #header-group header-component header,
-      #header-group .header-section {
-        background: rgba(20, 20, 20, 0.75) !important;
-        backdrop-filter: blur(20px) !important;
-        -webkit-backdrop-filter: blur(20px) !important;
-        border-bottom: 1px solid rgba(243, 255, 202, 0.05) !important;
-      }
+      /* Selection */
+      ::selection { background: #CAFD00; color: #3a4a00; }
 
-      /* ── Footer dark tonal ── */
-      footer .shopify-section,
-      footer section {
-        background-color: #131313 !important;
-      }
-
-      /* ── Selection color ── */
-      ::selection {
-        background: #cafd00;
-        color: #3a4a00;
-      }
-
-      /* ── Text color normalization ── */
-      p, li, span, div {
-        color: inherit;
-      }
-
-      /* ── Link normalization ── */
+      /* Generic text normalization */
       a { color: inherit; }
     </style>
   </head>
 
   <body class="page-width-{{ settings.page_width }} card-hover-effect-{{ settings.card_hover_effect }}">
     {% render 'skip-to-content-link', href: '#MainContent', text: 'accessibility.skip_to_text' %}
+
     <div id="header-group">
       {% sections 'header-group' %}
     </div>
 
     <script>
-      // Inline header height and menu style calculations to prevent layout shift
-      // Note: Updates in calculateHeaderGroupHeight(), updateTransparentHeaderOffset() and setHeaderMenuStyle() utilities.js should be kept in sync with this function
       (function setHeaderHeighCustomProperties() {
-        /*
-         * Header calculation functions for maintaining CSS variables
-         * Mimic calculateHeaderGroupHeight() in utilities.js
-         */
         const header = document.querySelector('header-component');
         const headerGroup = document.querySelector('#header-group');
         const hasHeaderSection = headerGroup?.querySelector('.header-section');
-
         if (!header || !headerGroup) return;
-
         const headerTopRow = header.querySelector('.header__row--top');
         const headerHeight = header.offsetHeight;
-
-        // Calculate the total height of the header group
         let headerGroupHeight = 0;
         const children = headerGroup.children;
         for (let i = 0; i < children.length; i++) {
@@ -134,36 +163,22 @@
           if (element === header || !(element instanceof HTMLElement)) continue;
           headerGroupHeight += element.offsetHeight;
         }
-
-        // Check for transparent header special case
         if (header.hasAttribute('transparent') && header.parentElement?.nextElementSibling) {
           headerGroupHeight += headerHeight;
         }
-
-        // Set CSS variables
         document.body.style.setProperty('--header-height', `${headerHeight}px`);
         document.body.style.setProperty('--header-group-height', `${headerGroupHeight}px`);
-
         if (headerTopRow) {
           window.requestAnimationFrame(function () {
             document.body.style.setProperty('--top-row-height', `${headerTopRow.offsetHeight}px`);
           });
         }
-
-        /**
-         * Updates CSS custom properties for transparent header offset calculation
-         * Mimic updateTransparentHeaderOffset() in utilities.js
-         */
-
         if (!hasHeaderSection || !header?.hasAttribute('transparent')) {
           document.body.style.setProperty('--transparent-header-offset-boolean', '0');
           return;
         }
-
         const hasImmediateSection = hasHeaderSection.nextElementSibling?.classList.contains('shopify-section');
-
-        const shouldApplyOffset = !hasImmediateSection ? '1' : '0';
-        document.body.style.setProperty('--transparent-header-offset-boolean', shouldApplyOffset);
+        document.body.style.setProperty('--transparent-header-offset-boolean', !hasImmediateSection ? '1' : '0');
       })();
 
       (function setHeaderMenuStyle() {
@@ -197,5 +212,12 @@
     {% if settings.quick_add or settings.mobile_quick_add %}
       {% render 'quick-add-modal' %}
     {% endif %}
+
+    {%- comment -%} W1W Cart Drawer {%- endcomment -%}
+    {% render 'w1w-cart-drawer' %}
+
+    {%- comment -%} W1W Data + App JS {%- endcomment -%}
+    <script src="{{ 'w1w-data.js' | asset_url }}" defer></script>
+    <script src="{{ 'w1w-app.js' | asset_url }}" defer></script>
   </body>
 </html>

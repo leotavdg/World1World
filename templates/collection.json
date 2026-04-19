@@ -13,17 +13,15 @@
       "type": "w1w-collection-hero",
       "settings": {
         "bg_image": "shopify://shop_images/220831_Eagle_SeatingBowl_InternalView.jpg",
-        "label": "International Edition",
-        "title_line1": "The Nations",
-        "title_line2": "Series"
+        "title": "THE ROSTER.",
+        "tag": "DROP 03",
+        "drop_line": "HOST NATIONS LIVE NOW"
       }
     },
     "w1w_col_main": {
       "type": "w1w-main-collection",
       "settings": {
-        "products_per_page": 12,
-        "sort_label": "Sort By",
-        "quick_add_label": "Quick Add"
+        "products_per_page": 24
       }
     },
     "w1w_col_promo": {

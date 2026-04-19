@@ -1,0 +1,20 @@
+<div class="w1w-scrim" id="w1w-scrim"></div>
+<aside class="w1w-drawer" id="w1w-cart-drawer" aria-label="Shopping bag">
+  <div class="w1w-drawer-head">
+    <h3>YOUR BAG</h3>
+    <button class="icon-btn" id="w1w-drawer-close" aria-label="Close">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="m6 6 12 12M18 6 6 18"/></svg>
+    </button>
+  </div>
+  <div id="w1w-drawer-free" class="w1w-drawer-free" style="display:none"></div>
+  <div id="w1w-drawer-body" class="w1w-drawer-body"></div>
+  <div id="w1w-drawer-foot" class="w1w-drawer-foot" style="display:none">
+    <div class="w1w-drawer-total">
+      <span class="label">SUBTOTAL</span>
+      <span class="amt" id="w1w-drawer-total">$0.00</span>
+    </div>
+    <p style="font-size:11px;color:var(--ink-3);letter-spacing:0.1em;text-transform:uppercase">Tax & shipping calculated at checkout</p>
+    <a href="/cart" class="btn btn-primary btn-block btn-lg">CHECKOUT →</a>
+    <button onclick="W1W.closeDrawer()" style="color:var(--ink-2);font-size:12px;letter-spacing:0.15em;text-transform:uppercase;font-weight:700;background:transparent;border:none;cursor:pointer">Continue shopping</button>
+  </div>
+</aside>

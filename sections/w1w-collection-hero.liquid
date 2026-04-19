@@ -1,98 +1,169 @@
-<section class="w1w-col-hero">
-  <div class="w1w-col-hero__bg">
+<section class="w1w-roster-hero">
+  <div class="w1w-roster-hero__bg">
     {%- if section.settings.bg_image != blank -%}
-      {{ section.settings.bg_image | image_url: width: 1800 | image_tag: loading: 'eager', class: 'w1w-col-hero__bg-img', alt: section.settings.bg_image.alt }}
+      {{ section.settings.bg_image | image_url: width: 1800 | image_tag: loading: 'eager', class: 'w1w-roster-hero__bg-img', alt: '' }}
     {%- elsif collection.image != blank -%}
-      {{ collection.image | image_url: width: 1800 | image_tag: loading: 'eager', class: 'w1w-col-hero__bg-img', alt: collection.image.alt }}
+      {{ collection.image | image_url: width: 1800 | image_tag: loading: 'eager', class: 'w1w-roster-hero__bg-img', alt: '' }}
     {%- endif -%}
-    <div class="w1w-col-hero__gradient"></div>
+    <div class="w1w-roster-hero__gradient"></div>
   </div>
-  <div class="w1w-col-hero__content">
-    <div class="w1w-col-hero__inner">
-      {%- if section.settings.label != blank -%}
-        <span class="w1w-col-hero__label">{{ section.settings.label }}</span>
+  <div class="w1w-roster-hero__inner">
+    <div class="w1w-roster-hero__eyebrow">
+      <span class="w1w-roster-hero__tag">{{ section.settings.tag | default: 'DROP 03' }}</span>
+      <span class="w1w-roster-hero__tag-sep">—</span>
+      <span>{{ section.settings.drop_line | default: 'HOST NATIONS LIVE NOW' }}</span>
+    </div>
+    <h1 class="w1w-roster-hero__title">
+      {%- if section.settings.title != blank -%}
+        {{ section.settings.title }}
+      {%- else -%}
+        {{ collection.title | upcase }}
       {%- endif -%}
-      <h1 class="w1w-col-hero__title">
-        {%- if section.settings.title_line1 != blank -%}
-          {{ section.settings.title_line1 }}<br>
-          <span class="w1w-col-hero__accent">{{ section.settings.title_line2 | default: collection.title }}</span>
-        {%- else -%}
-          {{ collection.title }}
-        {%- endif -%}
-      </h1>
+    </h1>
+    <div class="w1w-roster-hero__stats">
+      <div class="w1w-roster-hero__stat">
+        <span class="stat-num">50+</span>
+        <span class="stat-lbl">Nations</span>
+      </div>
+      <div class="w1w-roster-hero__stat-div"></div>
+      <div class="w1w-roster-hero__stat">
+        <span class="stat-num">6</span>
+        <span class="stat-lbl">Confederations</span>
+      </div>
+      <div class="w1w-roster-hero__stat-div"></div>
+      <div class="w1w-roster-hero__stat">
+        <span class="stat-num">73</span>
+        <span class="stat-lbl">Countries Worn</span>
+      </div>
+      <div class="w1w-roster-hero__stat-div"></div>
+      <div class="w1w-roster-hero__stat">
+        <span class="stat-num">$5</span>
+        <span class="stat-lbl">Per Bracelet</span>
+      </div>
     </div>
   </div>
 </section>
 
 {% stylesheet %}
-  .w1w-col-hero {
-    position: relative;
-    height: 409px;
-    display: flex;
-    align-items: flex-end;
-    overflow: hidden;
-    background: #000;
-    isolation: isolate;
+.w1w-roster-hero {
+  position: relative;
+  min-height: 380px;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+  background: #050505;
+  isolation: isolate;
+  padding: 0 32px 48px;
+}
+.w1w-roster-hero__bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+.w1w-roster-hero__bg-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.25;
+  mix-blend-mode: luminosity;
+  display: block;
+}
+.w1w-roster-hero__gradient {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to right, rgba(14,14,14,0.9) 40%, transparent 100%),
+    linear-gradient(to top, #0e0e0e 0%, transparent 60%);
+}
+.w1w-roster-hero__inner {
+  position: relative;
+  z-index: 1;
+  max-width: 1536px;
+  width: 100%;
+  margin: 0 auto;
+}
+.w1w-roster-hero__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: rgba(243,255,202,0.7);
+}
+.w1w-roster-hero__tag {
+  background: #F3FFCA;
+  color: #516700;
+  padding: 4px 10px;
+  font-size: 0.5625rem;
+  font-weight: 900;
+  letter-spacing: 0.2em;
+}
+.w1w-roster-hero__tag-sep {
+  color: rgba(243,255,202,0.3);
+}
+.w1w-roster-hero__title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(3.5rem, 9vw, 8rem);
+  font-weight: 900;
+  color: #FFFFFF;
+  text-transform: uppercase;
+  letter-spacing: -0.04em;
+  line-height: 0.88;
+  margin: 0 0 36px;
+}
+.w1w-roster-hero__stats {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.w1w-roster-hero__stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.w1w-roster-hero__stat .stat-num {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: #F3FFCA;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+.w1w-roster-hero__stat .stat-lbl {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.6rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: rgba(255,255,255,0.4);
+}
+.w1w-roster-hero__stat-div {
+  width: 1px;
+  height: 32px;
+  background: rgba(243,255,202,0.15);
+  flex-shrink: 0;
+}
+@media (max-width: 768px) {
+  .w1w-roster-hero {
+    min-height: 300px;
+    padding: 0 16px 36px;
   }
-  .w1w-col-hero__bg {
-    position: absolute;
-    inset: 0;
-    z-index: 0;
+  .w1w-roster-hero__title {
+    font-size: clamp(2.5rem, 12vw, 4rem);
+    margin-bottom: 24px;
   }
-  .w1w-col-hero__bg-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    opacity: 0.4;
-    mix-blend-mode: luminosity;
-    display: block;
+  .w1w-roster-hero__stats {
+    gap: 16px;
   }
-  .w1w-col-hero__gradient {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to top, #0e0e0e 0%, transparent 60%);
+  .w1w-roster-hero__stat .stat-num {
+    font-size: 1.25rem;
   }
-  .w1w-col-hero__content {
-    position: relative;
-    z-index: 1;
-    width: 100%;
-    padding: 0 32px 48px;
-  }
-  .w1w-col-hero__inner {
-    max-width: 1536px;
-    margin: 0 auto;
-  }
-  .w1w-col-hero__label {
-    display: block;
-    color: #f3ffca;
-    font-family: "Space Grotesk", sans-serif;
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.3em;
-    margin-bottom: 16px;
-  }
-  .w1w-col-hero__title {
-    font-family: "Space Grotesk", sans-serif;
-    font-size: clamp(3rem, 8vw, 7rem);
-    font-weight: 900;
-    color: rgba(255, 255, 255, 0.9);
-    text-transform: uppercase;
-    letter-spacing: -0.03em;
-    line-height: 0.9;
-    margin: 0;
-  }
-  .w1w-col-hero__accent {
-    color: #f3ffca;
-  }
-  @media (max-width: 768px) {
-    .w1w-col-hero {
-      height: 300px;
-    }
-    .w1w-col-hero__content {
-      padding: 0 16px 32px;
-    }
-  }
+}
 {% endstylesheet %}
 
 {% schema %}
@@ -102,25 +173,25 @@
     {
       "type": "image_picker",
       "id": "bg_image",
-      "label": "Background image (overrides collection image)"
+      "label": "Background image"
     },
     {
       "type": "text",
-      "id": "label",
-      "label": "Label above title",
-      "default": "International Edition"
+      "id": "title",
+      "label": "Hero title (leave blank to use collection title)",
+      "default": "THE ROSTER."
     },
     {
       "type": "text",
-      "id": "title_line1",
-      "label": "Title line 1 (leave blank to use collection title)",
-      "default": "The Nations"
+      "id": "tag",
+      "label": "Tag badge text",
+      "default": "DROP 03"
     },
     {
       "type": "text",
-      "id": "title_line2",
-      "label": "Title line 2 (accent, leave blank to use collection title)",
-      "default": "Series"
+      "id": "drop_line",
+      "label": "Tag line text",
+      "default": "HOST NATIONS LIVE NOW"
     }
   ],
   "presets": [

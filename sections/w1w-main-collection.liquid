@@ -1,74 +1,116 @@
 {%- liquid
-  assign products_per_page = section.settings.products_per_page | default: 12
+  assign products_per_page = section.settings.products_per_page | default: 24
   assign sort_by = collection.sort_by | default: collection.default_sort_by
 -%}
 
 {%- paginate collection.products by products_per_page -%}
-<section class="w1w-col-catalog">
-  <div class="w1w-col-catalog__inner">
 
-    <aside class="w1w-col-sidebar">
-      <div class="w1w-col-sidebar__sticky">
+{%- comment -%} Build JS product data for client-side filter/search {%- endcomment -%}
+<script>
+window.W1W_SHOP_PRODUCTS = [
+  {%- for product in collection.products -%}
+  {
+    id: {{ product.id }},
+    title: {{ product.title | json }},
+    handle: {{ product.handle | json }},
+    url: {{ product.url | json }},
+    price: {{ product.price | divided_by: 100.0 }},
+    type: {{ product.type | json }},
+    tags: {{ product.tags | json }},
+    vendor: {{ product.vendor | json }},
+    available: {{ product.available }},
+    image: "{% if product.featured_image %}{{ product.featured_image | image_url: width: 600 }}{% endif %}"
+  }{% unless forloop.last %},{% endunless %}
+  {%- endfor -%}
+];
+</script>
 
-        <!-- Sort By -->
-        <div class="w1w-filter-group">
-          <h3 class="w1w-filter-group__label">{{ section.settings.sort_label }}</h3>
-          <div class="w1w-sort-pills">
+<section class="w1w-shop">
+
+  <!-- Confederation chips -->
+  <div class="w1w-shop-chips-bar">
+    <div class="w1w-shop-chips-bar__inner">
+      <button class="w1w-chip w1w-chip--active" data-confed="all">
+        ALL <span class="w1w-chip__count" id="chip-count-all">{{ collection.products_count }}</span>
+      </button>
+      <button class="w1w-chip" data-confed="concacaf">CONCACAF <span class="w1w-chip__count" id="chip-count-concacaf"></span></button>
+      <button class="w1w-chip" data-confed="conmebol">CONMEBOL <span class="w1w-chip__count" id="chip-count-conmebol"></span></button>
+      <button class="w1w-chip" data-confed="uefa">UEFA <span class="w1w-chip__count" id="chip-count-uefa"></span></button>
+      <button class="w1w-chip" data-confed="caf">CAF <span class="w1w-chip__count" id="chip-count-caf"></span></button>
+      <button class="w1w-chip" data-confed="afc">AFC <span class="w1w-chip__count" id="chip-count-afc"></span></button>
+      <button class="w1w-chip" data-confed="ofc">OFC <span class="w1w-chip__count" id="chip-count-ofc"></span></button>
+    </div>
+  </div>
+
+  <div class="w1w-shop__inner">
+
+    <!-- Sidebar -->
+    <aside class="w1w-shop-sidebar" id="w1w-shop-sidebar">
+      <div class="w1w-shop-sidebar__sticky">
+
+        <!-- Search -->
+        <div class="w1w-shop-filter-group">
+          <div class="w1w-shop-search">
+            <svg class="w1w-shop-search__icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input type="text" id="w1w-shop-search-input" placeholder="Search nations…" class="w1w-shop-search__input" autocomplete="off">
+          </div>
+        </div>
+
+        <!-- Quick tags -->
+        <div class="w1w-shop-filter-group">
+          <h3 class="w1w-shop-filter-label">QUICK FILTER</h3>
+          <div class="w1w-shop-tags">
+            <button class="w1w-shop-tag" data-tag="host">HOST NATIONS</button>
+            <button class="w1w-shop-tag" data-tag="featured">FEATURED</button>
+            <button class="w1w-shop-tag" data-tag="all">SHOW ALL</button>
+          </div>
+        </div>
+
+        <!-- Sort -->
+        <div class="w1w-shop-filter-group">
+          <h3 class="w1w-shop-filter-label">SORT BY</h3>
+          <div class="w1w-shop-sort-list">
             {%- for option in collection.sort_options -%}
-              {%- assign is_active = false -%}
-              {%- if option.value == sort_by -%}{%- assign is_active = true -%}{%- endif -%}
               <a
-                href="{{ collection.url }}?sort_by={{ option.value }}{%- if collection.current_vendor or collection.current_type -%}&q={{ collection.current_vendor }}{{ collection.current_type }}{%- endif -%}"
-                class="w1w-sort-pill{% if is_active %} w1w-sort-pill--active{% endif %}"
+                href="{{ collection.url }}?sort_by={{ option.value }}"
+                class="w1w-shop-sort-link{% if option.value == sort_by %} active{% endif %}"
               >{{ option.label }}</a>
             {%- endfor -%}
           </div>
         </div>
 
-        <!-- Shopify native filters -->
+        <!-- Shopify filters -->
         {%- if collection.filters.size > 0 -%}
           {%- for filter in collection.filters -%}
-            <div class="w1w-filter-group">
-              <h3 class="w1w-filter-group__label">{{ filter.label }}</h3>
-
+            <div class="w1w-shop-filter-group">
+              <h3 class="w1w-shop-filter-label">{{ filter.label | upcase }}</h3>
               {%- if filter.type == 'price_range' -%}
-                <div class="w1w-price-filter">
-                  <div class="w1w-price-filter__inputs">
-                    <input
-                      type="number"
-                      name="{{ filter.min_value.param_name }}"
-                      value="{{ filter.min_value.value | divided_by: 100.0 }}"
-                      placeholder="Min"
-                      class="w1w-price-input"
-                      min="0"
-                      max="{{ filter.range_max | divided_by: 100.0 }}"
-                    >
-                    <span class="w1w-price-filter__sep">–</span>
-                    <input
-                      type="number"
-                      name="{{ filter.max_value.param_name }}"
-                      value="{{ filter.max_value.value | divided_by: 100.0 }}"
-                      placeholder="Max"
-                      class="w1w-price-input"
-                      min="0"
-                      max="{{ filter.range_max | divided_by: 100.0 }}"
-                    >
-                  </div>
+                <div class="w1w-shop-price-row">
+                  <input type="number" name="{{ filter.min_value.param_name }}"
+                    value="{{ filter.min_value.value | divided_by: 100.0 }}"
+                    placeholder="Min" class="w1w-shop-price-input" min="0"
+                    max="{{ filter.range_max | divided_by: 100.0 }}">
+                  <span>–</span>
+                  <input type="number" name="{{ filter.max_value.param_name }}"
+                    value="{{ filter.max_value.value | divided_by: 100.0 }}"
+                    placeholder="Max" class="w1w-shop-price-input" min="0"
+                    max="{{ filter.range_max | divided_by: 100.0 }}">
                 </div>
-
               {%- elsif filter.type == 'boolean' or filter.type == 'list' -%}
-                <ul class="w1w-filter-list">
+                <ul class="w1w-shop-filter-list">
                   {%- for value in filter.values -%}
-                    <li class="w1w-filter-item{% if value.active %} w1w-filter-item--active{% endif %}">
+                    <li>
                       {%- if value.active -%}
-                        <a href="{{ value.url_to_remove }}" class="w1w-filter-link w1w-filter-link--active" aria-label="Remove {{ value.label }}">
-                          <span class="w1w-filter-link__label">{{ value.label }}</span>
-                          <span class="w1w-filter-link__count">{{ value.count }}</span>
+                        <a href="{{ value.url_to_remove }}" class="w1w-shop-filter-link active">
+                          <span class="w1w-shop-filter-check">✓</span>
+                          <span>{{ value.label }}</span>
+                          <span class="w1w-shop-filter-cnt">{{ value.count }}</span>
                         </a>
                       {%- else -%}
-                        <a href="{{ value.url_to_add }}" class="w1w-filter-link{% if value.count == 0 %} w1w-filter-link--disabled{% endif %}" aria-label="{{ value.label }} ({{ value.count }})">
-                          <span class="w1w-filter-link__label">{{ value.label }}</span>
-                          <span class="w1w-filter-link__count">{{ value.count }}</span>
+                        <a href="{{ value.url_to_add }}" class="w1w-shop-filter-link{% if value.count == 0 %} disabled{% endif %}">
+                          <span class="w1w-shop-filter-check"></span>
+                          <span>{{ value.label }}</span>
+                          <span class="w1w-shop-filter-cnt">{{ value.count }}</span>
                         </a>
                       {%- endif -%}
                     </li>
@@ -78,440 +120,761 @@
             </div>
           {%- endfor -%}
 
-          {%- unless collection.filters == empty -%}
-            {%- assign active_filters_count = 0 -%}
-            {%- for filter in collection.filters -%}
-              {%- for value in filter.active_values -%}
-                {%- assign active_filters_count = active_filters_count | plus: 1 -%}
-              {%- endfor -%}
-            {%- endfor -%}
-            {%- if active_filters_count > 0 -%}
-              <a href="{{ collection.url }}" class="w1w-clear-filters">Clear all filters</a>
-            {%- endif -%}
-          {%- endunless -%}
+          {%- assign active_count = 0 -%}
+          {%- for filter in collection.filters -%}
+            {%- for v in filter.active_values -%}{%- assign active_count = active_count | plus: 1 -%}{%- endfor -%}
+          {%- endfor -%}
+          {%- if active_count > 0 -%}
+            <a href="{{ collection.url }}" class="w1w-shop-clear">Clear all filters</a>
+          {%- endif -%}
         {%- endif -%}
 
       </div>
     </aside>
 
-    <!-- Product Grid -->
-    <div class="w1w-col-grid">
-      {%- if collection.products.size == 0 -%}
-        <p class="w1w-col-empty">No products found.</p>
-      {%- else -%}
-        <div class="w1w-col-products">
+    <!-- Main content -->
+    <div class="w1w-shop-main">
+
+      <!-- Top bar -->
+      <div class="w1w-shop-topbar">
+        <span class="w1w-shop-topbar__count">
+          <span id="w1w-visible-count">{{ collection.products_count }}</span> NATIONS
+        </span>
+        <button class="w1w-shop-topbar__filter-toggle" id="w1w-filter-toggle" aria-label="Toggle filters">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+          FILTERS
+        </button>
+      </div>
+
+      <!-- Product grid (Shopify server-rendered products as data, JS renders bracelets) -->
+      <div class="w1w-shop-grid" id="w1w-shop-grid">
+        {%- if collection.products.size == 0 -%}
+          <p class="w1w-shop-empty">No products found in this collection.</p>
+        {%- else -%}
           {%- for product in collection.products -%}
-            <div class="w1w-col-card">
-              <div class="w1w-col-card__media">
-                <a href="{{ product.url }}" class="w1w-col-card__img-link" aria-label="{{ product.title | escape }}">
+            <div
+              class="w1w-nation-card"
+              data-handle="{{ product.handle }}"
+              data-title="{{ product.title | downcase | escape }}"
+              data-available="{{ product.available }}"
+              data-tags="{{ product.tags | join: ',' | downcase }}"
+            >
+              <a href="{{ product.url }}" class="w1w-nation-card__link">
+                <div class="w1w-nation-card__scene" data-bracelet-handle="{{ product.handle }}">
                   {%- if product.featured_image != blank -%}
-                    {{ product.featured_image | image_url: width: 600 | image_tag: loading: 'lazy', class: 'w1w-col-card__img', alt: product.featured_image.alt | escape }}
+                    {{ product.featured_image | image_url: width: 600 | image_tag:
+                      loading: 'lazy',
+                      class: 'w1w-nation-card__img',
+                      alt: product.featured_image.alt | escape }}
                   {%- else -%}
-                    {{ 'product-1' | placeholder_svg_tag: 'w1w-col-card__img w1w-col-card__img--placeholder' }}
+                    <div class="w1w-nation-card__bracelet-ph"></div>
                   {%- endif -%}
-                </a>
-                <div class="w1w-col-card__hover-overlay"></div>
-                <div class="w1w-col-card__actions">
-                  <a href="{{ product.url }}" class="w1w-col-card__quick-add" data-product-handle="{{ product.handle }}">
-                    {{ section.settings.quick_add_label }}
-                  </a>
-                  <a href="{{ product.url }}" class="w1w-col-card__view" aria-label="View {{ product.title | escape }}">
-                    <span class="material-symbols-outlined">visibility</span>
-                  </a>
+                  <div class="w1w-nation-card__overlay"></div>
                 </div>
-              </div>
-              <div class="w1w-col-card__info">
-                <div>
-                  <h4 class="w1w-col-card__title">
-                    <a href="{{ product.url }}">{{ product.title }}</a>
-                  </h4>
-                  <p class="w1w-col-card__type">{{ product.type }}</p>
+                <div class="w1w-nation-card__info">
+                  <div class="w1w-nation-card__meta">
+                    <span class="w1w-nation-card__swatch" data-swatch-handle="{{ product.handle }}"></span>
+                    <span class="w1w-nation-card__name">{{ product.title }}</span>
+                  </div>
+                  <span class="w1w-nation-card__price">{{ product.price | money_without_trailing_zeros }}</span>
                 </div>
-                <span class="w1w-col-card__price">{{ product.price | money_without_trailing_zeros }}</span>
-              </div>
+              </a>
+              <button
+                class="w1w-nation-card__atc"
+                data-product-id="{{ product.variants.first.id }}"
+                data-handle="{{ product.handle }}"
+                aria-label="Add {{ product.title | escape }} to bag"
+              >
+                {%- if product.available -%}
+                  ADD TO BAG
+                {%- else -%}
+                  SOLD OUT
+                {%- endif -%}
+              </button>
             </div>
           {%- endfor -%}
-        </div>
-
-        <!-- Pagination -->
-        {%- if paginate.pages > 1 -%}
-          <div class="w1w-pagination">
-            {%- if paginate.previous -%}
-              <a href="{{ paginate.previous.url }}" class="w1w-pagination__btn">
-                <span class="material-symbols-outlined">arrow_back</span>
-              </a>
-            {%- endif -%}
-            {%- for part in paginate.parts -%}
-              {%- if part.is_link -%}
-                <a href="{{ part.url }}" class="w1w-pagination__page">{{ part.title }}</a>
-              {%- else -%}
-                {%- if part.title == paginate.current_page -%}
-                  <span class="w1w-pagination__page w1w-pagination__page--active">{{ part.title }}</span>
-                {%- else -%}
-                  <span class="w1w-pagination__ellipsis">{{ part.title }}</span>
-                {%- endif -%}
-              {%- endif -%}
-            {%- endfor -%}
-            {%- if paginate.next -%}
-              <a href="{{ paginate.next.url }}" class="w1w-pagination__btn">
-                <span class="material-symbols-outlined">arrow_forward</span>
-              </a>
-            {%- endif -%}
-          </div>
         {%- endif -%}
-      {%- endif -%}
-    </div>
+      </div>
 
+      <!-- No results message (hidden by default) -->
+      <div class="w1w-shop-no-results" id="w1w-shop-no-results" style="display:none">
+        <p>No nations match your search. <button class="w1w-shop-no-results__reset" id="w1w-reset-filters">Reset filters</button></p>
+      </div>
+
+      <!-- Pagination -->
+      {%- if paginate.pages > 1 -%}
+        <div class="w1w-shop-pagination">
+          {%- if paginate.previous -%}
+            <a href="{{ paginate.previous.url }}" class="w1w-shop-pg-btn">←</a>
+          {%- endif -%}
+          {%- for part in paginate.parts -%}
+            {%- if part.is_link -%}
+              <a href="{{ part.url }}" class="w1w-shop-pg-num">{{ part.title }}</a>
+            {%- else -%}
+              {%- if part.title == paginate.current_page -%}
+                <span class="w1w-shop-pg-num active">{{ part.title }}</span>
+              {%- else -%}
+                <span class="w1w-shop-pg-ellipsis">…</span>
+              {%- endif -%}
+            {%- endif -%}
+          {%- endfor -%}
+          {%- if paginate.next -%}
+            <a href="{{ paginate.next.url }}" class="w1w-shop-pg-btn">→</a>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+
+    </div>
   </div>
 </section>
+
 {%- endpaginate -%}
 
 {% stylesheet %}
-  .w1w-col-catalog {
-    background: #0e0e0e;
-    padding: 64px 0;
+/* ── Shop Page Layout ── */
+.w1w-shop {
+  background: #0E0E0E;
+  min-height: 60vh;
+  padding-bottom: 96px;
+}
+
+/* Confederation chips bar */
+.w1w-shop-chips-bar {
+  background: #0E0E0E;
+  border-bottom: 1px solid rgba(243,255,202,0.08);
+  padding: 0 32px;
+  position: sticky;
+  top: var(--header-group-height, 80px);
+  z-index: 30;
+}
+.w1w-shop-chips-bar__inner {
+  max-width: 1536px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 12px 0;
+}
+.w1w-shop-chips-bar__inner::-webkit-scrollbar { display: none; }
+.w1w-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(243,255,202,0.15);
+  background: transparent;
+  color: rgba(255,255,255,0.55);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.w1w-chip:hover {
+  border-color: rgba(243,255,202,0.4);
+  color: #F3FFCA;
+}
+.w1w-chip--active {
+  background: #F3FFCA;
+  border-color: #F3FFCA;
+  color: #516700;
+}
+.w1w-chip__count {
+  font-size: 0.5625rem;
+  opacity: 0.7;
+}
+.w1w-chip--active .w1w-chip__count { opacity: 0.6; }
+
+/* Inner layout */
+.w1w-shop__inner {
+  max-width: 1536px;
+  margin: 0 auto;
+  padding: 40px 32px 0;
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 48px;
+  align-items: start;
+}
+
+/* ── Sidebar ── */
+.w1w-shop-sidebar__sticky {
+  position: sticky;
+  top: calc(var(--header-group-height, 80px) + 60px);
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+}
+.w1w-shop-filter-group { display: flex; flex-direction: column; gap: 12px; }
+.w1w-shop-filter-label {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.5625rem;
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+  margin: 0;
+}
+/* Search */
+.w1w-shop-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #1A1A1A;
+  border: 1px solid rgba(243,255,202,0.12);
+  padding: 10px 14px;
+  transition: border-color 0.2s;
+}
+.w1w-shop-search:focus-within { border-color: rgba(243,255,202,0.4); }
+.w1w-shop-search__icon { color: rgba(255,255,255,0.3); flex-shrink: 0; }
+.w1w-shop-search__input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #FFF;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.8125rem;
+  width: 100%;
+}
+.w1w-shop-search__input::placeholder { color: rgba(255,255,255,0.3); }
+/* Quick tags */
+.w1w-shop-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.w1w-shop-tag {
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(243,255,202,0.15);
+  background: transparent;
+  color: rgba(255,255,255,0.5);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.w1w-shop-tag:hover, .w1w-shop-tag.active {
+  border-color: #F3FFCA;
+  color: #F3FFCA;
+}
+/* Sort */
+.w1w-shop-sort-list { display: flex; flex-direction: column; gap: 8px; }
+.w1w-shop-sort-link {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: rgba(255,255,255,0.45);
+  text-decoration: none;
+  text-transform: capitalize;
+  transition: color 0.2s;
+}
+.w1w-shop-sort-link:hover { color: #FFF; }
+.w1w-shop-sort-link.active { color: #F3FFCA; }
+/* Filter list */
+.w1w-shop-filter-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
+.w1w-shop-filter-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: rgba(255,255,255,0.5);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+.w1w-shop-filter-link:hover { color: #FFF; }
+.w1w-shop-filter-link.active { color: #F3FFCA; }
+.w1w-shop-filter-link.disabled { opacity: 0.3; pointer-events: none; }
+.w1w-shop-filter-check {
+  width: 14px;
+  height: 14px;
+  border: 1px solid rgba(243,255,202,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.5625rem;
+  color: #F3FFCA;
+  flex-shrink: 0;
+}
+.w1w-shop-filter-cnt {
+  margin-left: auto;
+  font-size: 0.625rem;
+  color: rgba(255,255,255,0.3);
+}
+/* Price */
+.w1w-shop-price-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: rgba(255,255,255,0.4);
+  font-size: 0.875rem;
+}
+.w1w-shop-price-input {
+  width: 72px;
+  background: #1A1A1A;
+  border: 1px solid rgba(243,255,202,0.12);
+  color: #FFF;
+  padding: 8px 10px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.8125rem;
+  outline: none;
+}
+.w1w-shop-price-input:focus { border-color: rgba(243,255,202,0.4); }
+/* Clear */
+.w1w-shop-clear {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.3);
+  text-decoration: underline;
+  transition: color 0.2s;
+}
+.w1w-shop-clear:hover { color: #F3FFCA; }
+
+/* ── Main grid area ── */
+.w1w-shop-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(243,255,202,0.08);
+}
+.w1w-shop-topbar__count {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: rgba(255,255,255,0.35);
+}
+.w1w-shop-topbar__filter-toggle {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: 1px solid rgba(243,255,202,0.15);
+  color: rgba(255,255,255,0.6);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  padding: 8px 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.w1w-shop-topbar__filter-toggle:hover {
+  border-color: rgba(243,255,202,0.4);
+  color: #F3FFCA;
+}
+
+/* ── Nation Cards Grid ── */
+.w1w-shop-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2px;
+}
+.w1w-nation-card {
+  position: relative;
+  background: #131313;
+  display: flex;
+  flex-direction: column;
+}
+.w1w-nation-card__link {
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: inherit;
+  flex: 1;
+}
+.w1w-nation-card__scene {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  background: #0a0a0a;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+}
+.w1w-nation-card__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s ease;
+  display: block;
+}
+.w1w-nation-card:hover .w1w-nation-card__img { transform: scale(1.06); }
+.w1w-nation-card__bracelet-ph {
+  width: 70%;
+  aspect-ratio: 3 / 1;
+  border-radius: 999px;
+  background: repeating-linear-gradient(45deg,
+    var(--c1,#D72638) 0, var(--c1,#D72638) 12px,
+    var(--c2,#FFFFFF) 12px, var(--c2,#FFFFFF) 24px,
+    var(--c3,#000000) 24px, var(--c3,#000000) 36px);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.5);
+}
+.w1w-nation-card__overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(14,14,14,0);
+  transition: background 0.3s;
+  pointer-events: none;
+}
+.w1w-nation-card:hover .w1w-nation-card__overlay {
+  background: rgba(14,14,14,0.2);
+}
+.w1w-nation-card__info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px 8px;
+  gap: 8px;
+  border-top: 1px solid rgba(243,255,202,0.06);
+}
+.w1w-nation-card__meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.w1w-nation-card__swatch {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: #333;
+  display: block;
+}
+.w1w-nation-card__name {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: #FFF;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 0.2s;
+}
+.w1w-nation-card:hover .w1w-nation-card__name { color: #F3FFCA; }
+.w1w-nation-card__price {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #F3FFCA;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.w1w-nation-card__atc {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-top: 1px solid rgba(243,255,202,0.06);
+  color: rgba(255,255,255,0.35);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.5625rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.w1w-nation-card__atc:hover {
+  background: #F3FFCA;
+  color: #516700;
+  border-top-color: #F3FFCA;
+}
+.w1w-nation-card--hidden { display: none !important; }
+
+/* Empty / no results */
+.w1w-shop-empty, .w1w-shop-no-results {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 80px 0;
+  color: rgba(255,255,255,0.3);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9375rem;
+}
+.w1w-shop-no-results__reset {
+  background: none;
+  border: none;
+  color: #F3FFCA;
+  cursor: pointer;
+  text-decoration: underline;
+  font-size: inherit;
+}
+
+/* Pagination */
+.w1w-shop-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 72px;
+}
+.w1w-shop-pg-btn,
+.w1w-shop-pg-num {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  height: 40px;
+  padding: 0 8px;
+  background: #1A1A1A;
+  border: 1px solid rgba(243,255,202,0.1);
+  color: #FFF;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+.w1w-shop-pg-btn:hover, .w1w-shop-pg-num:hover {
+  border-color: rgba(243,255,202,0.3);
+  color: #F3FFCA;
+}
+.w1w-shop-pg-num.active {
+  background: #F3FFCA;
+  border-color: #F3FFCA;
+  color: #516700;
+  pointer-events: none;
+}
+.w1w-shop-pg-ellipsis { color: rgba(255,255,255,0.3); padding: 0 6px; }
+
+/* ── Responsive ── */
+@media (max-width: 1280px) {
+  .w1w-shop-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 1024px) {
+  .w1w-shop__inner {
+    grid-template-columns: 200px 1fr;
+    gap: 32px;
+    padding: 32px 24px 0;
   }
-  .w1w-col-catalog__inner {
-    max-width: 1536px;
-    margin: 0 auto;
-    padding: 0 32px;
-    display: grid;
-    grid-template-columns: 280px 1fr;
-    gap: 48px;
-    align-items: start;
+  .w1w-shop-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 768px) {
+  .w1w-shop-chips-bar { padding: 0 16px; }
+  .w1w-shop__inner {
+    grid-template-columns: 1fr;
+    padding: 24px 16px 0;
   }
-  /* ---- Sidebar ---- */
-  .w1w-col-sidebar__sticky {
-    position: sticky;
-    top: 120px;
-    display: flex;
-    flex-direction: column;
-    gap: 48px;
+  .w1w-shop-sidebar {
+    display: none;
   }
-  .w1w-filter-group__label {
-    font-family: "Space Grotesk", sans-serif;
-    font-size: 0.625rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.2em;
-    color: #adaaaa;
-    margin: 0 0 24px;
-  }
-  /* Sort pills */
-  .w1w-sort-pills {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-  .w1w-sort-pill {
-    display: inline-block;
-    padding: 8px 16px;
-    border-radius: 999px;
-    background: #262626;
-    color: #d4d4d4;
-    font-family: "Space Grotesk", sans-serif;
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    text-decoration: none;
-    transition: background 0.2s, color 0.2s;
-  }
-  .w1w-sort-pill:hover {
-    background: #2c2c2c;
-    color: #fff;
-  }
-  .w1w-sort-pill--active {
-    background: #f3ffca;
-    color: #516700;
-  }
-  /* Filter list */
-  .w1w-filter-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-  .w1w-filter-link {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    text-decoration: none;
-    color: #d4d4d4;
-    transition: color 0.2s;
-  }
-  .w1w-filter-link:hover {
-    color: #f3ffca;
-  }
-  .w1w-filter-link--active {
-    color: #f3ffca;
-  }
-  .w1w-filter-link--disabled {
-    opacity: 0.4;
-    pointer-events: none;
-  }
-  .w1w-filter-link__label {
-    font-family: "Inter", sans-serif;
-    font-size: 0.875rem;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-  .w1w-filter-link__count {
-    font-family: "Inter", monospace;
-    font-size: 0.625rem;
-    color: #adaaaa;
-  }
-  .w1w-filter-item--active .w1w-filter-link__count {
-    color: #f3ffca;
-  }
-  /* Price filter */
-  .w1w-price-filter__inputs {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .w1w-price-input {
-    background: #1a1919;
-    border: 1px solid #494847;
-    color: #fff;
-    padding: 8px 12px;
-    font-size: 0.875rem;
-    width: 80px;
-    font-family: "Inter", sans-serif;
-    outline: none;
-  }
-  .w1w-price-input:focus {
-    border-color: #f3ffca;
-  }
-  .w1w-price-filter__sep {
-    color: #adaaaa;
-  }
-  /* Clear filters */
-  .w1w-clear-filters {
-    display: inline-block;
-    color: #adaaaa;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    text-decoration: underline;
-    font-family: "Space Grotesk", sans-serif;
-    transition: color 0.2s;
-  }
-  .w1w-clear-filters:hover {
-    color: #f3ffca;
-  }
-  /* ---- Product Grid ---- */
-  .w1w-col-products {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 64px 32px;
-  }
-  .w1w-col-empty {
-    color: #adaaaa;
-    font-family: "Inter", sans-serif;
-    font-size: 1rem;
-    padding: 48px 0;
-  }
-  .w1w-col-card {
-    cursor: pointer;
-  }
-  .w1w-col-card__media {
-    position: relative;
-    aspect-ratio: 4 / 5;
-    overflow: hidden;
-    background: #131313;
-    border-radius: 4px;
-    margin-bottom: 24px;
-  }
-  .w1w-col-card__img-link {
+  .w1w-shop-sidebar.open {
     display: block;
-    width: 100%;
-    height: 100%;
-  }
-  .w1w-col-card__img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.7s;
-    display: block;
-  }
-  .w1w-col-card__img--placeholder {
-    padding: 20px;
-    opacity: 0.3;
-    height: 100%;
-  }
-  .w1w-col-card:hover .w1w-col-card__img {
-    transform: scale(1.1);
-  }
-  .w1w-col-card__hover-overlay {
-    position: absolute;
+    position: fixed;
     inset: 0;
-    background: rgba(243, 255, 202, 0.1);
-    opacity: 0;
-    transition: opacity 0.3s;
-    pointer-events: none;
+    z-index: 200;
+    background: #0E0E0E;
+    overflow-y: auto;
+    padding: 24px;
   }
-  .w1w-col-card:hover .w1w-col-card__hover-overlay {
-    opacity: 1;
-  }
-  .w1w-col-card__actions {
-    position: absolute;
-    bottom: 16px;
-    left: 16px;
-    right: 16px;
-    display: flex;
-    gap: 8px;
-    transform: translateY(8px);
-    opacity: 0;
-    transition: transform 0.3s, opacity 0.3s;
-  }
-  .w1w-col-card:hover .w1w-col-card__actions {
-    transform: translateY(0);
-    opacity: 1;
-  }
-  .w1w-col-card__quick-add {
-    flex: 1;
-    background: #f3ffca;
-    color: #516700;
-    padding: 12px;
-    font-family: "Space Grotesk", sans-serif;
-    font-weight: 700;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    text-align: center;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 2px;
-  }
-  .w1w-col-card__view {
-    background: #fff;
-    color: #000;
-    width: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 2px;
-    text-decoration: none;
-    flex-shrink: 0;
-  }
-  .w1w-col-card__view .material-symbols-outlined {
-    font-size: 1.125rem;
-  }
-  .w1w-col-card__info {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 8px;
-  }
-  .w1w-col-card__title {
-    font-family: "Space Grotesk", sans-serif;
-    font-size: 1.125rem;
-    font-weight: 700;
-    color: #fff;
-    text-transform: uppercase;
-    letter-spacing: -0.02em;
-    margin: 0 0 4px;
-    transition: color 0.2s;
-    line-height: 1.2;
-  }
-  .w1w-col-card:hover .w1w-col-card__title {
-    color: #f3ffca;
-  }
-  .w1w-col-card__title a {
-    color: inherit;
-    text-decoration: none;
-  }
-  .w1w-col-card__type {
-    color: #adaaaa;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.15em;
-    margin: 0;
-    font-family: "Inter", sans-serif;
-  }
-  .w1w-col-card__price {
-    color: #f3ffca;
-    font-family: "Space Grotesk", sans-serif;
-    font-weight: 700;
-    font-size: 1rem;
-    white-space: nowrap;
-  }
-  /* Pagination */
-  .w1w-pagination {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    margin-top: 96px;
-  }
-  .w1w-pagination__btn,
-  .w1w-pagination__page {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 44px;
-    height: 44px;
-    background: #262626;
-    color: #fff;
-    text-decoration: none;
-    font-family: "Space Grotesk", sans-serif;
-    font-size: 0.875rem;
-    font-weight: 700;
-    transition: background 0.2s;
-    border: 1px solid transparent;
-  }
-  .w1w-pagination__btn:hover,
-  .w1w-pagination__page:hover {
-    background: #2c2c2c;
-    border-color: rgba(243, 255, 202, 0.2);
-  }
-  .w1w-pagination__page--active {
-    background: #f3ffca;
-    color: #516700;
-    pointer-events: none;
-  }
-  .w1w-pagination__ellipsis {
-    color: #adaaaa;
-    padding: 0 8px;
-    font-family: "Space Grotesk", sans-serif;
-  }
-  /* Responsive */
-  @media (max-width: 1200px) {
-    .w1w-col-products {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-  @media (max-width: 990px) {
-    .w1w-col-catalog__inner {
-      grid-template-columns: 1fr;
-    }
-    .w1w-col-sidebar__sticky {
-      position: static;
-      flex-direction: row;
-      flex-wrap: wrap;
-      gap: 24px;
-    }
-    .w1w-filter-group {
-      min-width: 160px;
-    }
-    .w1w-col-products {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-  @media (max-width: 480px) {
-    .w1w-col-catalog__inner {
-      padding: 0 16px;
-    }
-    .w1w-col-products {
-      grid-template-columns: 1fr;
-      gap: 40px;
-    }
-  }
+  .w1w-shop-topbar__filter-toggle { display: flex; }
+  .w1w-shop-grid { grid-template-columns: repeat(2, 1fr); gap: 1px; }
+}
+@media (max-width: 480px) {
+  .w1w-shop-grid { grid-template-columns: repeat(2, 1fr); }
+  .w1w-nation-card__name { font-size: 0.625rem; }
+}
 {% endstylesheet %}
+
+<script>
+(function() {
+  // Wait for W1W_COUNTRIES to be available
+  function initShop() {
+    var countries = window.W1W_COUNTRIES || [];
+    var products = window.W1W_SHOP_PRODUCTS || [];
+    var cards = document.querySelectorAll('.w1w-nation-card');
+    var grid = document.getElementById('w1w-shop-grid');
+    var noResults = document.getElementById('w1w-shop-no-results');
+    var visibleCount = document.getElementById('w1w-visible-count');
+
+    // Map handle → country data
+    var countryByHandle = {};
+    countries.forEach(function(c) { countryByHandle[c.slug] = c; });
+
+    // Render bracelet placeholders and swatches
+    cards.forEach(function(card) {
+      var handle = card.dataset.handle;
+      var country = countryByHandle[handle];
+      if (!country) return;
+
+      var scene = card.querySelector('[data-bracelet-handle]');
+      var ph = scene && scene.querySelector('.w1w-nation-card__bracelet-ph');
+      var swatch = card.querySelector('[data-swatch-handle]');
+
+      if (ph && country.colors) {
+        ph.style.setProperty('--c1', country.colors[0]);
+        ph.style.setProperty('--c2', country.colors[1]);
+        ph.style.setProperty('--c3', country.colors[2]);
+      }
+
+      if (swatch && country.colors) {
+        swatch.style.background = 'linear-gradient(135deg, ' +
+          country.colors[0] + ' 0%, ' +
+          country.colors[0] + ' 33%, ' +
+          country.colors[1] + ' 33%, ' +
+          country.colors[1] + ' 66%, ' +
+          country.colors[2] + ' 66%, ' +
+          country.colors[2] + ' 100%)';
+      }
+    });
+
+    // Confederation chip counts
+    var confedMap = {
+      concacaf: ['concacaf'],
+      conmebol: ['southamerica'],
+      uefa: ['europe'],
+      caf: ['africa'],
+      afc: ['asia'],
+      ofc: ['oceania']
+    };
+    Object.keys(confedMap).forEach(function(confed) {
+      var regions = confedMap[confed];
+      var cnt = 0;
+      cards.forEach(function(card) {
+        var country = countryByHandle[card.dataset.handle];
+        if (country && regions.indexOf(country.region) !== -1) cnt++;
+      });
+      var el = document.getElementById('chip-count-' + confed);
+      if (el) el.textContent = cnt;
+    });
+
+    // Filter state
+    var state = { confed: 'all', tag: 'all', search: '' };
+
+    function applyFilters() {
+      var regions = state.confed !== 'all' ? (confedMap[state.confed] || []) : null;
+      var visible = 0;
+
+      cards.forEach(function(card) {
+        var handle = card.dataset.handle;
+        var country = countryByHandle[handle];
+        var title = card.dataset.title || '';
+        var tags = card.dataset.tags || '';
+        var show = true;
+
+        // Confed filter
+        if (regions && country) {
+          if (regions.indexOf(country.region) === -1) show = false;
+        }
+
+        // Tag filter
+        if (show && state.tag !== 'all') {
+          if (state.tag === 'host') {
+            show = country && country.host === true;
+          } else if (state.tag === 'featured') {
+            show = country && country.featured === true;
+          }
+        }
+
+        // Search
+        if (show && state.search) {
+          var q = state.search.toLowerCase();
+          var sub = country ? (country.sub || '').toLowerCase() : '';
+          show = title.indexOf(q) !== -1 || sub.indexOf(q) !== -1;
+        }
+
+        card.classList.toggle('w1w-nation-card--hidden', !show);
+        if (show) visible++;
+      });
+
+      if (visibleCount) visibleCount.textContent = visible;
+      if (noResults) noResults.style.display = visible === 0 ? 'block' : 'none';
+    }
+
+    // Confed chips
+    document.querySelectorAll('.w1w-chip').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.w1w-chip').forEach(function(b) { b.classList.remove('w1w-chip--active'); });
+        btn.classList.add('w1w-chip--active');
+        state.confed = btn.dataset.confed;
+        applyFilters();
+      });
+    });
+
+    // Quick tags
+    document.querySelectorAll('.w1w-shop-tag').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.w1w-shop-tag').forEach(function(b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        state.tag = btn.dataset.tag;
+        applyFilters();
+      });
+    });
+
+    // Search
+    var searchInput = document.getElementById('w1w-shop-search-input');
+    if (searchInput) {
+      searchInput.addEventListener('input', function() {
+        state.search = this.value.trim();
+        applyFilters();
+      });
+    }
+
+    // Reset
+    var resetBtn = document.getElementById('w1w-reset-filters');
+    if (resetBtn) {
+      resetBtn.addEventListener('click', function() {
+        state = { confed: 'all', tag: 'all', search: '' };
+        if (searchInput) searchInput.value = '';
+        document.querySelectorAll('.w1w-chip').forEach(function(b) { b.classList.remove('w1w-chip--active'); });
+        var allChip = document.querySelector('.w1w-chip[data-confed="all"]');
+        if (allChip) allChip.classList.add('w1w-chip--active');
+        document.querySelectorAll('.w1w-shop-tag').forEach(function(b) { b.classList.remove('active'); });
+        applyFilters();
+      });
+    }
+
+    // Mobile filter toggle
+    var filterToggle = document.getElementById('w1w-filter-toggle');
+    var sidebar = document.getElementById('w1w-shop-sidebar');
+    if (filterToggle && sidebar) {
+      filterToggle.addEventListener('click', function() {
+        sidebar.classList.toggle('open');
+      });
+      sidebar.addEventListener('click', function(e) {
+        if (e.target === sidebar) sidebar.classList.remove('open');
+      });
+    }
+
+    // ATC buttons → W1W cart drawer
+    document.querySelectorAll('.w1w-nation-card__atc').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        var handle = btn.dataset.handle;
+        var country = countryByHandle[handle];
+        if (!country) return;
+        if (window.W1W && window.W1W.addToCart) {
+          window.W1W.addToCart({
+            slug: country.slug,
+            name: country.name,
+            sub: country.sub,
+            size: 'M',
+            qty: 1,
+            price: window.W1W_PRICE || 5
+          });
+        }
+      });
+    });
+  }
+
+  // Run after W1W_COUNTRIES is available (loaded in w1w-data.js)
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initShop);
+  } else {
+    initShop();
+  }
+})();
+</script>
 
 {% schema %}
 {
@@ -521,22 +884,10 @@
       "type": "range",
       "id": "products_per_page",
       "label": "Products per page",
-      "min": 6,
-      "max": 48,
-      "step": 3,
-      "default": 12
-    },
-    {
-      "type": "text",
-      "id": "sort_label",
-      "label": "Sort section label",
-      "default": "Sort By"
-    },
-    {
-      "type": "text",
-      "id": "quick_add_label",
-      "label": "Quick add button label",
-      "default": "Quick Add"
+      "min": 12,
+      "max": 60,
+      "step": 6,
+      "default": 24
     }
   ],
   "presets": [
