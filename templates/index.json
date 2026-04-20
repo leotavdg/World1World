@@ -43,7 +43,7 @@
       "settings": {
         "label": "New Arrivals · Drop 03",
         "heading": "FEATURED KIT",
-        "collection": "",
+        "collection": "featured",
         "view_all_label": "VIEW ALL 50 NATIONS",
         "quick_add_label": "Quick Add"
       }
