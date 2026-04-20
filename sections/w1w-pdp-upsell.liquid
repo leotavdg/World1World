@@ -285,7 +285,11 @@ document.addEventListener('DOMContentLoaded', function () {
       .then(function () {
         btn.textContent = 'ADDED ✓';
         if (window.W1W && window.W1W.fetchCart) {
-          window.W1W.fetchCart(function () { window.W1W.openDrawer(); });
+          window.W1W.fetchCart(function () {
+            if (window.W1W.renderDrawer) window.W1W.renderDrawer();
+            if (window.W1W.renderBadge) window.W1W.renderBadge();
+            window.W1W.openDrawer();
+          });
         } else {
           window.location.href = '/cart';
         }
@@ -374,23 +378,24 @@ document.addEventListener('DOMContentLoaded', function () {
 .w1w-region-tab:hover { border-color: var(--line-strong); color: var(--ink-0); }
 .w1w-region-tab.active { background: var(--lime-softer); border-color: var(--lime); color: var(--lime); }
 
-/* Country card grid */
+/* Country card grid — 6 columns */
 .w1w-upsell-grid {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
-  gap: 6px; max-height: 460px; overflow-y: auto; padding-right: 4px;
+  display: grid; grid-template-columns: repeat(6, 1fr);
+  gap: 8px; max-height: 520px; overflow-y: auto; padding-right: 4px;
 }
 .w1w-upsell-grid::-webkit-scrollbar { width: 4px; }
-.w1w-upsell-grid::-webkit-scrollbar-thumb { background: var(--line-strong); }
+.w1w-upsell-grid::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 2px; }
 .w1w-upsell-card {
   aspect-ratio: 3/4; background: var(--bg-2); padding: 10px; cursor: pointer;
   display: flex; flex-direction: column; justify-content: space-between;
   border: 1px solid transparent; transition: all .15s; position: relative;
+  min-width: 0;
 }
 .w1w-upsell-card:hover { border-color: var(--line-strong); transform: translateY(-2px); }
 .w1w-upsell-card.picked { border-color: var(--lime); background: var(--lime-softer); }
-.w1w-upsell-swatch { aspect-ratio: 3/2; border-radius: 2px; overflow: hidden; }
-.w1w-upsell-nm { font-family: var(--font-display); font-weight: 700; font-size: 9px; letter-spacing: 0.05em; color: var(--ink-0); text-transform: uppercase; line-height: 1.2; }
-.w1w-upsell-check { position: absolute; top: 6px; right: 6px; width: 18px; height: 18px; background: var(--lime); color: var(--lime-dark) !important; border-radius: 50%; display: none; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; }
+.w1w-upsell-swatch { aspect-ratio: 1/1; border-radius: 2px; overflow: hidden; }
+.w1w-upsell-nm { font-family: var(--font-display); font-weight: 700; font-size: 10px; letter-spacing: 0.04em; color: var(--ink-0); text-transform: uppercase; line-height: 1.2; margin-top: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.w1w-upsell-check { position: absolute; top: 6px; right: 6px; width: 20px; height: 20px; background: var(--lime); color: var(--lime-dark) !important; border-radius: 50%; display: none; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; }
 .w1w-upsell-card.picked .w1w-upsell-check { display: inline-flex; }
 
 /* Summary sidebar */
@@ -415,13 +420,21 @@ document.addEventListener('DOMContentLoaded', function () {
 .w1w-related { padding: 80px 0 120px; background: var(--bg-0); border-top: 1px solid var(--line); }
 .w1w-related-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
 
-@media (max-width: 1024px) { .w1w-upsell-picker { grid-template-columns: 1fr 280px; } }
+@media (max-width: 1200px) { .w1w-upsell-grid { grid-template-columns: repeat(5, 1fr); } }
+@media (max-width: 1024px) {
+  .w1w-upsell-picker { grid-template-columns: 1fr 280px; }
+  .w1w-upsell-grid { grid-template-columns: repeat(4, 1fr); }
+}
 @media (max-width: 900px) {
   .w1w-upsell-picker { grid-template-columns: 1fr; }
   .w1w-upsell-summary { position: static; }
   .w1w-related-grid { grid-template-columns: repeat(2, 1fr); }
   .w1w-upsell-banner { flex-direction: column; gap: 12px; }
   .w1w-upsell-section { padding: 48px 0; }
+  .w1w-upsell-grid { grid-template-columns: repeat(4, 1fr); }
+}
+@media (max-width: 600px) {
+  .w1w-upsell-grid { grid-template-columns: repeat(3, 1fr); }
 }
 
 {% endstylesheet %}

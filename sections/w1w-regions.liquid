@@ -15,9 +15,19 @@
       <!-- Left: Region list -->
       <div class="w1w-regions__list" id="w1wRegionList">
         {%- for block in section.blocks -%}
+          {%- liquid
+            assign row_href = ''
+            if block.settings.collection != blank
+              assign row_href = block.settings.collection.url
+            endif
+            if row_href == blank and block.settings.url != blank
+              assign row_href = block.settings.url
+            endif
+          -%}
           <button
             class="w1w-region-row{% if forloop.first %} w1w-region-row--active{% endif %}"
             data-region-idx="{{ forloop.index0 }}"
+            {% if row_href != blank %}data-href="{{ row_href }}"{% endif %}
             type="button"
             {{ block.shopify_attributes }}
           >
@@ -78,14 +88,21 @@
                   </div>
                 {%- endif -%}
               </div>
-              {%- assign region_href = '' -%}
-              {%- if block.settings.collection != blank -%}
-                {%- assign region_href = block.settings.collection.url -%}
-              {%- elsif block.settings.url != blank -%}
-                {%- assign region_href = block.settings.url -%}
-              {%- endif -%}
-              {%- if region_href != '' -%}
+              {%- liquid
+                assign region_href = ''
+                if block.settings.collection != blank
+                  assign region_href = block.settings.collection.url
+                endif
+                if region_href == blank and block.settings.url != blank
+                  assign region_href = block.settings.url
+                endif
+              -%}
+              {%- if region_href != blank -%}
                 <a href="{{ region_href }}" class="w1w-btn w1w-btn--outline">
+                  Explore {{ block.settings.confederation | default: block.settings.title }} →
+                </a>
+              {%- else -%}
+                <a href="/collections/all" class="w1w-btn w1w-btn--outline">
                   Explore {{ block.settings.confederation | default: block.settings.title }} →
                 </a>
               {%- endif -%}
@@ -120,8 +137,23 @@
     });
   }
   rows.forEach(function (row) {
-    row.addEventListener('click', function () { activate(row.dataset.regionIdx); });
     row.addEventListener('mouseenter', function () { activate(row.dataset.regionIdx); });
+    row.addEventListener('click', function () {
+      activate(row.dataset.regionIdx);
+      // Navigate on click if a link is set
+      var href = row.dataset.href;
+      if (href) window.location.href = href;
+    });
+  });
+
+  // Also make the Explore buttons in panels clickable (they're <a> tags, should work natively)
+  // But also make the entire panel image area clickable
+  panels.forEach(function (panel) {
+    panel.addEventListener('click', function (e) {
+      if (e.target.closest('a')) return; // let link clicks through
+      var link = panel.querySelector('.w1w-btn');
+      if (link) window.location.href = link.href;
+    });
   });
 })();
 </script>
