@@ -1,3 +1,12 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "w1w_hero": {
@@ -51,7 +60,9 @@
             "confederation": "UEFA",
             "blurb": "Tactical, technical, relentless. The modern machine.",
             "nations_count": "16",
-            "editions_count": "16"
+            "editions_count": "16",
+            "collection": "europe",
+            "url": ""
           }
         },
         "region_south_america": {
@@ -63,7 +74,9 @@
             "confederation": "CONMEBOL",
             "blurb": "Where the game was perfected. Pure rhythm.",
             "nations_count": "6",
-            "editions_count": "6"
+            "editions_count": "6",
+            "collection": "south-america",
+            "url": ""
           }
         },
         "region_rJgETK": {
@@ -75,7 +88,9 @@
             "confederation": "CONCACAF",
             "blurb": "Home soil. The continent that lifts the curtain.",
             "nations_count": "6",
-            "editions_count": "6"
+            "editions_count": "6",
+            "collection": "north-america",
+            "url": ""
           }
         },
         "region_africa": {
@@ -87,7 +102,9 @@
             "confederation": "CAF",
             "blurb": "Raw speed. Rising force. Nothing fears nothing.",
             "nations_count": "9",
-            "editions_count": "9"
+            "editions_count": "9",
+            "collection": "",
+            "url": ""
           }
         },
         "region_asia": {
@@ -99,19 +116,23 @@
             "confederation": "AFC",
             "blurb": "Discipline meets dream. The fastest-climbing continent.",
             "nations_count": "9",
-            "editions_count": "9"
+            "editions_count": "9",
+            "collection": "asia",
+            "url": ""
           }
         },
         "region_aKGmhR": {
           "type": "region",
           "settings": {
             "image": "shopify://shop_images/Circular-Quay_Charlotte-Karp.jpg",
-            "title": "Oceania",
+            "title": "Australia & Oceania",
             "tag": "FRONTIER",
             "confederation": "OFC",
             "blurb": "The long journey. Every tournament earned twice over.",
             "nations_count": "1",
-            "editions_count": "1"
+            "editions_count": "1",
+            "collection": "australia-oceania",
+            "url": ""
           }
         }
       },
