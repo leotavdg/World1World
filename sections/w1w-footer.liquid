@@ -1,285 +1,301 @@
 <footer class="w1w-footer">
-  <div class="w1w-footer__inner">
-    <div class="w1w-footer__grid">
+  <div class="wrap">
+    <div class="w1w-footer-top">
 
-      <div class="w1w-footer__brand">
-        <div class="w1w-footer__logo">{{ shop.name }}</div>
-        <p class="w1w-footer__tagline">{{ section.settings.tagline }}</p>
-        <div class="w1w-footer__social">
+      <!-- Brand -->
+      <div class="w1w-footer-brand">
+        <h3 class="w1w-footer-logo">WORLD 1 WORLD</h3>
+        <p class="w1w-footer-tagline">{{ section.settings.tagline }}</p>
+        <div class="w1w-footer-social">
           {%- if section.settings.instagram_url != blank -%}
-            <a href="{{ section.settings.instagram_url }}" class="w1w-footer__social-link" aria-label="Instagram" target="_blank" rel="noopener">
-              <span class="material-symbols-outlined">photo_camera</span>
-            </a>
-          {%- endif -%}
-          {%- if section.settings.twitter_url != blank -%}
-            <a href="{{ section.settings.twitter_url }}" class="w1w-footer__social-link" aria-label="Twitter / X" target="_blank" rel="noopener">
-              <span class="material-symbols-outlined">alternate_email</span>
+            <a href="{{ section.settings.instagram_url }}" class="w1w-footer-icon-btn" aria-label="Instagram" target="_blank" rel="noopener">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.6" fill="currentColor"/></svg>
             </a>
           {%- endif -%}
           {%- if section.settings.tiktok_url != blank -%}
-            <a href="{{ section.settings.tiktok_url }}" class="w1w-footer__social-link" aria-label="TikTok" target="_blank" rel="noopener">
-              <span class="material-symbols-outlined">social_leaderboard</span>
+            <a href="{{ section.settings.tiktok_url }}" class="w1w-footer-icon-btn" aria-label="TikTok" target="_blank" rel="noopener">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 8v10a3 3 0 1 1-3-3"/><path d="M10 8a5 5 0 0 0 5 5V8"/></svg>
+            </a>
+          {%- endif -%}
+          {%- if section.settings.twitter_url != blank -%}
+            <a href="{{ section.settings.twitter_url }}" class="w1w-footer-icon-btn" aria-label="X" target="_blank" rel="noopener">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18 3h3l-7.5 8.6L22 21h-6.8l-5-6.5L4 21H1l8.1-9.3L1 3h7l4.6 6z"/></svg>
             </a>
           {%- endif -%}
         </div>
       </div>
 
-      <div class="w1w-footer__links-wrap">
-        <div class="w1w-footer__links-col">
-          <h4 class="w1w-footer__col-heading">{{ section.settings.shop_heading }}</h4>
+      <!-- Shop column -->
+      <div class="w1w-footer-col">
+        <h4 class="w1w-footer-col-h">{{ section.settings.shop_heading }}</h4>
+        <ul class="w1w-footer-links">
           {%- if linklists[section.settings.shop_menu].links.size > 0 -%}
             {%- for link in linklists[section.settings.shop_menu].links -%}
-              <a href="{{ link.url }}" class="w1w-footer__link">{{ link.title }}</a>
+              <li><a href="{{ link.url }}">{{ link.title }}</a></li>
             {%- endfor -%}
           {%- else -%}
-            <a href="{{ routes.all_products_collection_url }}" class="w1w-footer__link">New Arrivals</a>
-            <a href="{{ routes.all_products_collection_url }}" class="w1w-footer__link">Best Sellers</a>
-            <a href="{{ routes.collections_url }}" class="w1w-footer__link">Sale</a>
+            <li><a href="{{ routes.all_products_collection_url }}">All Nations</a></li>
+            <li><a href="{{ routes.all_products_collection_url }}">New Arrivals</a></li>
+            <li><a href="{{ routes.all_products_collection_url }}">Best Sellers</a></li>
+            <li><a href="{{ routes.collections_url }}">Collections</a></li>
           {%- endif -%}
-        </div>
-        <div class="w1w-footer__links-col">
-          <h4 class="w1w-footer__col-heading">{{ section.settings.support_heading }}</h4>
-          {%- if linklists[section.settings.support_menu].links.size > 0 -%}
-            {%- for link in linklists[section.settings.support_menu].links -%}
-              <a href="{{ link.url }}" class="w1w-footer__link">{{ link.title }}</a>
-            {%- endfor -%}
-          {%- else -%}
-            <a href="/policies/shipping-policy" class="w1w-footer__link">Shipping</a>
-            <a href="/policies/refund-policy" class="w1w-footer__link">Returns</a>
-            <a href="/pages/faq" class="w1w-footer__link">FAQ</a>
-          {%- endif -%}
-        </div>
+        </ul>
       </div>
 
-      <div class="w1w-footer__newsletter">
-        <h4 class="w1w-footer__col-heading">{{ section.settings.newsletter_heading }}</h4>
-        <p class="w1w-footer__newsletter-desc">{{ section.settings.newsletter_desc }}</p>
-        {%- form 'customer', class: 'w1w-footer__form' -%}
+      <!-- Support column -->
+      <div class="w1w-footer-col">
+        <h4 class="w1w-footer-col-h">{{ section.settings.support_heading }}</h4>
+        <ul class="w1w-footer-links">
+          {%- if linklists[section.settings.support_menu].links.size > 0 -%}
+            {%- for link in linklists[section.settings.support_menu].links -%}
+              <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+            {%- endfor -%}
+          {%- else -%}
+            <li><a href="/pages/faq">Shipping</a></li>
+            <li><a href="/pages/faq">Returns</a></li>
+            <li><a href="/pages/faq">Sizing</a></li>
+            <li><a href="/pages/faq">FAQ</a></li>
+            <li><a href="/pages/contact">Contact</a></li>
+          {%- endif -%}
+        </ul>
+      </div>
+
+      <!-- Newsletter -->
+      <div class="w1w-footer-col w1w-footer-news">
+        <h4 class="w1w-footer-col-h">{{ section.settings.newsletter_heading }}</h4>
+        <p class="w1w-footer-news-desc">{{ section.settings.newsletter_desc }}</p>
+        {%- form 'customer', class: 'w1w-footer-newsletter-form' -%}
           <input type="hidden" name="contact[tags]" value="newsletter">
-          <div class="w1w-footer__form-row">
+          <div class="w1w-footer-news-row">
             <input
               type="email"
               name="contact[email]"
-              class="w1w-footer__email-input"
+              class="w1w-footer-news-input"
               placeholder="{{ section.settings.email_placeholder }}"
               required
               autocomplete="email"
             >
-            <button type="submit" class="w1w-footer__submit">
+            <button type="submit" class="w1w-footer-news-btn">
               {{ section.settings.submit_label }}
             </button>
           </div>
           {%- if form.posted_successfully? -%}
-            <p class="w1w-footer__success">{{ section.settings.success_message }}</p>
+            <p class="w1w-footer-news-success">✓ {{ section.settings.success_message }}</p>
           {%- endif -%}
         {%- endform -%}
       </div>
 
     </div>
 
-    <div class="w1w-footer__bottom">
-      <p class="w1w-footer__copyright">{{ section.settings.copyright_text | replace: '{year}', 'now' | date: '%Y' }}</p>
-      <div class="w1w-footer__bottom-links">
+    <!-- Bottom bar -->
+    <div class="w1w-footer-bottom">
+      <span>{{ section.settings.copyright_text }}</span>
+      <ul>
         {%- for policy in shop.policies -%}
           {%- if policy != blank -%}
-            <a href="{{ policy.url }}" class="w1w-footer__bottom-link">{{ policy.title }}</a>
+            <li><a href="{{ policy.url }}">{{ policy.title }}</a></li>
           {%- endif -%}
         {%- endfor -%}
-      </div>
+      </ul>
     </div>
   </div>
 </footer>
 
 {% stylesheet %}
-  .w1w-footer {
-    background: #131313;
-    padding: 48px 0 0;
-    font-family: "Inter", sans-serif;
-  }
-  .w1w-footer__inner {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 48px;
-  }
-  .w1w-footer__grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 48px;
-    padding-bottom: 48px;
-  }
-  .w1w-footer__logo {
-    font-family: "Space Grotesk", sans-serif;
-    font-size: 1.125rem;
-    font-weight: 900;
-    color: #f3ffca;
-    text-transform: uppercase;
-    letter-spacing: -0.02em;
-    margin-bottom: 24px;
-  }
-  .w1w-footer__tagline {
-    color: #d4d4d4;
-    font-size: 0.875rem;
-    line-height: 1.6;
-    max-width: 22rem;
-    margin: 0 0 24px;
-  }
-  .w1w-footer__social {
-    display: flex;
-    gap: 16px;
-  }
-  .w1w-footer__social-link {
-    color: #f3ffca;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-  }
-  .w1w-footer__social-link .material-symbols-outlined {
-    font-size: 1.5rem;
-  }
-  .w1w-footer__links-wrap {
-    display: grid;
+.w1w-footer {
+  background: var(--bg-1, #131313);
+  border-top: 1px solid var(--line, rgba(243,255,202,0.12));
+  padding: 80px 0 32px;
+  margin-top: 0;
+}
+
+/* Top grid — 4 columns */
+.w1w-footer-top {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr 1.4fr;
+  gap: 48px;
+  padding-bottom: 64px;
+  border-bottom: 1px solid var(--line, rgba(243,255,202,0.12));
+}
+
+/* Brand */
+.w1w-footer-logo {
+  font-family: var(--font-display, 'Space Grotesk', sans-serif);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--lime, #F3FFCA);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  line-height: 0.95;
+}
+.w1w-footer-tagline {
+  font-size: 14px;
+  color: var(--ink-1, #D4D4D4);
+  max-width: 320px;
+  margin-bottom: 24px;
+  line-height: 1.7;
+}
+.w1w-footer-social {
+  display: flex;
+  gap: 12px;
+}
+.w1w-footer-icon-btn {
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-1, #D4D4D4);
+  border-radius: 4px;
+  transition: color .15s, background .15s;
+  text-decoration: none;
+}
+.w1w-footer-icon-btn:hover {
+  color: var(--lime, #F3FFCA);
+  background: rgba(243,255,202,0.08);
+}
+
+/* Link columns */
+.w1w-footer-col-h {
+  font-family: var(--font-display, 'Space Grotesk', sans-serif);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: var(--lime, #F3FFCA);
+  text-transform: uppercase;
+  font-weight: 700;
+  margin-bottom: 20px;
+  line-height: 0.95;
+}
+.w1w-footer-links {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 0;
+  margin: 0;
+}
+.w1w-footer-links a {
+  font-size: 13px;
+  color: var(--ink-1, #D4D4D4);
+  text-decoration: none;
+  transition: color .12s;
+}
+.w1w-footer-links a:hover {
+  color: var(--lime, #F3FFCA);
+}
+
+/* Newsletter */
+.w1w-footer-news-desc {
+  color: var(--ink-2, #ADAAAA);
+  font-size: 13px;
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+.w1w-footer-newsletter-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.w1w-footer-news-row {
+  display: flex;
+  border: 1px solid var(--line-strong, rgba(243,255,202,0.25));
+}
+.w1w-footer-news-input {
+  flex: 1;
+  background: transparent;
+  border: 0;
+  outline: none;
+  padding: 14px 16px;
+  color: var(--ink-0, #fff);
+  font-family: var(--font-body, 'Inter', sans-serif);
+  font-size: 13px;
+}
+.w1w-footer-news-input::placeholder {
+  color: var(--ink-3, #737373);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 12px;
+}
+.w1w-footer-news-btn {
+  background: var(--lime, #F3FFCA);
+  color: var(--lime-dark, #516700);
+  padding: 0 20px;
+  font-family: var(--font-display, 'Space Grotesk', sans-serif);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: none;
+  cursor: pointer;
+  transition: background .15s;
+  white-space: nowrap;
+}
+.w1w-footer-news-btn:hover {
+  background: var(--lime-hot, #CAFD00);
+}
+.w1w-footer-news-success {
+  color: var(--lime, #F3FFCA);
+  margin-top: 12px;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* Bottom bar */
+.w1w-footer-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 32px;
+  font-size: 12px;
+  color: var(--ink-3, #737373);
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.w1w-footer-bottom ul {
+  list-style: none;
+  display: flex;
+  gap: 24px;
+  padding: 0;
+  margin: 0;
+}
+.w1w-footer-bottom a {
+  color: var(--ink-3, #737373);
+  text-decoration: none;
+  font-size: 12px;
+  transition: color .12s;
+}
+.w1w-footer-bottom a:hover {
+  color: var(--lime, #F3FFCA);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .w1w-footer-top {
     grid-template-columns: 1fr 1fr;
+  }
+  .w1w-footer-brand {
+    grid-column: span 2;
+  }
+}
+@media (max-width: 600px) {
+  .w1w-footer {
+    padding: 48px 0 24px;
+  }
+  .w1w-footer-top {
+    grid-template-columns: 1fr;
     gap: 32px;
+    padding-bottom: 40px;
   }
-  .w1w-footer__col-heading {
-    font-family: "Space Grotesk", sans-serif;
-    font-size: 0.875rem;
-    font-weight: 700;
-    color: #fff;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    margin: 0 0 16px;
+  .w1w-footer-brand {
+    grid-column: span 1;
   }
-  .w1w-footer__links-col {
-    display: flex;
+  .w1w-footer-bottom {
     flex-direction: column;
-    gap: 12px;
+    align-items: flex-start;
   }
-  .w1w-footer__link {
-    color: #d4d4d4;
-    text-decoration: none;
-    font-size: 0.875rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    transition: color 0.2s;
-  }
-  .w1w-footer__link:hover {
-    color: #f3ffca;
-  }
-  .w1w-footer__newsletter {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-  }
-  .w1w-footer__newsletter-desc {
-    color: #d4d4d4;
-    font-size: 0.875rem;
-    margin: 0 0 24px;
-    line-height: 1.5;
-  }
-  .w1w-footer__form {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-  .w1w-footer__form-row {
-    display: flex;
-    background: #262626;
-    padding: 4px;
-  }
-  .w1w-footer__email-input {
-    background: transparent;
-    border: none;
-    color: #fff;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    padding: 12px 16px;
-    flex: 1;
-    outline: none;
-    font-family: "Inter", sans-serif;
-  }
-  .w1w-footer__email-input::placeholder {
-    color: rgba(255, 255, 255, 0.3);
-  }
-  .w1w-footer__submit {
-    background: #f3ffca;
-    color: #516700;
-    border: none;
-    padding: 12px 24px;
-    font-family: "Space Grotesk", sans-serif;
-    font-weight: 700;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    cursor: pointer;
-    transition: background 0.2s;
-    white-space: nowrap;
-  }
-  .w1w-footer__submit:hover {
-    background: #cafd00;
-  }
-  .w1w-footer__success {
-    color: #f3ffca;
-    font-size: 0.75rem;
-    margin: 0;
-  }
-  .w1w-footer__bottom {
-    border-top: 1px solid rgba(73, 72, 71, 0.1);
-    padding: 32px 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 16px;
-    flex-wrap: wrap;
-  }
-  .w1w-footer__copyright {
-    color: #d4d4d4;
-    font-size: 0.625rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin: 0;
-  }
-  .w1w-footer__bottom-links {
-    display: flex;
-    gap: 24px;
-    flex-wrap: wrap;
-  }
-  .w1w-footer__bottom-link {
-    color: #d4d4d4;
-    text-decoration: none;
-    font-size: 0.625rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    transition: color 0.2s;
-  }
-  .w1w-footer__bottom-link:hover {
-    color: #f3ffca;
-  }
-  @media (max-width: 990px) {
-    .w1w-footer__grid {
-      grid-template-columns: 1fr 1fr;
-    }
-    .w1w-footer__brand {
-      grid-column: span 2;
-    }
-    .w1w-footer__inner {
-      padding: 0 24px;
-    }
-  }
-  @media (max-width: 600px) {
-    .w1w-footer__grid {
-      grid-template-columns: 1fr;
-      gap: 32px;
-    }
-    .w1w-footer__brand {
-      grid-column: span 1;
-    }
-    .w1w-footer__bottom {
-      flex-direction: column;
-      align-items: flex-start;
-    }
-  }
+}
 {% endstylesheet %}
 
 {% schema %}
@@ -294,106 +310,42 @@
       "type": "textarea",
       "id": "tagline",
       "label": "Tagline",
-      "default": "Supplying technical collectibles for the most beautiful game. Engineered for the floodlit stage."
+      "default": "Technical collectibles for the most beautiful game. Engineered for the floodlit stage."
     },
     {
       "type": "header",
       "content": "Social links"
     },
-    {
-      "type": "url",
-      "id": "instagram_url",
-      "label": "Instagram URL"
-    },
-    {
-      "type": "url",
-      "id": "twitter_url",
-      "label": "Twitter / X URL"
-    },
-    {
-      "type": "url",
-      "id": "tiktok_url",
-      "label": "TikTok URL"
-    },
+    { "type": "url", "id": "instagram_url", "label": "Instagram URL" },
+    { "type": "url", "id": "tiktok_url", "label": "TikTok URL" },
+    { "type": "url", "id": "twitter_url", "label": "Twitter / X URL" },
     {
       "type": "header",
       "content": "Shop column"
     },
-    {
-      "type": "text",
-      "id": "shop_heading",
-      "label": "Heading",
-      "default": "Shop"
-    },
-    {
-      "type": "link_list",
-      "id": "shop_menu",
-      "label": "Menu"
-    },
+    { "type": "text", "id": "shop_heading", "label": "Heading", "default": "SHOP" },
+    { "type": "link_list", "id": "shop_menu", "label": "Menu" },
     {
       "type": "header",
       "content": "Support column"
     },
-    {
-      "type": "text",
-      "id": "support_heading",
-      "label": "Heading",
-      "default": "Support"
-    },
-    {
-      "type": "link_list",
-      "id": "support_menu",
-      "label": "Menu"
-    },
+    { "type": "text", "id": "support_heading", "label": "Heading", "default": "SUPPORT" },
+    { "type": "link_list", "id": "support_menu", "label": "Menu" },
     {
       "type": "header",
       "content": "Newsletter"
     },
-    {
-      "type": "text",
-      "id": "newsletter_heading",
-      "label": "Heading",
-      "default": "Join the Ranks"
-    },
-    {
-      "type": "text",
-      "id": "newsletter_desc",
-      "label": "Description",
-      "default": "Get early access to drops and exclusive content."
-    },
-    {
-      "type": "text",
-      "id": "email_placeholder",
-      "label": "Email placeholder",
-      "default": "Email address"
-    },
-    {
-      "type": "text",
-      "id": "submit_label",
-      "label": "Submit button label",
-      "default": "Join"
-    },
-    {
-      "type": "text",
-      "id": "success_message",
-      "label": "Success message",
-      "default": "Thanks for subscribing!"
-    },
+    { "type": "text", "id": "newsletter_heading", "label": "Heading", "default": "JOIN THE RANKS" },
+    { "type": "text", "id": "newsletter_desc", "label": "Description", "default": "First access to drops and exclusive editions." },
+    { "type": "text", "id": "email_placeholder", "label": "Email placeholder", "default": "EMAIL ADDRESS" },
+    { "type": "text", "id": "submit_label", "label": "Submit button label", "default": "JOIN" },
+    { "type": "text", "id": "success_message", "label": "Success message", "default": "You're on the list." },
     {
       "type": "header",
       "content": "Bottom bar"
     },
-    {
-      "type": "text",
-      "id": "copyright_text",
-      "label": "Copyright text",
-      "default": "© 2024 World 1 World. Engineered for the Floodlit Stage."
-    }
+    { "type": "text", "id": "copyright_text", "label": "Copyright text", "default": "© 2026 World 1 World. All prices in USD." }
   ],
-  "presets": [
-    {
-      "name": "W1W Footer"
-    }
-  ]
+  "presets": [{ "name": "W1W Footer" }]
 }
 {% endschema %}
