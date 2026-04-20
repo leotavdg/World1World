@@ -1,10 +1,6 @@
 {%- liquid
   assign nations_col = collections[section.settings.nations_collection]
   assign current_handle = product.handle
-  assign mf_ns = section.settings.mf_namespace | default: 'custom'
-  assign mf_c1 = section.settings.mf_color_1 | default: 'color_1'
-  assign mf_c2 = section.settings.mf_color_2 | default: 'color_2'
-  assign mf_c3 = section.settings.mf_color_3 | default: 'color_3'
 -%}
 
 {%- comment %} Build a JSON array of all nation products for JS to consume {%- endcomment %}
@@ -16,15 +12,13 @@ window.W1W_NATIONS = [
         "handle":    {{ p.handle | json }},
         "title":     {{ p.title | json }},
         "url":       {{ p.url | json }},
-        "vendor":    {{ p.vendor | json }},
-        "image":     {{ p.featured_image | image_url: width: 400 | json }},
-        "color1":    {{ p.metafields[mf_ns][mf_c1].value | default: '' | json }},
-        "color2":    {{ p.metafields[mf_ns][mf_c2].value | default: '' | json }},
-        "color3":    {{ p.metafields[mf_ns][mf_c3].value | default: '' | json }},
+        "continent": {{ p.metafields.custom.continent | default: p.vendor | json }},
+        "country":   {{ p.metafields.custom.country | default: p.title | json }},
+        "image":     {% if p.featured_image %}{{ p.featured_image | image_url: width: 400 | json }}{% else %}""{% endif %},
         "variantId": {{ p.first_available_variant.id | json }},
         "price":     {{ p.price | json }},
         "available": {{ p.available | json }},
-        "isCurrent": {{ p.handle | json }} === {{ current_handle | json }}
+        "isCurrent": {% if p.handle == current_handle %}true{% else %}false{% endif %}
       }{%- unless forloop.last -%},{%- endunless -%}
     {%- endfor -%}
   {%- endif -%}
@@ -135,9 +129,6 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function swatchStyle(n) {
-    if (n.color1 && n.color2 && n.color3) {
-      return 'background:linear-gradient(90deg,' + n.color1 + ' 33%,' + n.color2 + ' 33% 66%,' + n.color3 + ' 66%)';
-    }
     if (n.image) return 'background-image:url(' + n.image + ');background-size:cover;background-position:center';
     return 'background:var(--bg-3)';
   }
@@ -165,7 +156,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Build region tabs from unique vendor values
     var vendors = [];
     NATIONS.forEach(function (n) {
-      if (n.vendor && vendors.indexOf(n.vendor) === -1) vendors.push(n.vendor);
+      if (n.continent && vendors.indexOf(n.continent) === -1) vendors.push(n.continent);
     });
     vendors.sort();
     vendors.forEach(function (v) {
@@ -178,7 +169,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function renderGrid() {
       var list = activeRegion
-        ? NATIONS.filter(function (n) { return n.vendor === activeRegion; })
+        ? NATIONS.filter(function (n) { return n.continent === activeRegion; })
         : NATIONS;
 
       bundleGrid.innerHTML = list.map(function (n) {
@@ -315,7 +306,7 @@ document.addEventListener('DOMContentLoaded', function () {
   if (relatedGrid && NATIONS.length) {
     var currentNation = NATIONS.find(function (n) { return n.handle === CURRENT_HANDLE; });
     var related = currentNation
-      ? NATIONS.filter(function (n) { return n.vendor === currentNation.vendor && n.handle !== CURRENT_HANDLE; }).slice(0, 4)
+      ? NATIONS.filter(function (n) { return n.continent === currentNation.continent && n.handle !== CURRENT_HANDLE; }).slice(0, 4)
       : NATIONS.filter(function (n) { return n.handle !== CURRENT_HANDLE; }).slice(0, 4);
 
     relatedGrid.innerHTML = related.map(function (n) {
@@ -327,7 +318,7 @@ document.addEventListener('DOMContentLoaded', function () {
         '<div class="product-card-body">' +
           '<div>' +
             '<div class="product-card-country">' + n.title.toUpperCase() + '</div>' +
-            '<div class="product-card-sub">' + (n.vendor || '') + '</div>' +
+            '<div class="product-card-sub">' + (n.continent || '') + '</div>' +
           '</div>' +
           '<div class="product-card-price">$' + BASE_PRICE.toFixed(2) + '</div>' +
         '</div>' +
@@ -445,14 +436,6 @@ document.addEventListener('DOMContentLoaded', function () {
       "content": "Nations collection"
     },
     { "type": "collection", "id": "nations_collection", "label": "Nations collection", "info": "Select the collection that contains all nation products (e.g. 'All Nations')" },
-    {
-      "type": "header",
-      "content": "Color metafields (optional)"
-    },
-    { "type": "text", "id": "mf_namespace", "label": "Metafield namespace", "default": "custom", "info": "The namespace of your color metafields (usually 'custom')" },
-    { "type": "text", "id": "mf_color_1",   "label": "Color 1 metafield key", "default": "color_1", "info": "Key for the first band color (hex, e.g. #009c3b)" },
-    { "type": "text", "id": "mf_color_2",   "label": "Color 2 metafield key", "default": "color_2" },
-    { "type": "text", "id": "mf_color_3",   "label": "Color 3 metafield key", "default": "color_3" },
     {
       "type": "header",
       "content": "Discount Banner"
