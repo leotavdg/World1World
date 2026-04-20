@@ -1,0 +1,457 @@
+{%- liquid
+  assign faq_items      = section.blocks | where: 'type', 'faq_item'
+  assign shipping_zones = section.blocks | where: 'type', 'shipping_zone'
+  assign size_rows      = section.blocks | where: 'type', 'size_row'
+-%}
+
+<div class="w1w-faq-wrap">
+  <div class="wrap">
+    <div class="w1w-fbody">
+
+      <!-- Sticky left nav -->
+      <nav class="w1w-fnav" id="w1wFaqNav">
+        {%- if faq_items.size > 0 -%}
+          <a href="#w1wFaqSection" class="w1w-fnav-link active" data-target="w1wFaqSection">{{ section.settings.nav_faq }}</a>
+        {%- endif -%}
+        {%- if shipping_zones.size > 0 and section.settings.show_shipping -%}
+          <a href="#w1wShippingSection" class="w1w-fnav-link" data-target="w1wShippingSection">{{ section.settings.nav_shipping }}</a>
+        {%- endif -%}
+        {%- if section.settings.show_returns and section.settings.returns_text != blank -%}
+          <a href="#w1wReturnsSection" class="w1w-fnav-link" data-target="w1wReturnsSection">{{ section.settings.nav_returns }}</a>
+        {%- endif -%}
+        {%- if size_rows.size > 0 and section.settings.show_sizing -%}
+          <a href="#w1wSizingSection" class="w1w-fnav-link" data-target="w1wSizingSection">{{ section.settings.nav_sizing }}</a>
+        {%- endif -%}
+        {%- if section.settings.show_care and section.settings.care_text != blank -%}
+          <a href="#w1wCareSection" class="w1w-fnav-link" data-target="w1wCareSection">{{ section.settings.nav_care }}</a>
+        {%- endif -%}
+      </nav>
+
+      <!-- Content -->
+      <div class="w1w-fcontent">
+
+        <!-- FAQ Accordion -->
+        {%- if faq_items.size > 0 -%}
+          <section id="w1wFaqSection" class="w1w-fsec">
+            <h2 class="w1w-fsec-h">{{ section.settings.faq_heading }}</h2>
+            <div class="w1w-faq">
+              {%- for block in faq_items -%}
+                <div class="w1w-faq-item" {{ block.shopify_attributes }}>
+                  <button class="w1w-faq-q" aria-expanded="false">
+                    {{ block.settings.question }}
+                    <span class="w1w-faq-plus" aria-hidden="true">+</span>
+                  </button>
+                  <div class="w1w-faq-a" role="region">
+                    {{ block.settings.answer }}
+                  </div>
+                </div>
+              {%- endfor -%}
+            </div>
+          </section>
+        {%- endif -%}
+
+        <!-- Shipping -->
+        {%- if shipping_zones.size > 0 and section.settings.show_shipping -%}
+          <section id="w1wShippingSection" class="w1w-fsec">
+            <h2 class="w1w-fsec-h">{{ section.settings.shipping_heading }}</h2>
+            <div class="w1w-ship-grid">
+              {%- for block in shipping_zones -%}
+                <div class="w1w-ship-card" {{ block.shopify_attributes }}>
+                  <h3 class="w1w-ship-h">{{ block.settings.zone_name }}</h3>
+                  <p class="w1w-ship-timing">{{ block.settings.timing }}</p>
+                  <div class="w1w-ship-price">{{ block.settings.price_text }}</div>
+                </div>
+              {%- endfor -%}
+            </div>
+            {%- if section.settings.shipping_note != blank -%}
+              <p class="w1w-shipping-note">{{ section.settings.shipping_note }}</p>
+            {%- endif -%}
+          </section>
+        {%- endif -%}
+
+        <!-- Returns -->
+        {%- if section.settings.show_returns and section.settings.returns_text != blank -%}
+          <section id="w1wReturnsSection" class="w1w-fsec">
+            <h2 class="w1w-fsec-h">{{ section.settings.returns_heading }}</h2>
+            <div class="w1w-fsec-body">{{ section.settings.returns_text }}</div>
+            {%- if section.settings.returns_portal_label != blank and section.settings.returns_portal_url != blank -%}
+              <p style="margin-top:12px;font-size:13px;color:var(--ink-2)">
+                Start a return at <a href="{{ section.settings.returns_portal_url }}" style="color:var(--lime)">{{ section.settings.returns_portal_label }}</a>.
+              </p>
+            {%- endif -%}
+          </section>
+        {%- endif -%}
+
+        <!-- Sizing -->
+        {%- if size_rows.size > 0 and section.settings.show_sizing -%}
+          <section id="w1wSizingSection" class="w1w-fsec">
+            <h2 class="w1w-fsec-h">{{ section.settings.sizing_heading }}</h2>
+            {%- if section.settings.sizing_intro != blank -%}
+              <p class="w1w-fsec-intro">{{ section.settings.sizing_intro }}</p>
+            {%- endif -%}
+            <table class="w1w-size-table">
+              <thead>
+                <tr>
+                  <th>{{ section.settings.size_col_size }}</th>
+                  <th>{{ section.settings.size_col_wrist }}</th>
+                  <th>{{ section.settings.size_col_band }}</th>
+                  <th>{{ section.settings.size_col_fits }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {%- for block in size_rows -%}
+                  <tr {{ block.shopify_attributes }}>
+                    <td>{{ block.settings.size }}</td>
+                    <td>{{ block.settings.wrist }}</td>
+                    <td>{{ block.settings.band }}</td>
+                    <td>{{ block.settings.fits }}</td>
+                  </tr>
+                {%- endfor -%}
+              </tbody>
+            </table>
+          </section>
+        {%- endif -%}
+
+        <!-- Care -->
+        {%- if section.settings.show_care and section.settings.care_text != blank -%}
+          <section id="w1wCareSection" class="w1w-fsec">
+            <h2 class="w1w-fsec-h">{{ section.settings.care_heading }}</h2>
+            <div class="w1w-fsec-body">{{ section.settings.care_text }}</div>
+          </section>
+        {%- endif -%}
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  // FAQ accordion
+  document.querySelectorAll('.w1w-faq-q').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var item = btn.closest('.w1w-faq-item');
+      var isOpen = item.classList.contains('open');
+      // Close all
+      document.querySelectorAll('.w1w-faq-item.open').forEach(function (el) {
+        el.classList.remove('open');
+        el.querySelector('.w1w-faq-q').setAttribute('aria-expanded', 'false');
+      });
+      // Open clicked if it was closed
+      if (!isOpen) {
+        item.classList.add('open');
+        btn.setAttribute('aria-expanded', 'true');
+      }
+    });
+  });
+
+  // Sticky nav — highlight on scroll
+  var sections = document.querySelectorAll('.w1w-fsec[id]');
+  var navLinks = document.querySelectorAll('.w1w-fnav-link');
+  if (sections.length && navLinks.length) {
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          navLinks.forEach(function (a) { a.classList.remove('active'); });
+          var target = document.querySelector('.w1w-fnav-link[data-target="' + entry.target.id + '"]');
+          if (target) target.classList.add('active');
+        }
+      });
+    }, { threshold: 0.25, rootMargin: '-80px 0px -50% 0px' });
+    sections.forEach(function (s) { observer.observe(s); });
+  }
+
+  // Smooth scroll for nav links
+  navLinks.forEach(function (a) {
+    a.addEventListener('click', function (e) {
+      e.preventDefault();
+      var id = a.dataset.target;
+      var el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+});
+</script>
+
+{% stylesheet %}
+
+.w1w-faq-wrap {
+  padding: 48px 0 120px;
+}
+
+/* Two-column layout */
+.w1w-fbody {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 64px;
+  align-items: start;
+}
+
+/* Sticky left nav */
+.w1w-fnav {
+  position: sticky;
+  top: calc(var(--header-height, 72px) + 24px);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.w1w-fnav-link {
+  display: block;
+  padding: 10px 14px;
+  font-size: 12px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  border-left: 2px solid transparent;
+  font-family: var(--font-display);
+  font-weight: 700;
+  text-decoration: none;
+  transition: all .15s;
+}
+.w1w-fnav-link:hover { color: var(--lime); border-color: var(--line); }
+.w1w-fnav-link.active { color: var(--lime); border-color: var(--lime); background: var(--lime-softer); }
+
+/* Content sections */
+.w1w-fsec {
+  margin-bottom: 64px;
+  scroll-margin-top: calc(var(--header-height, 72px) + 32px);
+}
+.w1w-fsec-h {
+  font-size: 32px;
+  margin-bottom: 24px;
+  letter-spacing: -0.01em;
+}
+.w1w-fsec-intro {
+  color: var(--ink-1);
+  font-size: 14px;
+  line-height: 1.7;
+  margin-bottom: 16px;
+}
+.w1w-fsec-body {
+  color: var(--ink-1);
+  font-size: 14px;
+  line-height: 1.7;
+  font-family: var(--font-body);
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.w1w-fsec-body a { color: var(--lime); }
+
+/* FAQ accordion */
+.w1w-faq {
+  border-top: 1px solid var(--line);
+}
+.w1w-faq-item {
+  border-bottom: 1px solid var(--line);
+}
+.w1w-faq-q {
+  width: 100%;
+  text-align: left;
+  padding: 20px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: -0.01em;
+  color: var(--ink-0);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color .15s;
+}
+.w1w-faq-q:hover { color: var(--lime); }
+.w1w-faq-plus {
+  color: var(--lime);
+  font-size: 20px;
+  width: 24px;
+  text-align: center;
+  flex-shrink: 0;
+  transition: transform .3s;
+  display: inline-block;
+}
+.w1w-faq-item.open .w1w-faq-plus { transform: rotate(45deg); }
+.w1w-faq-a {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height .35s ease, padding .3s ease;
+  color: var(--ink-1);
+  font-size: 14px;
+  line-height: 1.7;
+  font-family: var(--font-body);
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.w1w-faq-a a { color: var(--lime); }
+.w1w-faq-item.open .w1w-faq-a { max-height: 600px; padding: 0 0 24px; }
+
+/* Shipping grid */
+.w1w-ship-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  margin-bottom: 24px;
+}
+.w1w-ship-card {
+  background: var(--bg-1);
+  padding: 24px;
+  border: 1px solid var(--line);
+}
+.w1w-ship-h {
+  font-size: 18px;
+  margin-bottom: 4px;
+  color: var(--lime);
+  font-family: var(--font-display);
+  font-weight: 700;
+}
+.w1w-ship-timing {
+  font-size: 13px;
+  color: var(--ink-2);
+}
+.w1w-ship-price {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 22px;
+  color: var(--ink-0);
+  margin-top: 12px;
+}
+.w1w-shipping-note {
+  color: var(--ink-2);
+  font-size: 14px;
+  line-height: 1.6;
+  font-family: var(--font-body);
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+/* Sizing table */
+.w1w-size-table {
+  border-collapse: collapse;
+  width: 100%;
+  border: 1px solid var(--line);
+  margin: 16px 0;
+}
+.w1w-size-table th,
+.w1w-size-table td {
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 13px;
+  border-bottom: 1px solid var(--line);
+}
+.w1w-size-table th {
+  background: var(--bg-2);
+  color: var(--lime);
+  font-family: var(--font-display);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-size: 11px;
+  font-weight: 700;
+}
+.w1w-size-table td { color: var(--ink-1); }
+.w1w-size-table tbody tr:last-child td { border-bottom: none; }
+
+/* Responsive */
+@media (max-width: 900px) {
+  .w1w-fbody { grid-template-columns: 1fr; gap: 32px; }
+  .w1w-fnav { position: static; flex-direction: row; overflow-x: auto; flex-wrap: nowrap; gap: 0; border-bottom: 1px solid var(--line); padding-bottom: 0; margin-bottom: 24px; }
+  .w1w-fnav-link { border-left: none; border-bottom: 2px solid transparent; white-space: nowrap; }
+  .w1w-fnav-link.active { border-left: none; border-bottom-color: var(--lime); }
+  .w1w-ship-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+  .w1w-faq-q { font-size: 14px; }
+  .w1w-fsec-h { font-size: 24px; }
+}
+
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "W1W FAQ Body",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Nav labels"
+    },
+    { "type": "text", "id": "nav_faq",      "label": "Nav: FAQ",      "default": "FAQ" },
+    { "type": "text", "id": "nav_shipping", "label": "Nav: Shipping", "default": "Shipping" },
+    { "type": "text", "id": "nav_returns",  "label": "Nav: Returns",  "default": "Returns" },
+    { "type": "text", "id": "nav_sizing",   "label": "Nav: Sizing",   "default": "Sizing" },
+    { "type": "text", "id": "nav_care",     "label": "Nav: Care",     "default": "Care" },
+    {
+      "type": "header",
+      "content": "FAQ section"
+    },
+    { "type": "text", "id": "faq_heading", "label": "FAQ section heading", "default": "FREQUENTLY ASKED." },
+    {
+      "type": "header",
+      "content": "Shipping section"
+    },
+    { "type": "checkbox", "id": "show_shipping",   "label": "Show shipping section", "default": true },
+    { "type": "text",     "id": "shipping_heading", "label": "Shipping heading",      "default": "SHIPPING." },
+    { "type": "textarea", "id": "shipping_note",    "label": "Shipping footnote",     "default": "All orders ship from Toronto, Canada. Tracking included on every order. Ships within 24 hours of order confirmation, Monday–Friday." },
+    {
+      "type": "header",
+      "content": "Returns section"
+    },
+    { "type": "checkbox",  "id": "show_returns",       "label": "Show returns section",  "default": true },
+    { "type": "text",      "id": "returns_heading",     "label": "Returns heading",       "default": "RETURNS." },
+    { "type": "richtext",  "id": "returns_text",        "label": "Returns policy text",   "default": "<p>30-day returns on unworn bands in original packaging. Return shipping is free within North America, $6 elsewhere. Refunds process in 3–5 business days after receipt.</p>" },
+    { "type": "text",      "id": "returns_portal_label","label": "Returns portal link text","default": "returns.world1world.com" },
+    { "type": "url",       "id": "returns_portal_url",  "label": "Returns portal URL" },
+    {
+      "type": "header",
+      "content": "Sizing section"
+    },
+    { "type": "checkbox",  "id": "show_sizing",    "label": "Show sizing section",       "default": true },
+    { "type": "text",      "id": "sizing_heading", "label": "Sizing heading",            "default": "SIZING." },
+    { "type": "textarea",  "id": "sizing_intro",   "label": "Sizing intro text",         "default": "Measure the circumference of your wrist at the widest point. Add ½ inch for a comfortable fit." },
+    { "type": "text",      "id": "size_col_size",  "label": "Size column header",        "default": "Size" },
+    { "type": "text",      "id": "size_col_wrist", "label": "Wrist column header",       "default": "Wrist" },
+    { "type": "text",      "id": "size_col_band",  "label": "Band Length column header", "default": "Band Length" },
+    { "type": "text",      "id": "size_col_fits",  "label": "Fits column header",        "default": "Fits" },
+    {
+      "type": "header",
+      "content": "Care section"
+    },
+    { "type": "checkbox",  "id": "show_care",    "label": "Show care section",   "default": true },
+    { "type": "text",      "id": "care_heading", "label": "Care heading",        "default": "CARE." },
+    { "type": "richtext",  "id": "care_text",    "label": "Care instructions",   "default": "<p>Hand-wash with mild soap and cold water. Air-dry. Do not tumble dry. Do not iron. If it gets stadium-dusty, a soft brush and water is all you need. Built to last the cycle.</p>" }
+  ],
+  "blocks": [
+    {
+      "type": "faq_item",
+      "name": "FAQ item",
+      "settings": [
+        { "type": "text",     "id": "question", "label": "Question", "default": "What is a World 1 World band made of?" },
+        { "type": "richtext", "id": "answer",   "label": "Answer",   "default": "<p>550-rated 7-strand paracord — the same spec trusted by mountaineers and military. Nylon core with a high-tenacity sheath. Colors are dyed-through, not printed, so they won't fade.</p>" }
+      ]
+    },
+    {
+      "type": "shipping_zone",
+      "name": "Shipping zone",
+      "settings": [
+        { "type": "text", "id": "zone_name",  "label": "Zone name",   "default": "NORTH AMERICA" },
+        { "type": "text", "id": "timing",     "label": "Delivery time","default": "3–5 business days" },
+        { "type": "text", "id": "price_text", "label": "Price text",  "default": "$6 · FREE over $35" }
+      ]
+    },
+    {
+      "type": "size_row",
+      "name": "Size row",
+      "settings": [
+        { "type": "text", "id": "size",  "label": "Size",        "default": "M" },
+        { "type": "text", "id": "wrist", "label": "Wrist range", "default": "7.0–8.0\"" },
+        { "type": "text", "id": "band",  "label": "Band length", "default": "8.5\"" },
+        { "type": "text", "id": "fits",  "label": "Fits",        "default": "Most adults" }
+      ]
+    }
+  ],
+  "presets": [{ "name": "W1W FAQ Body" }]
+}
+{% endschema %}

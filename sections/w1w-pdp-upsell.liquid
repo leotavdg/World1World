@@ -3,27 +3,39 @@
   <div class="wrap">
 
     <!-- Discount banner -->
+    {%- if section.settings.show_banner -%}
     <div class="w1w-upsell-banner">
       <div class="w1w-upsell-banner__icon">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--lime-dark)" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
       </div>
       <div class="w1w-upsell-banner__body">
-        <strong>Stack 3+ nations and save up to 20%.</strong>
-        Discount applied automatically at checkout — no code needed.
+        <strong>{{ section.settings.banner_heading }}</strong>
+        {{ section.settings.banner_body }}
       </div>
       <div class="w1w-upsell-banner__tiers">
-        <span>3× = <strong>10% off</strong></span>
-        <span>5× = <strong>15% off</strong></span>
-        <span>8× = <strong>20% off</strong></span>
+        {%- if section.settings.tier_1_qty != blank -%}
+          <span>{{ section.settings.tier_1_qty }}× = <strong>{{ section.settings.tier_1_pct }}% off</strong></span>
+        {%- endif -%}
+        {%- if section.settings.tier_2_qty != blank -%}
+          <span>{{ section.settings.tier_2_qty }}× = <strong>{{ section.settings.tier_2_pct }}% off</strong></span>
+        {%- endif -%}
+        {%- if section.settings.tier_3_qty != blank -%}
+          <span>{{ section.settings.tier_3_qty }}× = <strong>{{ section.settings.tier_3_pct }}% off</strong></span>
+        {%- endif -%}
       </div>
     </div>
+    {%- endif -%}
 
     <!-- Section header -->
     <div class="w1w-upsell-head">
       <div>
-        <span class="eyebrow">Build Your Squad</span>
-        <h2 class="w1w-upsell-title">STACK THE NATIONS.</h2>
-        <p class="w1w-upsell-hint">Pick up to 11 nations. Build the starting XI, gift the supporters, dress the group chat.</p>
+        {%- if section.settings.eyebrow != blank -%}
+          <span class="eyebrow">{{ section.settings.eyebrow }}</span>
+        {%- endif -%}
+        <h2 class="w1w-upsell-title">{{ section.settings.title }}</h2>
+        {%- if section.settings.hint != blank -%}
+          <p class="w1w-upsell-hint">{{ section.settings.hint }}</p>
+        {%- endif -%}
       </div>
     </div>
 
@@ -65,10 +77,14 @@
   <div class="wrap">
     <div class="sec-head">
       <div>
-        <span class="eyebrow">More From This Region</span>
-        <h2 style="margin-top:12px;font-size:clamp(28px,4vw,48px)">RELATED NATIONS</h2>
+        {%- if section.settings.related_eyebrow != blank -%}
+          <span class="eyebrow">{{ section.settings.related_eyebrow }}</span>
+        {%- endif -%}
+        <h2 style="margin-top:12px;font-size:clamp(28px,4vw,48px)">{{ section.settings.related_title }}</h2>
       </div>
-      <a href="/collections/all" class="btn btn-outline">VIEW ALL →</a>
+      {%- if section.settings.related_cta_label != blank -%}
+        <a href="{{ section.settings.related_cta_url }}" class="btn btn-outline">{{ section.settings.related_cta_label }}</a>
+      {%- endif -%}
     </div>
     <div class="w1w-related-grid" id="w1wRelatedGrid"></div>
   </div>
@@ -324,7 +340,48 @@ document.addEventListener('DOMContentLoaded', function () {
 {% schema %}
 {
   "name": "W1W PDP Upsell",
-  "settings": [],
+  "settings": [
+    {
+      "type": "header",
+      "content": "Discount Banner"
+    },
+    { "type": "checkbox", "id": "show_banner", "label": "Show discount banner", "default": true },
+    { "type": "text", "id": "banner_heading", "label": "Banner heading", "default": "Stack 3+ nations and save up to 20%." },
+    { "type": "text", "id": "banner_body", "label": "Banner body text", "default": "Discount applied automatically at checkout — no code needed." },
+    {
+      "type": "header",
+      "content": "Tier 1"
+    },
+    { "type": "number", "id": "tier_1_qty", "label": "Tier 1 quantity", "default": 3 },
+    { "type": "number", "id": "tier_1_pct", "label": "Tier 1 discount %", "default": 10 },
+    {
+      "type": "header",
+      "content": "Tier 2"
+    },
+    { "type": "number", "id": "tier_2_qty", "label": "Tier 2 quantity", "default": 5 },
+    { "type": "number", "id": "tier_2_pct", "label": "Tier 2 discount %", "default": 15 },
+    {
+      "type": "header",
+      "content": "Tier 3"
+    },
+    { "type": "number", "id": "tier_3_qty", "label": "Tier 3 quantity", "default": 8 },
+    { "type": "number", "id": "tier_3_pct", "label": "Tier 3 discount %", "default": 20 },
+    {
+      "type": "header",
+      "content": "Bundle Builder"
+    },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow label", "default": "Build Your Squad" },
+    { "type": "text", "id": "title", "label": "Section title", "default": "STACK THE NATIONS." },
+    { "type": "textarea", "id": "hint", "label": "Hint text", "default": "Pick up to 11 nations. Build the starting XI, gift the supporters, dress the group chat." },
+    {
+      "type": "header",
+      "content": "Related Nations"
+    },
+    { "type": "text", "id": "related_eyebrow", "label": "Eyebrow label", "default": "More From This Region" },
+    { "type": "text", "id": "related_title", "label": "Section title", "default": "RELATED NATIONS" },
+    { "type": "text", "id": "related_cta_label", "label": "CTA button label", "default": "VIEW ALL →" },
+    { "type": "url", "id": "related_cta_url", "label": "CTA button URL", "default": "/collections/all" }
+  ],
   "presets": [{ "name": "W1W PDP Upsell" }]
 }
 {% endschema %}

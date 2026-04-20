@@ -1,0 +1,130 @@
+{
+  "sections": {
+    "hero": {
+      "type": "w1w-faq-hero",
+      "settings": {
+        "eyebrow": "Help Center",
+        "heading": "ALL ANSWERS."
+      }
+    },
+    "body": {
+      "type": "w1w-faq-body",
+      "blocks": {
+        "faq_1": {
+          "type": "faq_item",
+          "settings": {
+            "question": "What is a World 1 World band made of?",
+            "answer": "<p>550-rated 7-strand paracord — the same spec trusted by mountaineers and military. Nylon core with a high-tenacity sheath. Colors are dyed-through, not printed, so they won't fade.</p>"
+          }
+        },
+        "faq_2": {
+          "type": "faq_item",
+          "settings": {
+            "question": "How long is shipping?",
+            "answer": "<p>We ship in 24 hours from our Toronto facility. US/Canada: 3–5 business days. UK/EU: 5–8 days. Rest of world: 7–14 days. Free over $35.</p>"
+          }
+        },
+        "faq_3": {
+          "type": "faq_item",
+          "settings": {
+            "question": "Are stack discounts applied automatically?",
+            "answer": "<p>Yes, automatically. Add 3 to your bag: 10% off everything. 5: 15%. 8: 20%. No code needed — the cart does the math.</p>"
+          }
+        },
+        "faq_4": {
+          "type": "faq_item",
+          "settings": {
+            "question": "What if my country isn't listed?",
+            "answer": "<p>Drop 04 is already in production. Email <a href=\"mailto:hello@world1world.com\">hello@world1world.com</a> with your flag and we'll tell you when it's live.</p>"
+          }
+        },
+        "faq_5": {
+          "type": "faq_item",
+          "settings": {
+            "question": "Do you do custom or team orders?",
+            "answer": "<p>Yes — for orders of 25+ with custom color-ways or club crests, reach out to <a href=\"mailto:teams@world1world.com\">teams@world1world.com</a>. Lead time is typically 3 weeks.</p>"
+          }
+        },
+        "faq_6": {
+          "type": "faq_item",
+          "settings": {
+            "question": "Can I wear it in water?",
+            "answer": "<p>Yes. Paracord is water-resistant and fast-drying. Pool, ocean, rain — all fine. Just air-dry before storing.</p>"
+          }
+        },
+        "ship_1": {
+          "type": "shipping_zone",
+          "settings": {
+            "zone_name": "NORTH AMERICA",
+            "timing": "3–5 business days",
+            "price_text": "$6 · FREE over $35"
+          }
+        },
+        "ship_2": {
+          "type": "shipping_zone",
+          "settings": {
+            "zone_name": "UK & EUROPE",
+            "timing": "5–8 business days",
+            "price_text": "$9 · FREE over $50"
+          }
+        },
+        "ship_3": {
+          "type": "shipping_zone",
+          "settings": {
+            "zone_name": "REST OF WORLD",
+            "timing": "7–14 business days",
+            "price_text": "$12 · FREE over $60"
+          }
+        },
+        "size_s": {
+          "type": "size_row",
+          "settings": {
+            "size": "S",
+            "wrist": "6.0–7.0\"",
+            "band": "7.5\"",
+            "fits": "Kids / small wrists"
+          }
+        },
+        "size_m": {
+          "type": "size_row",
+          "settings": {
+            "size": "M",
+            "wrist": "7.0–8.0\"",
+            "band": "8.5\"",
+            "fits": "Most adults"
+          }
+        },
+        "size_l": {
+          "type": "size_row",
+          "settings": {
+            "size": "L",
+            "wrist": "8.0–9.0\"",
+            "band": "9.5\"",
+            "fits": "Larger wrists"
+          }
+        },
+        "size_xl": {
+          "type": "size_row",
+          "settings": {
+            "size": "XL",
+            "wrist": "9.0–10.0\"",
+            "band": "10.5\"",
+            "fits": "XL wrists / ankle wear"
+          }
+        }
+      },
+      "block_order": [
+        "faq_1", "faq_2", "faq_3", "faq_4", "faq_5", "faq_6",
+        "ship_1", "ship_2", "ship_3",
+        "size_s", "size_m", "size_l", "size_xl"
+      ],
+      "settings": {
+        "show_shipping": true,
+        "show_returns": true,
+        "show_sizing": true,
+        "show_care": true
+      }
+    }
+  },
+  "order": ["hero", "body"]
+}

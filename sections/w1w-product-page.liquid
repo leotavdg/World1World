@@ -1,100 +1,165 @@
 {%- liquid
   assign current_variant = product.selected_or_first_available_variant
+  assign has_images = false
+  if product.media.size > 0
+    assign has_images = true
+  endif
+  assign has_multiple_images = false
+  if product.media.size > 1
+    assign has_multiple_images = true
+  endif
 -%}
 
 <div class="w1w-pdp-wrap">
   <div class="wrap">
 
-    <nav class="w1w-crumbs" aria-label="Breadcrumb">
-      <a href="/">Home</a><span>/</span>
-      <a href="/collections/all">Shop</a><span>/</span>
-      <span>{{ product.title }}</span>
-    </nav>
+    {%- if section.settings.show_breadcrumb -%}
+      <nav class="w1w-crumbs" aria-label="Breadcrumb">
+        <a href="/">{{ section.settings.breadcrumb_home }}</a><span>/</span>
+        <a href="{{ section.settings.breadcrumb_shop_url }}">{{ section.settings.breadcrumb_shop_label }}</a><span>/</span>
+        <span>{{ product.title }}</span>
+      </nav>
+    {%- endif -%}
 
-    <!-- Country flag stripe — JS fills in colors -->
-    <div class="w1w-flag-stripe" id="w1wFlagStripe" aria-hidden="true">
-      <div class="w1w-flag-stripe__seg" id="w1wFlagC1"></div>
-      <div class="w1w-flag-stripe__seg" id="w1wFlagC2"></div>
-      <div class="w1w-flag-stripe__seg" id="w1wFlagC3"></div>
-    </div>
+    {%- if section.settings.show_flag_stripe -%}
+      <div class="w1w-flag-stripe" id="w1wFlagStripe" aria-hidden="true">
+        <div class="w1w-flag-stripe__seg" id="w1wFlagC1"></div>
+        <div class="w1w-flag-stripe__seg" id="w1wFlagC2"></div>
+        <div class="w1w-flag-stripe__seg" id="w1wFlagC3"></div>
+      </div>
+    {%- endif -%}
 
     <div class="w1w-pdp">
 
       <!-- ── Gallery ── -->
-      <div class="w1w-pdp-gallery" id="w1wGallery">
+      <div class="w1w-pdp-gallery">
+
         <div class="w1w-pdp-main-wrap">
-          <div class="w1w-pdp-glow" id="w1wGlowEl"></div>
+          {%- if section.settings.show_glow -%}
+            <div class="w1w-pdp-glow" id="w1wGlowEl"></div>
+          {%- endif -%}
+
           <div class="w1w-pdp-main" id="w1wMainScene">
-            {%- if product.featured_image != blank -%}
-              <img
-                id="w1wFallbackImg"
-                src="{{ product.featured_image | image_url: width: 1000 }}"
-                alt="{{ product.featured_image.alt | default: product.title | escape }}"
-                loading="eager"
-                style="width:100%;height:100%;object-fit:cover;display:block"
-              >
+            {%- if has_images -%}
+              {%- for media in product.media -%}
+                {%- if media.media_type == 'image' -%}
+                  <img
+                    class="w1w-main-img{% if forloop.first %} active{% endif %}"
+                    src="{{ media | image_url: width: 1000 }}"
+                    alt="{{ media.alt | default: product.title | escape }}"
+                    loading="{{ forloop.first | ternary: 'eager', 'lazy' }}"
+                    data-index="{{ forloop.index0 }}"
+                    style="{% unless forloop.first %}display:none;{% endunless %}width:100%;height:100%;object-fit:cover;display:{% if forloop.first %}block{% else %}none{% endif %}"
+                  >
+                {%- endif -%}
+              {%- endfor -%}
             {%- else -%}
-              <div class="bracelet-scene" style="height:100%;aspect-ratio:1">
+              <!-- No product images — bracelet CSS placeholder, populated by JS -->
+              <div class="bracelet-scene" id="w1wBraceletMain" style="height:100%;aspect-ratio:1">
                 <div class="floor"></div>
                 <div class="bracelet-ph" id="w1wMainPh"></div>
               </div>
             {%- endif -%}
-            <span class="w1w-pdp-tag" id="w1wMainTag">DROP 03</span>
+
+            {%- if section.settings.drop_tag != blank -%}
+              <span class="w1w-pdp-tag" id="w1wMainTag">{{ section.settings.drop_tag }}</span>
+            {%- endif -%}
           </div>
-          <span class="w1w-pdp-corner w1w-pdp-corner--tl">N° 2026</span>
-          <span class="w1w-pdp-corner w1w-pdp-corner--br">{{ product.title | upcase }}</span>
+
+          {%- if section.settings.show_corner_labels -%}
+            {%- if section.settings.corner_tl != blank -%}
+              <span class="w1w-pdp-corner w1w-pdp-corner--tl">{{ section.settings.corner_tl }}</span>
+            {%- endif -%}
+            {%- if section.settings.corner_br == 'product_title' -%}
+              <span class="w1w-pdp-corner w1w-pdp-corner--br">{{ product.title | upcase }}</span>
+            {%- elsif section.settings.corner_br != blank -%}
+              <span class="w1w-pdp-corner w1w-pdp-corner--br">{{ section.settings.corner_br }}</span>
+            {%- endif -%}
+          {%- endif -%}
         </div>
 
-        <!-- Color-variant thumbnails (JS-populated) -->
-        <div class="w1w-pdp-thumbs" id="w1wThumbs"></div>
+        <!-- Thumbnails: only render if 2+ images, or if no images (JS fills bracelet variants) -->
+        {%- if has_multiple_images -%}
+          <div class="w1w-pdp-thumbs" id="w1wThumbs">
+            {%- for media in product.media -%}
+              {%- if media.media_type == 'image' -%}
+                <div class="w1w-pdp-thumb{% if forloop.first %} active{% endif %}" data-index="{{ forloop.index0 }}">
+                  {{ media | image_url: width: 300 | image_tag: loading: 'lazy', alt: media.alt }}
+                </div>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+        {%- elsif has_images == false -%}
+          <!-- Bracelet color variant thumbs — JS populated -->
+          <div class="w1w-pdp-thumbs" id="w1wThumbs"></div>
+        {%- endif -%}
 
-        <div class="w1w-pdp-edition-strip">
-          <div class="w1w-pdp-edition-item">
-            <span class="w1w-pdp-edition-label">Material</span>
-            <span class="w1w-pdp-edition-val">Paracord 550</span>
+        {%- if section.settings.show_edition_strip -%}
+          <div class="w1w-pdp-edition-strip">
+            {%- if section.settings.edition_1_label != blank -%}
+              <div class="w1w-pdp-edition-item">
+                <span class="w1w-pdp-edition-label">{{ section.settings.edition_1_label }}</span>
+                <span class="w1w-pdp-edition-val">{{ section.settings.edition_1_val }}</span>
+              </div>
+            {%- endif -%}
+            {%- if section.settings.edition_2_label != blank -%}
+              <div class="w1w-pdp-edition-item">
+                <span class="w1w-pdp-edition-label">{{ section.settings.edition_2_label }}</span>
+                <span class="w1w-pdp-edition-val">{{ section.settings.edition_2_val }}</span>
+              </div>
+            {%- endif -%}
+            {%- if section.settings.edition_3_label != blank -%}
+              <div class="w1w-pdp-edition-item">
+                <span class="w1w-pdp-edition-label">{{ section.settings.edition_3_label }}</span>
+                <span class="w1w-pdp-edition-val">{{ section.settings.edition_3_val }}</span>
+              </div>
+            {%- endif -%}
           </div>
-          <div class="w1w-pdp-edition-item">
-            <span class="w1w-pdp-edition-label">Release</span>
-            <span class="w1w-pdp-edition-val">Drop 03</span>
-          </div>
-          <div class="w1w-pdp-edition-item">
-            <span class="w1w-pdp-edition-label">Year</span>
-            <span class="w1w-pdp-edition-val">2026</span>
-          </div>
-        </div>
-      </div>
+        {%- endif -%}
+
+      </div><!-- /.w1w-pdp-gallery -->
 
       <!-- ── Info panel ── -->
       <div class="w1w-pdp-info">
 
-        <span class="w1w-pdp-sub" id="w1wSub">
-          {%- if product.metafields.custom.sub != blank -%}
-            {{ product.metafields.custom.sub }}
-          {%- else -%}WORLD 1 WORLD EDITION{%- endif -%}
-        </span>
+        {%- liquid
+          assign sub_text = section.settings.default_sub
+          if product.metafields.custom.sub != blank
+            assign sub_text = product.metafields.custom.sub
+          endif
+        -%}
+        <span class="w1w-pdp-sub" id="w1wSub">{{ sub_text }}</span>
 
         <h1 class="w1w-pdp-title">{{ product.title | upcase }}</h1>
 
         <div class="w1w-pdp-meta">
-          <div class="w1w-pdp-meta-item">
-            <span class="w1w-pdp-meta-k">Confederation</span>
-            <strong class="w1w-pdp-meta-v" id="w1wConfed">{{ product.vendor | default: 'W1W' }}</strong>
-          </div>
-          <div class="w1w-pdp-meta-item">
-            <span class="w1w-pdp-meta-k">Edition</span>
-            <strong class="w1w-pdp-meta-v">N°/2026</strong>
-          </div>
-          <div class="w1w-pdp-meta-item">
-            <span class="w1w-pdp-meta-k">Status</span>
-            <strong class="w1w-pdp-meta-v{% unless current_variant.available %} w1w-pdp-status--out{% endunless %}">
-              {{ current_variant.available | ternary: 'In Stock', 'Sold Out' }}
-            </strong>
-          </div>
+          {%- if section.settings.show_vendor -%}
+            <div class="w1w-pdp-meta-item">
+              <span class="w1w-pdp-meta-k">{{ section.settings.meta_confederation_label }}</span>
+              <strong class="w1w-pdp-meta-v" id="w1wConfed">{{ product.vendor }}</strong>
+            </div>
+          {%- endif -%}
+          {%- if section.settings.edition_label != blank -%}
+            <div class="w1w-pdp-meta-item">
+              <span class="w1w-pdp-meta-k">{{ section.settings.meta_edition_label }}</span>
+              <strong class="w1w-pdp-meta-v">{{ section.settings.edition_label }}</strong>
+            </div>
+          {%- endif -%}
+          {%- if section.settings.show_stock_status -%}
+            <div class="w1w-pdp-meta-item">
+              <span class="w1w-pdp-meta-k">{{ section.settings.meta_status_label }}</span>
+              <strong class="w1w-pdp-meta-v{% unless current_variant.available %} w1w-pdp-status--out{% endunless %}">
+                {%- if current_variant.available -%}{{ section.settings.in_stock_label }}{%- else -%}{{ section.settings.sold_out_label }}{%- endif -%}
+              </strong>
+            </div>
+          {%- endif -%}
         </div>
 
         <div class="w1w-pdp-price-row">
           <div class="w1w-pdp-price">{{ current_variant.price | money }}</div>
-          <div class="w1w-pdp-price-note">Free shipping on 3+</div>
+          {%- if section.settings.price_note != blank -%}
+            <div class="w1w-pdp-price-note">{{ section.settings.price_note }}</div>
+          {%- endif -%}
         </div>
 
         {%- form 'product', product, id: 'w1w-product-form', novalidate: 'novalidate' -%}
@@ -103,8 +168,10 @@
           {%- unless product.has_only_default_variant -%}
             <div class="w1w-field">
               <div class="w1w-field-label">
-                <span>Size</span>
-                <a href="#" onclick="alert('S: 6-7\" · M: 7-8\" · L: 8-9\"');return false" class="w1w-field-guide">Size guide →</a>
+                <span>{{ section.settings.size_label }}</span>
+                {%- if section.settings.size_guide_label != blank -%}
+                  <a href="#" onclick="alert('S: 6-7&quot; · M: 7-8&quot; · L: 8-9&quot;');return false" class="w1w-field-guide">{{ section.settings.size_guide_label }}</a>
+                {%- endif -%}
               </div>
               <div class="w1w-size-row">
                 {%- for variant in product.variants -%}
@@ -120,67 +187,83 @@
             </div>
           {%- endunless -%}
 
-          <!-- Stack & Save tier -->
-          <div class="w1w-field">
-            <div class="w1w-field-label">
-              <span>Stack &amp; Save</span>
-              <span class="w1w-field-lime">More = Less</span>
-            </div>
-            <div class="w1w-tier-row">
-              <button type="button" class="w1w-tier active" data-t="0" data-qty="1" data-pct="0">
-                <div class="w1w-tier-qty">1×</div>
-                <div class="w1w-tier-lb">SINGLE</div>
-                <div class="w1w-tier-off" style="opacity:0">—</div>
-              </button>
-              <button type="button" class="w1w-tier" data-t="1" data-qty="3" data-pct="10">
-                <div class="w1w-tier-qty">3×</div>
-                <div class="w1w-tier-lb">TRIO</div>
-                <div class="w1w-tier-off">Save 10%</div>
-              </button>
-              <button type="button" class="w1w-tier" data-t="2" data-qty="5" data-pct="15">
-                <div class="w1w-tier-qty">5×</div>
-                <div class="w1w-tier-lb">FIVE-A-SIDE</div>
-                <div class="w1w-tier-off">Save 15%</div>
-              </button>
-              <button type="button" class="w1w-tier" data-t="3" data-qty="8" data-pct="20">
-                <div class="w1w-tier-qty">8×</div>
-                <div class="w1w-tier-lb">STARTING XI</div>
-                <div class="w1w-tier-off">Save 20%</div>
-              </button>
-            </div>
-          </div>
-
-          <div class="w1w-field">
-            <div class="w1w-field-label"><span>Quantity</span></div>
-            <div class="w1w-qty-row">
-              <div class="w1w-qty-ctrl">
-                <button type="button" id="w1wQtyMinus">−</button>
-                <input type="number" name="quantity" id="w1wQtyInput" value="1" min="1" readonly>
-                <button type="button" id="w1wQtyPlus">+</button>
+          {%- if section.settings.show_tier_pricing -%}
+            <div class="w1w-field">
+              <div class="w1w-field-label">
+                <span>{{ section.settings.tier_label }}</span>
+                {%- if section.settings.tier_note != blank -%}
+                  <span class="w1w-field-lime">{{ section.settings.tier_note }}</span>
+                {%- endif -%}
               </div>
-              <span class="w1w-ships-note">Ships in 24h · Worldwide</span>
+              <div class="w1w-tier-row">
+                <button type="button" class="w1w-tier active" data-t="0" data-qty="1" data-pct="0">
+                  <div class="w1w-tier-qty">1×</div>
+                  <div class="w1w-tier-lb">{{ section.settings.tier_1_label }}</div>
+                  <div class="w1w-tier-off" style="opacity:0">—</div>
+                </button>
+                <button type="button" class="w1w-tier" data-t="1" data-qty="{{ section.settings.tier_2_qty }}" data-pct="{{ section.settings.tier_2_pct }}">
+                  <div class="w1w-tier-qty">{{ section.settings.tier_2_qty }}×</div>
+                  <div class="w1w-tier-lb">{{ section.settings.tier_2_label }}</div>
+                  <div class="w1w-tier-off">Save {{ section.settings.tier_2_pct }}%</div>
+                </button>
+                <button type="button" class="w1w-tier" data-t="2" data-qty="{{ section.settings.tier_3_qty }}" data-pct="{{ section.settings.tier_3_pct }}">
+                  <div class="w1w-tier-qty">{{ section.settings.tier_3_qty }}×</div>
+                  <div class="w1w-tier-lb">{{ section.settings.tier_3_label }}</div>
+                  <div class="w1w-tier-off">Save {{ section.settings.tier_3_pct }}%</div>
+                </button>
+                <button type="button" class="w1w-tier" data-t="3" data-qty="{{ section.settings.tier_4_qty }}" data-pct="{{ section.settings.tier_4_pct }}">
+                  <div class="w1w-tier-qty">{{ section.settings.tier_4_qty }}×</div>
+                  <div class="w1w-tier-lb">{{ section.settings.tier_4_label }}</div>
+                  <div class="w1w-tier-off">Save {{ section.settings.tier_4_pct }}%</div>
+                </button>
+              </div>
             </div>
-          </div>
+          {%- endif -%}
 
-          <div class="w1w-pdp-total">
-            <div>
-              <div class="w1w-pdp-total-k">Total</div>
-              <div class="w1w-pdp-total-hint" id="w1wTotalHint">1 band · no discount</div>
+          {%- if section.settings.show_quantity -%}
+            <div class="w1w-field">
+              <div class="w1w-field-label"><span>{{ section.settings.quantity_label }}</span></div>
+              <div class="w1w-qty-row">
+                <div class="w1w-qty-ctrl">
+                  <button type="button" id="w1wQtyMinus">−</button>
+                  <input type="number" name="quantity" id="w1wQtyInput" value="1" min="1" readonly>
+                  <button type="button" id="w1wQtyPlus">+</button>
+                </div>
+                {%- if section.settings.ships_note != blank -%}
+                  <span class="w1w-ships-note">{{ section.settings.ships_note }}</span>
+                {%- endif -%}
+              </div>
             </div>
-            <div class="w1w-pdp-total-right">
-              <span class="w1w-pdp-total-v" id="w1wTotalAmt">{{ current_variant.price | money }}</span>
-              <span class="w1w-pdp-total-saved" id="w1wTotalSaved"></span>
+          {%- endif -%}
+
+          {%- if section.settings.show_tier_pricing -%}
+            <div class="w1w-pdp-total">
+              <div>
+                <div class="w1w-pdp-total-k">{{ section.settings.total_label }}</div>
+                <div class="w1w-pdp-total-hint" id="w1wTotalHint"></div>
+              </div>
+              <div class="w1w-pdp-total-right">
+                <span class="w1w-pdp-total-v" id="w1wTotalAmt">{{ current_variant.price | money }}</span>
+                <span class="w1w-pdp-total-saved" id="w1wTotalSaved"></span>
+              </div>
             </div>
-          </div>
+          {%- endif -%}
 
           <div class="w1w-pdp-actions">
-            <button type="submit" class="btn btn-primary btn-lg btn-block w1w-atb" id="w1wAddBtn" {% unless current_variant.available %}disabled{% endunless %}>
+            <button type="submit" class="btn btn-primary btn-lg btn-block w1w-atb" id="w1wAddBtn"
+              {% unless current_variant.available %}disabled{% endunless %}>
               {%- if current_variant.available -%}
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-                ADD TO BAG
-              {%- else -%}SOLD OUT{%- endif -%}
+                {{ section.settings.add_to_cart_label }}
+              {%- else -%}
+                {{ section.settings.sold_out_button_label }}
+              {%- endif -%}
             </button>
-            <a href="/collections/all" class="btn btn-ghost btn-block">STACK MORE NATIONS</a>
+            {%- if section.settings.secondary_cta_label != blank -%}
+              <a href="{{ section.settings.secondary_cta_url }}" class="btn btn-ghost btn-block">
+                {{ section.settings.secondary_cta_label }}
+              </a>
+            {%- endif -%}
           </div>
         {%- endform -%}
 
@@ -188,24 +271,42 @@
           <div class="w1w-pdp-desc rte">{{ product.description }}</div>
         {%- endif -%}
 
-        <div class="w1w-pdp-feats">
-          <div class="w1w-pdp-feat">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--lime)" stroke-width="1.6"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-            <div><div class="w1w-feat-title">Paracord 550</div><div class="w1w-feat-desc">7-strand military-grade</div></div>
-          </div>
-          <div class="w1w-pdp-feat">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--lime)" stroke-width="1.6"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            <div><div class="w1w-feat-title">Water &amp; Sweat Proof</div><div class="w1w-feat-desc">Stadium to street</div></div>
-          </div>
-          <div class="w1w-pdp-feat">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--lime)" stroke-width="1.6"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-            <div><div class="w1w-feat-title">Ships in 24h</div><div class="w1w-feat-desc">73 countries</div></div>
-          </div>
-          <div class="w1w-pdp-feat">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--lime)" stroke-width="1.6"><polyline points="20 6 9 17 4 12"/></svg>
-            <div><div class="w1w-feat-title">30-Day Returns</div><div class="w1w-feat-desc">No questions asked</div></div>
-          </div>
-        </div>
+        {%- if section.settings.show_feature_tiles -%}
+          {%- liquid
+            assign has_feat = false
+            if section.settings.feat_1_title != blank or section.settings.feat_2_title != blank or section.settings.feat_3_title != blank or section.settings.feat_4_title != blank
+              assign has_feat = true
+            endif
+          -%}
+          {%- if has_feat -%}
+            <div class="w1w-pdp-feats">
+              {%- if section.settings.feat_1_title != blank -%}
+                <div class="w1w-pdp-feat">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--lime)" stroke-width="1.6"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+                  <div><div class="w1w-feat-title">{{ section.settings.feat_1_title }}</div><div class="w1w-feat-desc">{{ section.settings.feat_1_desc }}</div></div>
+                </div>
+              {%- endif -%}
+              {%- if section.settings.feat_2_title != blank -%}
+                <div class="w1w-pdp-feat">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--lime)" stroke-width="1.6"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                  <div><div class="w1w-feat-title">{{ section.settings.feat_2_title }}</div><div class="w1w-feat-desc">{{ section.settings.feat_2_desc }}</div></div>
+                </div>
+              {%- endif -%}
+              {%- if section.settings.feat_3_title != blank -%}
+                <div class="w1w-pdp-feat">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--lime)" stroke-width="1.6"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                  <div><div class="w1w-feat-title">{{ section.settings.feat_3_title }}</div><div class="w1w-feat-desc">{{ section.settings.feat_3_desc }}</div></div>
+                </div>
+              {%- endif -%}
+              {%- if section.settings.feat_4_title != blank -%}
+                <div class="w1w-pdp-feat">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--lime)" stroke-width="1.6"><polyline points="20 6 9 17 4 12"/></svg>
+                  <div><div class="w1w-feat-title">{{ section.settings.feat_4_title }}</div><div class="w1w-feat-desc">{{ section.settings.feat_4_desc }}</div></div>
+                </div>
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+        {%- endif -%}
 
       </div><!-- /.w1w-pdp-info -->
     </div><!-- /.w1w-pdp -->
@@ -214,85 +315,107 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+  var hasImages = {{ has_images | json }};
+  var hasMultiple = {{ has_multiple_images | json }};
+
+  // ── Country data from W1W_COUNTRIES ──
   var COUNTRIES = window.W1W_COUNTRIES || [];
-  var TIERS = window.W1W_BUNDLE_TIERS || [
-    {qty:1,pct:0},{qty:3,pct:10},{qty:5,pct:15},{qty:8,pct:20}
+  var TIERS = [
+    { qty: 1,  pct: 0  },
+    { qty: {{ section.settings.tier_2_qty }}, pct: {{ section.settings.tier_2_pct }} },
+    { qty: {{ section.settings.tier_3_qty }}, pct: {{ section.settings.tier_3_pct }} },
+    { qty: {{ section.settings.tier_4_qty }}, pct: {{ section.settings.tier_4_pct }} }
   ];
   var slug = {{ product.handle | json }};
   var country = COUNTRIES.find(function (c) { return c.slug === slug; });
-  var colors = country ? country.colors : ['#F3FFCA','#131313','#F3FFCA'];
+  var colors = country ? country.colors : null;
 
-  // Flag stripe
-  var fc = ['w1wFlagC1','w1wFlagC2','w1wFlagC3'];
-  fc.forEach(function (id, i) {
-    var el = document.getElementById(id);
-    if (el) el.style.background = colors[i];
-  });
+  // ── Flag stripe + glow (only if country data found) ──
+  if (colors) {
+    ['w1wFlagC1','w1wFlagC2','w1wFlagC3'].forEach(function (id, i) {
+      var el = document.getElementById(id); if (el) el.style.background = colors[i];
+    });
+    var glowEl = document.getElementById('w1wGlowEl');
+    if (glowEl) glowEl.style.background = colors[0];
+  }
 
-  // Glow
-  var glowEl = document.getElementById('w1wGlowEl');
-  if (glowEl) glowEl.style.background = colors[0];
-
-  // Sub / confed text
+  // ── Sub / confed text from country data ──
   if (country) {
     var subEl = document.getElementById('w1wSub');
-    if (subEl) subEl.textContent = country.sub;
+    if (subEl && country.sub) subEl.textContent = country.sub;
     var confedEl = document.getElementById('w1wConfed');
-    if (confedEl) confedEl.textContent = country.confed;
+    if (confedEl && country.confed) confedEl.textContent = country.confed;
   }
 
-  // Gallery variants
-  var variants = [
-    colors,
-    [colors[1], colors[2], colors[0]],
-    [colors[2], colors[0], colors[1]],
-    ['#0E0E0E', colors[0], colors[1]]
-  ];
-  var tags = ['DROP 03','AWAY','REVERSE','BLACKOUT'];
+  // ── Gallery ──
+  var mainScene = document.getElementById('w1wMainScene');
+  var mainTag   = document.getElementById('w1wMainTag');
+  var thumbsEl  = document.getElementById('w1wThumbs');
+  var glowEl    = document.getElementById('w1wGlowEl');
 
-  function braceletScene(c, pct) {
-    return '<div class="bracelet-scene" style="height:100%;aspect-ratio:1"><div class="floor"></div>' +
-      '<div class="bracelet-ph" style="--c1:' + c[0] + ';--c2:' + c[1] + ';--c3:' + c[2] + ';width:' + (pct||'85%') + '"></div></div>';
-  }
+  if (hasMultiple && thumbsEl) {
+    // Real image thumbs — wire up click handlers
+    thumbsEl.querySelectorAll('.w1w-pdp-thumb').forEach(function (thumb) {
+      thumb.addEventListener('click', function () {
+        var idx = parseInt(thumb.dataset.index);
+        thumbsEl.querySelectorAll('.w1w-pdp-thumb').forEach(function (t) { t.classList.remove('active'); });
+        thumb.classList.add('active');
+        mainScene.querySelectorAll('.w1w-main-img').forEach(function (img, i) {
+          img.style.display = i === idx ? 'block' : 'none';
+        });
+      });
+    });
 
-  var fallbackImg = document.getElementById('w1wFallbackImg');
-  var mainScene   = document.getElementById('w1wMainScene');
-  var mainTag     = document.getElementById('w1wMainTag');
-  if (!fallbackImg && mainScene) {
-    mainScene.innerHTML = braceletScene(variants[0],'80%') + '<span class="w1w-pdp-tag">DROP 03</span>';
-  }
+  } else if (!hasImages && thumbsEl && colors) {
+    // No product images — render bracelet color variants
+    var variants = [
+      colors,
+      [colors[1], colors[2], colors[0]],
+      [colors[2], colors[0], colors[1]],
+      ['#0E0E0E', colors[0], colors[1]]
+    ];
+    var tags = ['DROP 03', 'AWAY', 'REVERSE', 'BLACKOUT'];
 
-  var thumbsEl = document.getElementById('w1wThumbs');
-  if (thumbsEl) {
+    function braceletScene(c, pct) {
+      return '<div class="bracelet-scene" style="height:100%;aspect-ratio:1"><div class="floor"></div>' +
+        '<div class="bracelet-ph" style="--c1:' + c[0] + ';--c2:' + c[1] + ';--c3:' + c[2] + ';width:' + (pct||'85%') + '"></div></div>';
+    }
+
+    // Populate main bracelet
+    var mainPh = document.getElementById('w1wMainPh');
+    if (mainPh) {
+      mainPh.style.setProperty('--c1', colors[0]);
+      mainPh.style.setProperty('--c2', colors[1]);
+      mainPh.style.setProperty('--c3', colors[2]);
+      mainPh.style.width = '80%';
+    }
+
+    // Build 4 variant thumbs
     thumbsEl.innerHTML = variants.map(function (v, i) {
-      return '<div class="w1w-pdp-thumb' + (i===0?' active':'') + '" data-i="' + i + '">' +
+      return '<div class="w1w-pdp-thumb' + (i===0?' active':'') + '" data-vi="' + i + '">' +
         braceletScene(v,'90%') +
         '<span class="w1w-pdp-thumb-tag">' + tags[i] + '</span>' +
         '</div>';
     }).join('');
+
     thumbsEl.querySelectorAll('.w1w-pdp-thumb').forEach(function (el) {
       el.addEventListener('click', function () {
-        var i = parseInt(el.dataset.i);
+        var i = parseInt(el.dataset.vi);
         thumbsEl.querySelectorAll('.w1w-pdp-thumb').forEach(function (t) { t.classList.remove('active'); });
         el.classList.add('active');
-        if (fallbackImg) fallbackImg.style.display = i===0 ? 'block' : 'none';
-        if (mainScene) {
-          var ex = mainScene.querySelector('.bracelet-scene');
-          if (ex) ex.remove();
-          if (!fallbackImg || i > 0) {
-            mainScene.insertBefore(
-              document.createRange().createContextualFragment(braceletScene(variants[i],'80%')),
-              mainScene.firstChild
-            );
-          }
-        }
+        var ex = mainScene.querySelector('.bracelet-scene');
+        if (ex) ex.remove();
+        mainScene.insertBefore(
+          document.createRange().createContextualFragment(braceletScene(variants[i], '80%')),
+          mainScene.firstChild
+        );
         if (mainTag) mainTag.textContent = tags[i];
         if (glowEl) { glowEl.style.opacity='0.6'; setTimeout(function(){glowEl.style.opacity='0.35';},400); }
       });
     });
   }
 
-  // Size buttons
+  // ── Size buttons ──
   var selectedVariantId = {{ current_variant.id }};
   var selectedPrice = {{ current_variant.price }};
   document.querySelectorAll('.w1w-size-btn').forEach(function (btn) {
@@ -301,13 +424,12 @@ document.addEventListener('DOMContentLoaded', function () {
       btn.classList.add('active');
       selectedVariantId = parseInt(btn.dataset.variantId);
       selectedPrice = parseInt(btn.dataset.variantPrice);
-      var vi = document.getElementById('w1wVariantId');
-      if (vi) vi.value = selectedVariantId;
+      var vi = document.getElementById('w1wVariantId'); if (vi) vi.value = selectedVariantId;
       recalc();
     });
   });
 
-  // Tier + qty
+  // ── Tier + qty ──
   var tierIdx = 0, qty = 1;
   document.querySelectorAll('.w1w-tier').forEach(function (btn) {
     btn.addEventListener('click', function () {
@@ -327,14 +449,14 @@ document.addEventListener('DOMContentLoaded', function () {
     var tier = TIERS[tierIdx];
     var effQty = Math.max(qty, tier?tier.qty:1);
     var unit = selectedPrice/100;
-    var gross = unit*effQty;
     var pct = tier?tier.pct:0;
+    var gross = unit*effQty;
     var disc = gross*pct/100;
     qty = effQty;
-    var qi = document.getElementById('w1wQtyInput'); if(qi) qi.value=effQty;
-    var ta = document.getElementById('w1wTotalAmt'); if(ta) ta.textContent='$'+(gross-disc).toFixed(2);
-    var th = document.getElementById('w1wTotalHint'); if(th) th.textContent=effQty+' band'+(effQty>1?'s':'')+' · '+(pct?pct+'% off':'no discount');
-    var ts = document.getElementById('w1wTotalSaved'); if(ts) ts.textContent=disc>0?'Saved $'+disc.toFixed(2):'';
+    var qi=document.getElementById('w1wQtyInput'); if(qi) qi.value=effQty;
+    var ta=document.getElementById('w1wTotalAmt'); if(ta) ta.textContent='$'+(gross-disc).toFixed(2);
+    var th=document.getElementById('w1wTotalHint'); if(th) th.textContent=effQty+' band'+(effQty>1?'s':'')+' · '+(pct?pct+'% off':'no discount');
+    var ts=document.getElementById('w1wTotalSaved'); if(ts) ts.textContent=disc>0?'Saved $'+disc.toFixed(2):'';
   }
   recalc();
 });
@@ -344,54 +466,38 @@ document.addEventListener('DOMContentLoaded', function () {
 
 .w1w-pdp-wrap { background: var(--bg-0); color: var(--ink-0); }
 
-.w1w-crumbs {
-  padding: 24px 0 16px;
-  font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase;
-  color: var(--ink-3); display: flex; gap: 8px; align-items: center;
-}
+.w1w-crumbs { padding: 24px 0 16px; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--ink-3); display: flex; gap: 8px; align-items: center; }
 .w1w-crumbs a { color: var(--ink-3); transition: color .12s; }
 .w1w-crumbs a:hover { color: var(--lime); }
 
 .w1w-flag-stripe { display: grid; grid-template-columns: repeat(3,1fr); height: 4px; margin-bottom: 40px; }
 .w1w-flag-stripe__seg { transition: background .5s; }
 
-.w1w-pdp {
-  display: grid; grid-template-columns: 1.15fr 1fr;
-  gap: 72px; padding-bottom: 100px; align-items: start;
-}
+.w1w-pdp { display: grid; grid-template-columns: 1.15fr 1fr; gap: 72px; padding-bottom: 100px; align-items: start; }
 
 /* Gallery */
 .w1w-pdp-gallery { position: sticky; top: calc(var(--nav-h,72px) + 24px); }
 .w1w-pdp-main-wrap { position: relative; }
-.w1w-pdp-glow {
-  position: absolute; inset: -50px; border-radius: 50%;
-  filter: blur(90px); opacity: 0.35; pointer-events: none; z-index: 0;
-  transition: opacity .4s, background .5s;
-}
-.w1w-pdp-main {
-  position: relative; aspect-ratio: 1;
-  background:
-    radial-gradient(ellipse 70% 50% at 50% 30%, rgba(243,255,202,0.07), transparent 60%),
-    var(--bg-1);
-  overflow: hidden; z-index: 1;
-  box-shadow: 0 40px 80px -20px rgba(0,0,0,0.8);
-}
+.w1w-pdp-glow { position: absolute; inset: -50px; border-radius: 50%; filter: blur(90px); opacity: 0.35; pointer-events: none; z-index: 0; transition: opacity .4s, background .5s; }
+.w1w-pdp-main { position: relative; aspect-ratio: 1; background: radial-gradient(ellipse 70% 50% at 50% 30%, rgba(243,255,202,0.07), transparent 60%), var(--bg-1); overflow: hidden; z-index: 1; box-shadow: 0 40px 80px -20px rgba(0,0,0,0.8); }
 .w1w-pdp-main .bracelet-scene { height: 100%; aspect-ratio: 1; }
 .w1w-pdp-main .bracelet-ph { width: 80%; }
-.w1w-pdp-corner {
-  position: absolute; padding: 6px 10px; font-family: var(--font-display);
-  font-weight: 700; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; z-index: 2;
-}
+.w1w-main-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.w1w-pdp-corner { position: absolute; padding: 6px 10px; font-family: var(--font-display); font-weight: 700; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; z-index: 2; }
 .w1w-pdp-corner--tl { top: -10px; left: -10px; background: var(--bg-3); color: var(--lime); border: 1px solid rgba(243,255,202,0.2); }
-.w1w-pdp-corner--br { bottom: -10px; right: -10px; background: var(--lime); color: var(--lime-dark) !important; max-width: 160px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.w1w-pdp-corner--br { bottom: -10px; right: -10px; background: var(--lime); color: var(--lime-dark) !important; max-width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .w1w-pdp-tag { position: absolute; top: 20px; left: 20px; padding: 6px 10px; background: var(--lime); color: var(--lime-dark) !important; font-family: var(--font-display); font-weight: 700; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; z-index: 2; }
+
 .w1w-pdp-thumbs { display: grid; grid-template-columns: repeat(4,1fr); gap: 4px; margin-top: 16px; }
 .w1w-pdp-thumb { aspect-ratio: 1; background: var(--bg-2); cursor: pointer; overflow: hidden; border: 1px solid transparent; transition: border-color .15s; position: relative; }
+.w1w-pdp-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .w1w-pdp-thumb .bracelet-scene { height: 100%; }
 .w1w-pdp-thumb .bracelet-ph { width: 90%; }
 .w1w-pdp-thumb:hover, .w1w-pdp-thumb.active { border-color: var(--lime); }
 .w1w-pdp-thumb-tag { position: absolute; bottom: 0; left: 0; right: 0; font-family: var(--font-display); font-weight: 700; font-size: 8px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); padding: 4px 6px; background: linear-gradient(0deg,rgba(0,0,0,0.7),transparent); text-align: center; }
 .w1w-pdp-thumb.active .w1w-pdp-thumb-tag { color: var(--lime); }
+
 .w1w-pdp-edition-strip { display: grid; grid-template-columns: repeat(3,1fr); gap: 1px; margin-top: 4px; background: var(--line); }
 .w1w-pdp-edition-item { background: var(--bg-1); padding: 12px; display: flex; flex-direction: column; gap: 4px; }
 .w1w-pdp-edition-label { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-3); font-family: var(--font-display); }
@@ -408,16 +514,19 @@ document.addEventListener('DOMContentLoaded', function () {
 .w1w-pdp-price-row { display: flex; align-items: baseline; gap: 16px; margin-bottom: 28px; }
 .w1w-pdp-price { font-family: var(--font-display); font-weight: 700; font-size: 52px; color: var(--lime); letter-spacing: -0.03em; line-height: 1; }
 .w1w-pdp-price-note { font-size: 11px; color: var(--ink-3); letter-spacing: 0.1em; text-transform: uppercase; font-family: var(--font-display); }
+
 .w1w-field { margin-bottom: 24px; }
 .w1w-field-label { display: flex; justify-content: space-between; align-items: center; font-family: var(--font-display); font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-2); margin-bottom: 10px; }
 .w1w-field-guide { color: var(--lime); text-decoration: none; }
 .w1w-field-guide:hover { text-decoration: underline; }
 .w1w-field-lime { color: var(--lime); }
+
 .w1w-size-row { display: flex; gap: 4px; }
 .w1w-size-btn { flex: 1; padding: 14px 0; border: 1px solid var(--line); color: var(--ink-1); font-family: var(--font-display); font-weight: 700; font-size: 13px; letter-spacing: 0.1em; cursor: pointer; background: var(--bg-1); text-transform: uppercase; transition: all .15s; }
 .w1w-size-btn:hover { border-color: var(--line-strong); background: var(--bg-2); }
 .w1w-size-btn.active { background: var(--lime); color: var(--lime-dark) !important; border-color: var(--lime); }
 .w1w-size-btn--na { opacity: 0.35; text-decoration: line-through; cursor: not-allowed; }
+
 .w1w-tier-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 4px; }
 .w1w-tier { padding: 16px 8px; border: 1px solid var(--line); background: var(--bg-1); cursor: pointer; text-align: left; transition: all .15s; }
 .w1w-tier:hover { border-color: var(--line-strong); background: var(--bg-2); }
@@ -426,6 +535,7 @@ document.addEventListener('DOMContentLoaded', function () {
 .w1w-tier.active .w1w-tier-qty { color: var(--lime); }
 .w1w-tier-lb { font-size: 9px; letter-spacing: 0.12em; color: var(--ink-2); text-transform: uppercase; margin-top: 4px; }
 .w1w-tier-off { font-size: 9px; color: var(--lime); margin-top: 4px; font-weight: 700; }
+
 .w1w-qty-row { display: flex; align-items: center; gap: 16px; }
 .w1w-qty-ctrl { display: inline-flex; border: 1px solid var(--line); }
 .w1w-qty-ctrl button { width: 44px; height: 44px; font-family: var(--font-display); font-size: 18px; color: var(--ink-0); background: transparent; border: none; }
@@ -434,19 +544,23 @@ document.addEventListener('DOMContentLoaded', function () {
 .w1w-qty-ctrl input::-webkit-outer-spin-button,
 .w1w-qty-ctrl input::-webkit-inner-spin-button { -webkit-appearance: none; }
 .w1w-ships-note { font-size: 11px; color: var(--ink-3); letter-spacing: 0.1em; text-transform: uppercase; font-family: var(--font-display); }
+
 .w1w-pdp-total { padding: 20px; background: var(--bg-1); border: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
 .w1w-pdp-total-k { font-family: var(--font-display); font-size: 11px; letter-spacing: 0.2em; color: var(--ink-2); text-transform: uppercase; }
 .w1w-pdp-total-hint { font-size: 11px; color: var(--ink-3); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 4px; }
 .w1w-pdp-total-right { display: flex; align-items: baseline; gap: 10px; }
 .w1w-pdp-total-v { font-family: var(--font-display); font-weight: 700; font-size: 32px; color: var(--lime); }
 .w1w-pdp-total-saved { font-size: 11px; color: var(--lime); font-weight: 700; letter-spacing: 0.1em; }
+
 .w1w-pdp-actions { display: grid; gap: 8px; margin: 20px 0 24px; }
 .w1w-atb { position: relative; overflow: hidden; }
 .w1w-atb::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.15) 50%,transparent 100%); transform: translateX(-100%); transition: transform .6s; }
 .w1w-atb:hover::after { transform: translateX(100%); }
+
 .w1w-pdp-desc { font-size: 14px; color: var(--ink-2); line-height: 1.75; padding: 20px 0; border-top: 1px solid var(--line); margin-bottom: 24px; font-family: var(--font-body); font-weight: 400; text-transform: none; letter-spacing: 0; }
 .w1w-pdp-desc p { margin-bottom: 12px; }
 .w1w-pdp-desc p:last-child { margin-bottom: 0; }
+
 .w1w-pdp-feats { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
 .w1w-pdp-feat { padding: 16px; background: var(--bg-1); border: 1px solid var(--line); display: flex; gap: 12px; align-items: flex-start; transition: border-color .15s; }
 .w1w-pdp-feat:hover { border-color: var(--line-strong); }
@@ -468,7 +582,95 @@ document.addEventListener('DOMContentLoaded', function () {
 {% schema %}
 {
   "name": "W1W Product Page",
-  "settings": [],
+  "settings": [
+    {
+      "type": "header",
+      "content": "Breadcrumb"
+    },
+    { "type": "checkbox", "id": "show_breadcrumb", "label": "Show breadcrumb", "default": true },
+    { "type": "text", "id": "breadcrumb_home", "label": "Home label", "default": "Home" },
+    { "type": "text", "id": "breadcrumb_shop_label", "label": "Shop label", "default": "Shop" },
+    { "type": "url",  "id": "breadcrumb_shop_url", "label": "Shop URL" },
+    {
+      "type": "header",
+      "content": "Gallery"
+    },
+    { "type": "checkbox", "id": "show_flag_stripe", "label": "Show country flag stripe", "default": true },
+    { "type": "checkbox", "id": "show_glow", "label": "Show ambient glow", "default": true },
+    { "type": "text", "id": "drop_tag", "label": "Drop tag (e.g. DROP 03) — leave blank to hide", "default": "DROP 03" },
+    { "type": "checkbox", "id": "show_corner_labels", "label": "Show corner labels", "default": true },
+    { "type": "text", "id": "corner_tl", "label": "Top-left corner label", "default": "N° 2026" },
+    { "type": "text", "id": "corner_br", "label": "Bottom-right label — use 'product_title' for dynamic title", "default": "product_title" },
+    { "type": "checkbox", "id": "show_edition_strip", "label": "Show edition strip below image", "default": true },
+    { "type": "text", "id": "edition_1_label", "label": "Strip item 1 — label", "default": "Material" },
+    { "type": "text", "id": "edition_1_val",   "label": "Strip item 1 — value", "default": "Paracord 550" },
+    { "type": "text", "id": "edition_2_label", "label": "Strip item 2 — label", "default": "Release" },
+    { "type": "text", "id": "edition_2_val",   "label": "Strip item 2 — value", "default": "Drop 03" },
+    { "type": "text", "id": "edition_3_label", "label": "Strip item 3 — label", "default": "Year" },
+    { "type": "text", "id": "edition_3_val",   "label": "Strip item 3 — value", "default": "2026" },
+    {
+      "type": "header",
+      "content": "Product info"
+    },
+    { "type": "text", "id": "default_sub", "label": "Default sub-label (overridden by metafield custom.sub)", "default": "WORLD 1 WORLD EDITION" },
+    { "type": "checkbox", "id": "show_vendor", "label": "Show vendor as confederation", "default": true },
+    { "type": "text", "id": "meta_confederation_label", "label": "Confederation meta label", "default": "Confederation" },
+    { "type": "text", "id": "edition_label", "label": "Edition value", "default": "N°/2026" },
+    { "type": "text", "id": "meta_edition_label", "label": "Edition meta label", "default": "Edition" },
+    { "type": "checkbox", "id": "show_stock_status", "label": "Show stock status", "default": true },
+    { "type": "text", "id": "meta_status_label", "label": "Status meta label", "default": "Status" },
+    { "type": "text", "id": "in_stock_label", "label": "In stock label", "default": "In Stock" },
+    { "type": "text", "id": "sold_out_label", "label": "Sold out label", "default": "Sold Out" },
+    { "type": "text", "id": "price_note", "label": "Price note (leave blank to hide)", "default": "Free shipping on 3+" },
+    {
+      "type": "header",
+      "content": "Size selector"
+    },
+    { "type": "text", "id": "size_label", "label": "Size field label", "default": "Size" },
+    { "type": "text", "id": "size_guide_label", "label": "Size guide link label (leave blank to hide)", "default": "Size guide →" },
+    {
+      "type": "header",
+      "content": "Stack & Save tiers"
+    },
+    { "type": "checkbox", "id": "show_tier_pricing", "label": "Show Stack & Save", "default": true },
+    { "type": "text",     "id": "tier_label",   "label": "Tier field label", "default": "Stack & Save" },
+    { "type": "text",     "id": "tier_note",    "label": "Tier field note", "default": "More = Less" },
+    { "type": "text",     "id": "tier_1_label", "label": "Tier 1 label", "default": "SINGLE" },
+    { "type": "text",     "id": "tier_2_label", "label": "Tier 2 label", "default": "TRIO" },
+    { "type": "number",   "id": "tier_2_qty",   "label": "Tier 2 quantity", "default": 3 },
+    { "type": "number",   "id": "tier_2_pct",   "label": "Tier 2 discount %", "default": 10 },
+    { "type": "text",     "id": "tier_3_label", "label": "Tier 3 label", "default": "FIVE-A-SIDE" },
+    { "type": "number",   "id": "tier_3_qty",   "label": "Tier 3 quantity", "default": 5 },
+    { "type": "number",   "id": "tier_3_pct",   "label": "Tier 3 discount %", "default": 15 },
+    { "type": "text",     "id": "tier_4_label", "label": "Tier 4 label", "default": "STARTING XI" },
+    { "type": "number",   "id": "tier_4_qty",   "label": "Tier 4 quantity", "default": 8 },
+    { "type": "number",   "id": "tier_4_pct",   "label": "Tier 4 discount %", "default": 20 },
+    { "type": "text",     "id": "total_label",  "label": "Total field label", "default": "Total" },
+    {
+      "type": "header",
+      "content": "Quantity & checkout"
+    },
+    { "type": "checkbox", "id": "show_quantity", "label": "Show quantity selector", "default": true },
+    { "type": "text",     "id": "quantity_label", "label": "Quantity label", "default": "Quantity" },
+    { "type": "text",     "id": "ships_note", "label": "Shipping note beside quantity (leave blank to hide)", "default": "Ships in 24h · Worldwide" },
+    { "type": "text",     "id": "add_to_cart_label", "label": "Add to cart button", "default": "ADD TO BAG" },
+    { "type": "text",     "id": "sold_out_button_label", "label": "Sold out button", "default": "SOLD OUT" },
+    { "type": "text",     "id": "secondary_cta_label", "label": "Secondary CTA label (leave blank to hide)", "default": "STACK MORE NATIONS" },
+    { "type": "url",      "id": "secondary_cta_url", "label": "Secondary CTA URL" },
+    {
+      "type": "header",
+      "content": "Feature tiles"
+    },
+    { "type": "checkbox", "id": "show_feature_tiles", "label": "Show feature tiles", "default": true },
+    { "type": "text", "id": "feat_1_title", "label": "Tile 1 title (leave blank to hide)", "default": "Paracord 550" },
+    { "type": "text", "id": "feat_1_desc",  "label": "Tile 1 description", "default": "7-strand military-grade" },
+    { "type": "text", "id": "feat_2_title", "label": "Tile 2 title (leave blank to hide)", "default": "Water & Sweat Proof" },
+    { "type": "text", "id": "feat_2_desc",  "label": "Tile 2 description", "default": "Stadium to street" },
+    { "type": "text", "id": "feat_3_title", "label": "Tile 3 title (leave blank to hide)", "default": "Ships in 24h" },
+    { "type": "text", "id": "feat_3_desc",  "label": "Tile 3 description", "default": "73 countries" },
+    { "type": "text", "id": "feat_4_title", "label": "Tile 4 title (leave blank to hide)", "default": "30-Day Returns" },
+    { "type": "text", "id": "feat_4_desc",  "label": "Tile 4 description", "default": "No questions asked" }
+  ],
   "presets": [{ "name": "W1W Product Page" }]
 }
 {% endschema %}

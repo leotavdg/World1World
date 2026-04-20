@@ -1,0 +1,404 @@
+{%- assign threshold_cents = section.settings.free_ship_threshold | times: 100 -%}
+
+<div class="w1w-cart-wrap">
+
+  {%- if cart.item_count == 0 -%}
+
+    <div class="w1w-cart-empty">
+      <h2 class="w1w-cart-empty-h">{{ section.settings.empty_heading }}</h2>
+      <p class="w1w-cart-empty-p">{{ section.settings.empty_subtext }}</p>
+      <a href="{{ section.settings.empty_cta_url }}" class="btn btn-primary btn-lg">{{ section.settings.empty_cta_label }}</a>
+    </div>
+
+  {%- else -%}
+
+    <div class="cart-body">
+
+      <!-- Line items -->
+      <div class="cart-list" id="w1wCartList">
+        {%- for item in cart.items -%}
+          <div class="cart-line" data-key="{{ item.key }}" data-qty="{{ item.quantity }}">
+
+            <div class="cart-line-img">
+              {%- if item.image -%}
+                {{ item.image | image_url: width: 300 | image_tag: loading: 'lazy', alt: item.title, class: 'cart-img' }}
+              {%- else -%}
+                <div class="bracelet-scene" style="aspect-ratio:1;height:100%">
+                  <div class="floor"></div>
+                  <div class="bracelet-ph" style="width:90%"></div>
+                </div>
+              {%- endif -%}
+            </div>
+
+            <div class="cart-line-info">
+              <h3 class="cart-line-name">{{ item.product_title | upcase }}</h3>
+              <div class="meta">
+                {%- if item.variant_title and item.variant_title != 'Default Title' -%}
+                  Size {{ item.variant_title }}
+                  {%- if item.product.type != blank %} · {{ item.product.type }}{%- endif -%}
+                {%- elsif item.product.type != blank -%}
+                  {{ item.product.type }}
+                {%- endif -%}
+              </div>
+              <div class="cart-line-ctrls">
+                <div class="w1w-qty-ctrl">
+                  <button class="w1w-qty-btn" data-key="{{ item.key }}" data-delta="-1" aria-label="Decrease quantity">−</button>
+                  <span class="w1w-qty-val">{{ item.quantity }}</span>
+                  <button class="w1w-qty-btn" data-key="{{ item.key }}" data-delta="1" aria-label="Increase quantity">+</button>
+                </div>
+                <button class="cart-line-rm" data-key="{{ item.key }}" data-remove="true">{{ section.settings.remove_label }}</button>
+              </div>
+            </div>
+
+            <div class="cart-line-price">{{ item.line_price | money }}</div>
+
+          </div>
+        {%- endfor -%}
+      </div>
+
+      <!-- Order summary sidebar -->
+      <aside class="cart-summary" id="w1wCartSummary">
+        <h2 class="cart-summary-h">{{ section.settings.summary_heading }}</h2>
+
+        <div class="sum-row">
+          <span class="k">{{ section.settings.subtotal_label }}</span>
+          <span>{{ cart.original_total_price | money }}</span>
+        </div>
+
+        {%- if cart.total_discount > 0 -%}
+          <div class="sum-row disc">
+            <span class="k">{{ section.settings.discount_label }}</span>
+            <span>− {{ cart.total_discount | money }}</span>
+          </div>
+        {%- endif -%}
+
+        <div class="sum-row">
+          <span class="k">{{ section.settings.shipping_label }}</span>
+          <span>
+            {%- if cart.total_price >= threshold_cents -%}
+              {{ section.settings.free_shipping_text }}
+            {%- else -%}
+              {{ section.settings.shipping_cost_text }}
+            {%- endif -%}
+          </span>
+        </div>
+
+        <div class="sum-row">
+          <span class="k">{{ section.settings.tax_label }}</span>
+          <span>{{ section.settings.tax_text }}</span>
+        </div>
+
+        <div class="sum-row total">
+          <span class="k">{{ section.settings.total_label }}</span>
+          <span>{{ cart.total_price | money }}</span>
+        </div>
+
+        <a href="/checkout" class="btn btn-primary btn-lg sum-btn">{{ section.settings.checkout_label }}</a>
+        <a href="{{ section.settings.keep_shopping_url }}" class="btn btn-ghost sum-btn" style="margin-top:12px;display:block;text-align:center">{{ section.settings.keep_shopping_label }}</a>
+
+        {%- if section.blocks.size > 0 -%}
+          <div class="trust">
+            {%- for block in section.blocks -%}
+              {%- if block.type == 'trust_badge' and block.settings.text != blank -%}
+                <span {{ block.shopify_attributes }}>★ {{ block.settings.text }}</span>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+      </aside>
+
+    </div>
+
+  {%- endif -%}
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  function updateItem(key, qty) {
+    var btn = document.activeElement;
+    if (btn) btn.disabled = true;
+
+    fetch('/cart/change.js', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: key, quantity: qty })
+    })
+    .then(function (r) { return r.json(); })
+    .then(function () { location.reload(); })
+    .catch(function () { if (btn) btn.disabled = false; });
+  }
+
+  // Qty buttons
+  document.querySelectorAll('.w1w-qty-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var key = btn.dataset.key;
+      var line = btn.closest('.cart-line');
+      var currentQty = parseInt(line.dataset.qty);
+      var delta = parseInt(btn.dataset.delta);
+      var newQty = Math.max(0, currentQty + delta);
+      updateItem(key, newQty);
+    });
+  });
+
+  // Remove buttons
+  document.querySelectorAll('[data-remove="true"]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      updateItem(btn.dataset.key, 0);
+    });
+  });
+});
+</script>
+
+{% stylesheet %}
+
+.w1w-cart-wrap {
+  padding: 48px 0 120px;
+}
+
+/* Empty state */
+.w1w-cart-empty {
+  text-align: center;
+  padding: 80px 0;
+}
+.w1w-cart-empty-h {
+  font-size: clamp(32px, 5vw, 48px);
+  margin-bottom: 16px;
+  letter-spacing: -0.02em;
+}
+.w1w-cart-empty-p {
+  color: var(--ink-2);
+  margin-bottom: 32px;
+  font-size: 15px;
+}
+
+/* Cart body layout */
+.cart-body {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 48px;
+  align-items: start;
+}
+
+/* Line items */
+.cart-list {
+  border-top: 1px solid var(--line);
+}
+.cart-line {
+  display: grid;
+  grid-template-columns: 120px 1fr auto;
+  gap: 24px;
+  padding: 24px 0;
+  border-bottom: 1px solid var(--line);
+  align-items: center;
+}
+.cart-line-img {
+  width: 120px;
+  aspect-ratio: 1;
+  background: var(--bg-1);
+  overflow: hidden;
+}
+.cart-line-img .cart-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.cart-line-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 20px;
+  letter-spacing: -0.01em;
+}
+.cart-line-info .meta {
+  font-size: 12px;
+  color: var(--ink-2);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin: 4px 0 12px;
+}
+.cart-line-ctrls {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+.cart-line-price {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 24px;
+  color: var(--lime);
+  align-self: start;
+  text-align: right;
+}
+.cart-line-rm {
+  color: var(--ink-3);
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  font-weight: 700;
+  font-family: var(--font-display);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color .15s;
+}
+.cart-line-rm:hover { color: #ef4444; }
+
+/* Qty control */
+.w1w-qty-ctrl {
+  display: inline-flex;
+  border: 1px solid var(--line);
+}
+.w1w-qty-btn {
+  width: 36px;
+  height: 36px;
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--ink-0);
+  transition: background .15s;
+}
+.w1w-qty-btn:hover { background: var(--bg-2); }
+.w1w-qty-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.w1w-qty-val {
+  width: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 15px;
+  border-left: 1px solid var(--line);
+  border-right: 1px solid var(--line);
+}
+
+/* Summary sidebar */
+.cart-summary {
+  background: var(--bg-1);
+  border: 1px solid var(--line);
+  padding: 32px;
+  position: sticky;
+  top: calc(var(--header-height, 72px) + 24px);
+}
+.cart-summary-h {
+  font-size: 24px;
+  margin-bottom: 24px;
+  letter-spacing: -0.01em;
+}
+.sum-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  font-size: 14px;
+  border-bottom: 1px solid var(--line);
+}
+.sum-row:last-of-type { border-bottom: none; }
+.sum-row.disc { color: var(--lime); }
+.sum-row.total {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 24px;
+  color: var(--lime);
+  border-top: 1px solid var(--line);
+  border-bottom: none;
+  padding-top: 16px;
+  margin-top: 8px;
+}
+.sum-row .k {
+  color: var(--ink-2);
+  font-size: 12px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+.sum-row.total .k {
+  color: var(--ink-0);
+  font-size: 14px;
+  letter-spacing: 0.1em;
+  align-self: center;
+}
+.sum-btn {
+  width: 100%;
+  margin-top: 16px;
+  display: block;
+  text-align: center;
+}
+.trust {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+  font-size: 11px;
+  color: var(--ink-3);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-family: var(--font-display);
+  font-weight: 700;
+}
+
+@media (max-width: 900px) {
+  .cart-body { grid-template-columns: 1fr; }
+  .cart-summary { position: static; }
+  .cart-line { grid-template-columns: 80px 1fr auto; gap: 16px; }
+  .cart-line-img { width: 80px; }
+}
+@media (max-width: 600px) {
+  .cart-line { grid-template-columns: 72px 1fr; }
+  .cart-line-price { grid-column: 2; grid-row: 1; text-align: right; align-self: start; font-size: 18px; }
+  .cart-line-info { grid-column: 2; }
+}
+
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "W1W Cart Main",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Empty state"
+    },
+    { "type": "text",     "id": "empty_heading",  "label": "Empty heading",  "default": "YOUR BAG IS EMPTY." },
+    { "type": "text",     "id": "empty_subtext",  "label": "Empty subtext",  "default": "Pick a nation. Wear it proud." },
+    { "type": "text",     "id": "empty_cta_label","label": "Empty CTA label","default": "BROWSE ALL NATIONS" },
+    { "type": "url",      "id": "empty_cta_url",  "label": "Empty CTA URL",  "default": "/collections/all" },
+    {
+      "type": "header",
+      "content": "Summary labels"
+    },
+    { "type": "text", "id": "summary_heading",    "label": "Summary heading",     "default": "SUMMARY" },
+    { "type": "text", "id": "subtotal_label",     "label": "Subtotal label",      "default": "Subtotal" },
+    { "type": "text", "id": "discount_label",     "label": "Discount label",      "default": "Stack discount" },
+    { "type": "text", "id": "shipping_label",     "label": "Shipping label",      "default": "Shipping" },
+    { "type": "text", "id": "tax_label",          "label": "Tax label",           "default": "Tax" },
+    { "type": "text", "id": "tax_text",           "label": "Tax value text",      "default": "Calculated at checkout" },
+    { "type": "text", "id": "total_label",        "label": "Total label",         "default": "Total" },
+    {
+      "type": "header",
+      "content": "Shipping threshold"
+    },
+    { "type": "number", "id": "free_ship_threshold", "label": "Free shipping threshold (USD)", "default": 35 },
+    { "type": "text",   "id": "free_shipping_text",  "label": "Free shipping text",            "default": "FREE" },
+    { "type": "text",   "id": "shipping_cost_text",  "label": "Paid shipping text",            "default": "Calculated at checkout" },
+    {
+      "type": "header",
+      "content": "CTA buttons"
+    },
+    { "type": "text", "id": "checkout_label",      "label": "Checkout button label",     "default": "CHECKOUT →" },
+    { "type": "text", "id": "keep_shopping_label", "label": "Keep shopping label",       "default": "KEEP SHOPPING" },
+    { "type": "url",  "id": "keep_shopping_url",   "label": "Keep shopping URL",         "default": "/collections/all" },
+    { "type": "text", "id": "remove_label",        "label": "Remove item label",         "default": "Remove" }
+  ],
+  "blocks": [
+    {
+      "type": "trust_badge",
+      "name": "Trust badge",
+      "settings": [
+        { "type": "text", "id": "text", "label": "Badge text", "default": "30-DAY RETURNS" }
+      ]
+    }
+  ],
+  "presets": [{ "name": "W1W Cart Main" }]
+}
+{% endschema %}
