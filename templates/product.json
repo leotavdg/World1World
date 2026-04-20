@@ -2,17 +2,35 @@
   "sections": {
     "main": {
       "type": "w1w-product-page",
+      "settings": {}
+    },
+    "strip": {
+      "type": "w1w-marquee",
       "settings": {
-        "feature_1_icon": "verified_user",
+        "text": "WEAR YOUR NATION · DROP 03 · 2026 WORLD EDITION · 50+ NATIONS · PARACORD 550 · SHIPS WORLDWIDE",
+        "style": "secondary"
+      }
+    },
+    "features": {
+      "type": "w1w-pdp-features",
+      "settings": {
         "feature_1_title": "COMFORT-FIT TECH",
         "feature_1_desc": "Dual-weave nylon designed for moisture-wicking under peak performance conditions.",
-        "feature_2_icon": "auto_awesome",
         "feature_2_title": "RIO ENERGY SOUL",
-        "feature_2_desc": "Signature 5-star embroidery celebrating the legacy of world football icons."
+        "feature_2_desc": "Signature 5-star embroidery celebrating the legacy of world football icons.",
+        "feature_3_title": "WORLDWIDE DELIVERY",
+        "feature_3_desc": "Every order ships within 24 hours to 73 countries. Track it from pitch to doorstep."
       }
+    },
+    "upsell": {
+      "type": "w1w-pdp-upsell",
+      "settings": {}
     }
   },
   "order": [
-    "main"
+    "main",
+    "strip",
+    "features",
+    "upsell"
   ]
 }

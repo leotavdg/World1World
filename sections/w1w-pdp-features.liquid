@@ -1,0 +1,92 @@
+<div class="w1w-pdp-features-full">
+  <div class="wrap">
+    <div class="w1w-pdp-features-grid">
+      <div class="w1w-pdp-feature-card reveal">
+        <div class="w1w-pdp-feature-num">01</div>
+        <h3 class="w1w-pdp-feature-title">{{ section.settings.feature_1_title }}</h3>
+        <p class="w1w-pdp-feature-desc">{{ section.settings.feature_1_desc }}</p>
+        <div class="w1w-pdp-feature-line"></div>
+      </div>
+      <div class="w1w-pdp-feature-card reveal">
+        <div class="w1w-pdp-feature-num">02</div>
+        <h3 class="w1w-pdp-feature-title">{{ section.settings.feature_2_title }}</h3>
+        <p class="w1w-pdp-feature-desc">{{ section.settings.feature_2_desc }}</p>
+        <div class="w1w-pdp-feature-line"></div>
+      </div>
+      <div class="w1w-pdp-feature-card reveal">
+        <div class="w1w-pdp-feature-num">03</div>
+        <h3 class="w1w-pdp-feature-title">{{ section.settings.feature_3_title }}</h3>
+        <p class="w1w-pdp-feature-desc">{{ section.settings.feature_3_desc }}</p>
+        <div class="w1w-pdp-feature-line"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  if ('IntersectionObserver' in window) {
+    var obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add('in'); obs.unobserve(e.target); }
+      });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.w1w-pdp-features-full .reveal').forEach(function (el) { obs.observe(el); });
+  } else {
+    document.querySelectorAll('.w1w-pdp-features-full .reveal').forEach(function (el) { el.classList.add('in'); });
+  }
+});
+</script>
+
+{% stylesheet %}
+
+.w1w-pdp-features-full {
+  background: var(--bg-0);
+  padding: 80px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.w1w-pdp-features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--line);
+}
+.w1w-pdp-feature-card {
+  background: var(--bg-0);
+  padding: 48px 40px;
+  position: relative;
+  overflow: hidden;
+}
+.w1w-pdp-feature-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--lime), transparent);
+  opacity: 0; transition: opacity .3s;
+}
+.w1w-pdp-feature-card:hover::before { opacity: 1; }
+.w1w-pdp-feature-num { font-family: var(--font-display); font-weight: 700; font-size: 11px; letter-spacing: 0.3em; color: var(--lime); text-transform: uppercase; margin-bottom: 24px; }
+.w1w-pdp-feature-title { font-size: clamp(16px,1.8vw,22px); color: var(--ink-0); margin-bottom: 16px; line-height: 1; letter-spacing: -0.02em; }
+.w1w-pdp-feature-desc { font-size: 14px; color: var(--ink-2); line-height: 1.7; font-family: var(--font-body); font-weight: 400; letter-spacing: 0; text-transform: none; }
+.w1w-pdp-feature-line { height: 1px; background: var(--line); margin-top: 32px; position: relative; overflow: hidden; }
+.w1w-pdp-feature-line::after { content: ''; position: absolute; left: 0; top: 0; height: 100%; width: 60px; background: var(--lime); }
+
+@media (max-width: 900px) { .w1w-pdp-features-grid { grid-template-columns: 1fr; } }
+@media (max-width: 600px) { .w1w-pdp-feature-card { padding: 32px 24px; } }
+
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "W1W PDP Features",
+  "settings": [
+    { "type": "text",     "id": "feature_1_title", "label": "Feature 1 title", "default": "COMFORT-FIT TECH" },
+    { "type": "textarea", "id": "feature_1_desc",  "label": "Feature 1 description", "default": "Dual-weave nylon designed for moisture-wicking under peak performance conditions." },
+    { "type": "text",     "id": "feature_2_title", "label": "Feature 2 title", "default": "RIO ENERGY SOUL" },
+    { "type": "textarea", "id": "feature_2_desc",  "label": "Feature 2 description", "default": "Signature 5-star embroidery celebrating the legacy of world football icons." },
+    { "type": "text",     "id": "feature_3_title", "label": "Feature 3 title", "default": "WORLDWIDE DELIVERY" },
+    { "type": "textarea", "id": "feature_3_desc",  "label": "Feature 3 description", "default": "Every order ships within 24 hours to 73 countries. Track it from pitch to doorstep." }
+  ],
+  "presets": [{ "name": "W1W PDP Features" }]
+}
+{% endschema %}
