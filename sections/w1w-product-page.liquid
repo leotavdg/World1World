@@ -483,6 +483,8 @@ document.addEventListener('DOMContentLoaded', function () {
         if (addBtn) { addBtn.textContent = 'ADDED ✓'; }
         if (window.W1W) {
           window.W1W.fetchCart(function () {
+            if (window.W1W.renderDrawer) window.W1W.renderDrawer();
+            if (window.W1W.renderBadge) window.W1W.renderBadge();
             window.W1W.openDrawer();
           });
         }

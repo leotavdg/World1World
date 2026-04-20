@@ -1122,22 +1122,14 @@
       });
     }
 
-    // ATC buttons
+    // ATC buttons — use variant ID for Shopify AJAX Cart API
     document.querySelectorAll('.w1w-nation-card__atc').forEach(function(btn) {
       btn.addEventListener('click', function(e) {
         e.preventDefault();
-        var handle = btn.dataset.handle;
-        var country = countryByHandle[handle];
-        if (!country) return;
+        var variantId = btn.dataset.productId;
+        if (!variantId) return;
         if (window.W1W && window.W1W.addToCart) {
-          window.W1W.addToCart({
-            slug: country.slug,
-            name: country.name,
-            sub: country.sub,
-            size: 'M',
-            qty: 1,
-            price: window.W1W_PRICE || 5
-          });
+          window.W1W.addToCart({ id: parseInt(variantId, 10), quantity: 1 });
         }
       });
     });

@@ -159,15 +159,15 @@
 
       return '<div class="w1w-cart-item">' +
         '<div class="w1w-cart-item-img">' + imgHtml + '</div>' +
-        '<div>' +
+        '<div class="w1w-cart-item-body">' +
           '<div class="w1w-cart-item-name">' + displayName.toUpperCase() + '</div>' +
           '<div class="w1w-cart-item-sub">' + variantLabel + '</div>' +
           '<div class="w1w-cart-item-qty">' +
             '<button onclick="W1W.changeQty(\'' + it.key + '\', -1)">−</button>' +
             '<span style="min-width:20px;text-align:center">' + it.quantity + '</span>' +
             '<button onclick="W1W.changeQty(\'' + it.key + '\', 1)">+</button>' +
-            '<button style="margin-left:8px;border:0;color:var(--ink-3);background:transparent;cursor:pointer" onclick="W1W.removeItem(\'' + it.key + '\')">Remove</button>' +
           '</div>' +
+          '<button class="w1w-cart-item-remove" onclick="W1W.removeItem(\'' + it.key + '\')">Remove</button>' +
         '</div>' +
         '<div class="w1w-cart-item-price">$' + linePrice + '</div>' +
       '</div>';
@@ -213,6 +213,8 @@
     closeDrawer: closeDrawer,
     showToast: showToast,
     fetchCart: fetchCart,
+    renderDrawer: renderCartDrawer,
+    renderBadge: renderBadge,
   };
 
   // ── Init ──
@@ -235,5 +237,13 @@
     });
 
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeDrawer(); });
+
+    // Listen for Shopify theme's native cart events to keep drawer in sync
+    document.addEventListener('cart:update', function () {
+      fetchCart(function () {
+        renderCartDrawer();
+        renderBadge();
+      });
+    });
   });
 })();
