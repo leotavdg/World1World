@@ -1,0 +1,447 @@
+{%- assign terms = search.terms | escape -%}
+
+<section class="w1w-search-page">
+  <div class="w1w-search-page__inner">
+
+    <!-- Search Hero -->
+    <div class="w1w-search-hero">
+      <span class="w1w-search-eyebrow">Find Your Nation</span>
+      <h1 class="w1w-search-title">
+        {%- if search.performed -%}
+          SEARCH RESULTS
+        {%- else -%}
+          SEARCH
+        {%- endif -%}
+      </h1>
+
+      <form action="{{ routes.search_url }}" method="get" class="w1w-search-form" role="search">
+        <input type="hidden" name="type" value="product">
+        <div class="w1w-search-input-wrap">
+          <svg class="w1w-search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input
+            type="search"
+            name="q"
+            value="{{ terms }}"
+            placeholder="Search nations, collections..."
+            class="w1w-search-input"
+            autocomplete="off"
+            autofocus
+          >
+          <button type="submit" class="w1w-search-submit">SEARCH</button>
+        </div>
+      </form>
+
+      {%- if search.performed -%}
+        <p class="w1w-search-count">
+          {{ search.results_count }} result{{ search.results_count | pluralize: '', 's' }} for "{{ terms }}"
+        </p>
+      {%- endif -%}
+    </div>
+
+    <!-- Results -->
+    {%- if search.performed -%}
+      {%- if search.results_count > 0 -%}
+        {%- paginate search.results by 24 -%}
+          <div class="w1w-search-grid">
+            {%- for item in search.results -%}
+              {%- if item.object_type == 'product' -%}
+                {%- assign product = item -%}
+                {%- assign p_continent = product.metafields.custom.continent | remove: '[' | remove: ']' | remove: '"' | strip | default: '' -%}
+                <a href="{{ product.url }}" class="w1w-search-card">
+                  <div class="w1w-search-card__media">
+                    {%- if product.featured_image != blank -%}
+                      {{ product.featured_image | image_url: width: 480 | image_tag:
+                        loading: 'lazy',
+                        class: 'w1w-search-card__img',
+                        alt: product.featured_image.alt | escape }}
+                    {%- else -%}
+                      <div class="w1w-search-card__placeholder">W1W</div>
+                    {%- endif -%}
+                  </div>
+                  <div class="w1w-search-card__body">
+                    <div>
+                      <div class="w1w-search-card__name">{{ product.title | upcase }}</div>
+                      {%- if p_continent != blank -%}
+                        <div class="w1w-search-card__sub">{{ p_continent }}</div>
+                      {%- endif -%}
+                    </div>
+                    <div class="w1w-search-card__price">{{ product.price | money_without_trailing_zeros }}</div>
+                  </div>
+                </a>
+              {%- elsif item.object_type == 'article' -%}
+                <a href="{{ item.url }}" class="w1w-search-card w1w-search-card--article">
+                  <div class="w1w-search-card__media">
+                    {%- if item.image != blank -%}
+                      {{ item.image | image_url: width: 480 | image_tag:
+                        loading: 'lazy',
+                        class: 'w1w-search-card__img',
+                        alt: item.title | escape }}
+                    {%- else -%}
+                      <div class="w1w-search-card__placeholder">ARTICLE</div>
+                    {%- endif -%}
+                  </div>
+                  <div class="w1w-search-card__body">
+                    <div>
+                      <div class="w1w-search-card__name">{{ item.title | upcase }}</div>
+                      <div class="w1w-search-card__sub">{{ item.published_at | date: '%B %d, %Y' }}</div>
+                    </div>
+                    <span class="w1w-search-card__type">Article</span>
+                  </div>
+                </a>
+              {%- elsif item.object_type == 'page' -%}
+                <a href="{{ item.url }}" class="w1w-search-card w1w-search-card--page">
+                  <div class="w1w-search-card__media">
+                    <div class="w1w-search-card__placeholder">PAGE</div>
+                  </div>
+                  <div class="w1w-search-card__body">
+                    <div>
+                      <div class="w1w-search-card__name">{{ item.title | upcase }}</div>
+                      <div class="w1w-search-card__sub">{{ item.content | strip_html | truncate: 80 }}</div>
+                    </div>
+                    <span class="w1w-search-card__type">Page</span>
+                  </div>
+                </a>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+
+          {%- if paginate.pages > 1 -%}
+            <div class="w1w-search-pagination">
+              {%- if paginate.previous -%}
+                <a href="{{ paginate.previous.url }}" class="w1w-search-pg-btn">&larr;</a>
+              {%- endif -%}
+              {%- for part in paginate.parts -%}
+                {%- if part.is_link -%}
+                  <a href="{{ part.url }}" class="w1w-search-pg-num">{{ part.title }}</a>
+                {%- else -%}
+                  {%- if part.title == paginate.current_page -%}
+                    <span class="w1w-search-pg-num active">{{ part.title }}</span>
+                  {%- else -%}
+                    <span class="w1w-search-pg-ellipsis">&hellip;</span>
+                  {%- endif -%}
+                {%- endif -%}
+              {%- endfor -%}
+              {%- if paginate.next -%}
+                <a href="{{ paginate.next.url }}" class="w1w-search-pg-btn">&rarr;</a>
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+        {%- endpaginate -%}
+
+      {%- else -%}
+        <!-- No results -->
+        <div class="w1w-search-empty">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(243,255,202,0.3)" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <h2>No results found</h2>
+          <p>Try a different search term or browse our collections.</p>
+          <a href="/collections/all" class="w1w-search-empty__cta">BROWSE ALL NATIONS</a>
+        </div>
+      {%- endif -%}
+    {%- endif -%}
+
+  </div>
+</section>
+
+{% stylesheet %}
+.w1w-search-page {
+  background: #0E0E0E;
+  min-height: 80vh;
+  padding-bottom: 120px;
+}
+.w1w-search-page__inner {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 clamp(24px, 4vw, 64px);
+}
+
+/* Hero */
+.w1w-search-hero {
+  padding: 80px 0 48px;
+  border-bottom: 1px solid rgba(243,255,202,0.12);
+}
+.w1w-search-eyebrow {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: 0.5em;
+  text-transform: uppercase;
+  color: #F3FFCA;
+}
+.w1w-search-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: clamp(40px, 8vw, 80px);
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+  color: #FFF;
+  margin: 16px 0 32px;
+}
+
+/* Search form */
+.w1w-search-form {
+  max-width: 640px;
+}
+.w1w-search-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #1a1a1a;
+  border: 1px solid rgba(243,255,202,0.15);
+  padding: 4px 4px 4px 20px;
+  transition: border-color 0.2s;
+}
+.w1w-search-input-wrap:focus-within {
+  border-color: rgba(243,255,202,0.4);
+}
+.w1w-search-icon {
+  color: rgba(255,255,255,0.3);
+  flex-shrink: 0;
+}
+.w1w-search-page .w1w-search-input,
+.w1w-search-page .w1w-search-input:hover,
+.w1w-search-page .w1w-search-input:focus {
+  flex: 1;
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  color: #FFF !important;
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  padding: 12px 0;
+  min-width: 0;
+}
+.w1w-search-page .w1w-search-input::placeholder {
+  color: rgba(255,255,255,0.3) !important;
+}
+.w1w-search-submit {
+  background: #F3FFCA;
+  color: #516700;
+  border: none;
+  padding: 14px 28px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+.w1w-search-submit:hover {
+  background: #CAFD00;
+}
+
+/* Results count */
+.w1w-search-count {
+  margin-top: 20px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+}
+
+/* Results grid */
+.w1w-search-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  padding-top: 48px;
+}
+
+/* Search card (matches product-card design) */
+.w1w-search-card {
+  display: block;
+  background: #131313;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.2s;
+}
+.w1w-search-card:hover {
+  transform: translateY(-4px);
+}
+.w1w-search-card__media {
+  aspect-ratio: 1 / 1;
+  background: radial-gradient(ellipse at center top, rgba(243,255,202,0.08), transparent 60%), #131313;
+  overflow: hidden;
+  position: relative;
+}
+.w1w-search-card__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.6s ease;
+}
+.w1w-search-card:hover .w1w-search-card__img {
+  transform: scale(1.05);
+}
+.w1w-search-card__placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255,255,255,0.15);
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  background: #1a1a1a;
+}
+.w1w-search-card__body {
+  padding: 16px 4px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: start;
+}
+.w1w-search-card__name {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: #FFF;
+  transition: color 0.2s;
+}
+.w1w-search-card:hover .w1w-search-card__name {
+  color: #F3FFCA;
+}
+.w1w-search-card__sub {
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #ADAAAA;
+  margin-top: 4px;
+}
+.w1w-search-card__price {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  color: #F3FFCA;
+}
+.w1w-search-card__type {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(243,255,202,0.5);
+  padding: 4px 8px;
+  border: 1px solid rgba(243,255,202,0.15);
+}
+
+/* No results */
+.w1w-search-empty {
+  text-align: center;
+  padding: 100px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+.w1w-search-empty h2 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 28px;
+  color: #FFF;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+}
+.w1w-search-empty p {
+  color: rgba(255,255,255,0.4);
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+}
+.w1w-search-empty__cta {
+  display: inline-flex;
+  align-items: center;
+  padding: 16px 32px;
+  background: linear-gradient(180deg, #F3FFCA, #CAFD00);
+  color: #516700;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  margin-top: 8px;
+  transition: filter 0.15s;
+}
+.w1w-search-empty__cta:hover {
+  filter: brightness(1.05);
+}
+
+/* Pagination */
+.w1w-search-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 72px;
+}
+.w1w-search-pg-btn,
+.w1w-search-pg-num {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  height: 40px;
+  padding: 0 8px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(243,255,202,0.08);
+  border-radius: 4px;
+  color: #FFF;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+.w1w-search-pg-btn:hover, .w1w-search-pg-num:hover {
+  border-color: rgba(243,255,202,0.3);
+  color: #F3FFCA;
+}
+.w1w-search-pg-num.active {
+  background: #F3FFCA;
+  border-color: #F3FFCA;
+  color: #1a2600;
+  pointer-events: none;
+}
+.w1w-search-pg-ellipsis {
+  color: rgba(255,255,255,0.3);
+  padding: 0 6px;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .w1w-search-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 768px) {
+  .w1w-search-hero { padding: 48px 0 32px; }
+  .w1w-search-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; }
+  .w1w-search-card__name { font-size: 13px; }
+}
+@media (max-width: 480px) {
+  .w1w-search-card__price { font-size: 13px; }
+}
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "W1W Search",
+  "settings": [],
+  "presets": [
+    {
+      "name": "W1W Search"
+    }
+  ]
+}
+{% endschema %}

@@ -2,7 +2,7 @@
   <div class="w1w-regions__inner">
     <div class="w1w-regions__sec-head">
       <div>
-        <span class="w1w-eyebrow">Shop by Continent</span>
+        <span class="w1w-eyebrow">{{ section.settings.eyebrow }}</span>
         <h2 class="w1w-regions__heading">{{ section.settings.heading }}</h2>
       </div>
       {%- if section.settings.description != blank -%}
@@ -16,12 +16,18 @@
       <div class="w1w-regions__list" id="w1wRegionList">
         {%- for block in section.blocks -%}
           {%- liquid
-            assign row_href = ''
-            if block.settings.collection != blank
-              assign row_href = block.settings.collection.url
+            assign col = block.settings.collection
+            assign region_title = block.settings.title_override
+            if region_title == blank and col != blank
+              assign region_title = col.title
             endif
-            if row_href == blank and block.settings.url != blank
-              assign row_href = block.settings.url
+            if region_title == blank
+              assign region_title = 'Collection'
+            endif
+
+            assign row_href = ''
+            if col != blank
+              assign row_href = col.url
             endif
           -%}
           <button
@@ -31,11 +37,13 @@
             type="button"
             {{ block.shopify_attributes }}
           >
-            <span class="w1w-region-row__idx">0{{ forloop.index }}</span>
+            <span class="w1w-region-row__idx">{{ forloop.index | prepend: '00' | slice: -2, 2 }}</span>
             <div class="w1w-region-row__info">
-              <span class="w1w-region-row__name">{{ block.settings.title | upcase }}</span>
-              {%- if block.settings.confederation != blank -%}
-                <span class="w1w-region-row__conf">{{ block.settings.confederation }}</span>
+              <span class="w1w-region-row__name">{{ region_title | upcase }}</span>
+              {%- if block.settings.subtitle != blank -%}
+                <span class="w1w-region-row__conf">{{ block.settings.subtitle }}</span>
+              {%- elsif col != blank -%}
+                <span class="w1w-region-row__conf">{{ col.all_products_count }} Nations</span>
               {%- endif -%}
             </div>
             {%- if block.settings.tag != blank -%}
@@ -51,70 +59,82 @@
       <!-- Right: Region panel -->
       <div class="w1w-region-panel" id="w1wRegionPanel">
         {%- for block in section.blocks -%}
+          {%- liquid
+            assign col = block.settings.collection
+            assign region_title = block.settings.title_override
+            if region_title == blank and col != blank
+              assign region_title = col.title
+            endif
+            if region_title == blank
+              assign region_title = 'Collection'
+            endif
+
+            assign panel_image = block.settings.image_override
+            if panel_image == blank and col != blank and col.image != blank
+              assign panel_image = col.image
+            endif
+
+            assign blurb_text = block.settings.blurb_override
+            if blurb_text == blank and col != blank and col.description != blank
+              assign blurb_text = col.description | strip_html | truncate: 200
+            endif
+
+            assign nation_count = block.settings.nations_count_override
+            if nation_count == blank and col != blank
+              assign nation_count = col.all_products_count
+            endif
+
+            assign region_href = ''
+            if col != blank
+              assign region_href = col.url
+            endif
+          -%}
           <div
             class="w1w-region-panel__slide{% if forloop.first %} w1w-region-panel__slide--active{% endif %}"
             data-panel-idx="{{ forloop.index0 }}"
           >
-            {%- if block.settings.image != blank -%}
+            {%- if panel_image != blank -%}
               <div class="w1w-region-panel__bg">
-                {{ block.settings.image | image_url: width: 1200 | image_tag: loading: 'lazy', class: 'w1w-region-panel__bg-img', alt: block.settings.image.alt | escape }}
+                {{ panel_image | image_url: width: 1200 | image_tag: loading: 'lazy', class: 'w1w-region-panel__bg-img', alt: region_title }}
               </div>
             {%- endif -%}
             <div class="w1w-region-panel__meta">
               {%- if block.settings.tag != blank -%}
                 <div class="w1w-eyebrow">{{ block.settings.tag }}</div>
               {%- endif -%}
-              <h3 class="w1w-region-panel__name">{{ block.settings.title | upcase }}</h3>
-              {%- if block.settings.blurb != blank -%}
-                <p class="w1w-region-panel__blurb">{{ block.settings.blurb }}</p>
+              <h3 class="w1w-region-panel__name">{{ region_title | upcase }}</h3>
+              {%- if blurb_text != blank -%}
+                <p class="w1w-region-panel__blurb">{{ blurb_text }}</p>
               {%- endif -%}
               <div class="w1w-region-panel__stats">
-                {%- if block.settings.nations_count != blank -%}
+                {%- if nation_count != blank -%}
                   <div class="w1w-region-stat">
                     <span class="w1w-region-stat__label">Nations</span>
-                    <strong class="w1w-region-stat__value">{{ block.settings.nations_count }}</strong>
+                    <strong class="w1w-region-stat__value">{{ nation_count }}</strong>
                   </div>
                 {%- endif -%}
-                {%- if block.settings.confederation != blank -%}
+                {%- if block.settings.subtitle != blank -%}
                   <div class="w1w-region-stat">
                     <span class="w1w-region-stat__label">Confed.</span>
-                    <strong class="w1w-region-stat__value">{{ block.settings.confederation }}</strong>
+                    <strong class="w1w-region-stat__value">{{ block.settings.subtitle }}</strong>
                   </div>
                 {%- endif -%}
-                {%- if block.settings.editions_count != blank -%}
-                  <div class="w1w-region-stat">
-                    <span class="w1w-region-stat__label">Editions</span>
-                    <strong class="w1w-region-stat__value">{{ block.settings.editions_count }}</strong>
-                  </div>
-                {%- endif -%}
+                <div class="w1w-region-stat">
+                  <span class="w1w-region-stat__label">Edition</span>
+                  <strong class="w1w-region-stat__value">2026</strong>
+                </div>
               </div>
-              {%- liquid
-                assign region_href = ''
-                if block.settings.collection != blank
-                  assign region_href = block.settings.collection.url
-                endif
-                if region_href == blank and block.settings.url != blank
-                  assign region_href = block.settings.url
-                endif
-              -%}
-              {%- if region_href != blank -%}
-                <a href="{{ region_href }}" class="w1w-btn w1w-btn--outline">
-                  Explore {{ block.settings.confederation | default: block.settings.title }} →
-                </a>
-              {%- else -%}
-                <a href="/collections/all" class="w1w-btn w1w-btn--outline">
-                  Explore {{ block.settings.confederation | default: block.settings.title }} →
-                </a>
-              {%- endif -%}
+              <a href="{{ region_href | default: '/collections/all' }}" class="w1w-btn w1w-btn--outline">
+                Explore {{ region_title }} &rarr;
+              </a>
             </div>
           </div>
         {%- else -%}
-          <!-- Placeholder when no blocks added -->
           <div class="w1w-region-panel__slide w1w-region-panel__slide--active">
             <div class="w1w-region-panel__meta">
-              <div class="w1w-eyebrow">THE ENGINE</div>
-              <h3 class="w1w-region-panel__name">EUROPE</h3>
-              <p class="w1w-region-panel__blurb">Tactical, technical, relentless. The modern machine.</p>
+              <div class="w1w-eyebrow">Add collections</div>
+              <h3 class="w1w-region-panel__name">NO REGIONS YET</h3>
+              <p class="w1w-region-panel__blurb">Add collection blocks in the theme editor to populate this section.</p>
             </div>
           </div>
         {%- endfor -%}
@@ -391,8 +411,14 @@
 {% schema %}
 {
   "name": "W1W Regions",
-  "max_blocks": 8,
+  "max_blocks": 10,
   "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow text",
+      "default": "Shop by Continent"
+    },
     {
       "type": "text",
       "id": "heading",
@@ -412,55 +438,51 @@
       "name": "Region",
       "settings": [
         {
-          "type": "image_picker",
-          "id": "image",
-          "label": "Background image"
-        },
-        {
-          "type": "text",
-          "id": "title",
-          "label": "Region name",
-          "default": "Europe"
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection",
+          "info": "Select a collection. Title, image, product count, and description are pulled automatically."
         },
         {
           "type": "text",
           "id": "tag",
           "label": "Tag / eyebrow",
-          "default": "THE ENGINE"
+          "default": "THE ENGINE",
+          "info": "Short label shown above the title (e.g. THE ENGINE, HOSTS)"
         },
         {
           "type": "text",
-          "id": "confederation",
-          "label": "Confederation (e.g. UEFA)",
-          "default": "UEFA"
+          "id": "subtitle",
+          "label": "Subtitle",
+          "info": "Shown under the title in the list (e.g. UEFA, CONCACAF). If blank, shows product count."
+        },
+        {
+          "type": "header",
+          "content": "Overrides (optional)"
+        },
+        {
+          "type": "text",
+          "id": "title_override",
+          "label": "Title override",
+          "info": "Leave blank to use collection title"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_override",
+          "label": "Image override",
+          "info": "Leave blank to use collection featured image"
         },
         {
           "type": "textarea",
-          "id": "blurb",
-          "label": "Short description",
-          "default": "Tactical, technical, relentless. The modern machine."
+          "id": "blurb_override",
+          "label": "Description override",
+          "info": "Leave blank to use collection description"
         },
         {
           "type": "text",
-          "id": "nations_count",
-          "label": "Number of nations",
-          "default": "16"
-        },
-        {
-          "type": "text",
-          "id": "editions_count",
-          "label": "Editions count",
-          "default": "16"
-        },
-        {
-          "type": "collection",
-          "id": "collection",
-          "label": "Link to collection"
-        },
-        {
-          "type": "url",
-          "id": "url",
-          "label": "Custom link (used if no collection selected)"
+          "id": "nations_count_override",
+          "label": "Nations count override",
+          "info": "Leave blank to use actual product count"
         }
       ]
     }
@@ -472,67 +494,22 @@
         {
           "type": "region",
           "settings": {
-            "title": "Europe",
             "tag": "THE ENGINE",
-            "confederation": "UEFA",
-            "blurb": "Tactical, technical, relentless. The modern machine.",
-            "nations_count": "16",
-            "editions_count": "16"
+            "subtitle": "UEFA"
           }
         },
         {
           "type": "region",
           "settings": {
-            "title": "South America",
             "tag": "THE CORE",
-            "confederation": "CONMEBOL",
-            "blurb": "Where the game was perfected. Pure rhythm.",
-            "nations_count": "6",
-            "editions_count": "6"
+            "subtitle": "CONMEBOL"
           }
         },
         {
           "type": "region",
           "settings": {
-            "title": "North America",
             "tag": "HOSTS",
-            "confederation": "CONCACAF",
-            "blurb": "Home soil. The continent that lifts the curtain.",
-            "nations_count": "6",
-            "editions_count": "6"
-          }
-        },
-        {
-          "type": "region",
-          "settings": {
-            "title": "Africa",
-            "tag": "UNTAMED",
-            "confederation": "CAF",
-            "blurb": "Raw speed. Rising force. Nothing fears nothing.",
-            "nations_count": "9",
-            "editions_count": "9"
-          }
-        },
-        {
-          "type": "region",
-          "settings": {
-            "title": "Asia",
-            "tag": "RISING",
-            "confederation": "AFC",
-            "blurb": "Discipline meets dream. The fastest-climbing continent.",
-            "nations_count": "9",
-            "editions_count": "9"
-          }
-        },
-        {
-          "type": "region",
-          "settings": {
-            "title": "Oceania",
-            "tag": "FRONTIER",
-            "confederation": "OFC",
-            "blurb": "The long journey. Every tournament earned twice over.",
-            "nations_count": "1",
-            "editions_count": "1"
+            "subtitle": "CONCACAF"
           }
         }
       ]
