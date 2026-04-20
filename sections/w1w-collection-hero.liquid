@@ -8,6 +8,13 @@
     <div class="w1w-roster-hero__gradient"></div>
   </div>
   <div class="w1w-roster-hero__inner">
+    <!-- Breadcrumbs -->
+    <div class="w1w-roster-hero__crumbs">
+      <a href="/collections">Collections</a>
+      <span>/</span>
+      <span>{{ collection.title }}</span>
+    </div>
+
     <div class="w1w-roster-hero__eyebrow">
       <span class="w1w-roster-hero__tag">{{ section.settings.tag | default: 'DROP 03' }}</span>
       <span class="w1w-roster-hero__tag-sep">—</span>
@@ -20,9 +27,14 @@
         {{ collection.title | upcase }}
       {%- endif -%}
     </h1>
+
+    {%- if collection.description != blank -%}
+      <p class="w1w-roster-hero__desc">{{ collection.description | strip_html }}</p>
+    {%- endif -%}
+
     <div class="w1w-roster-hero__stats">
       <div class="w1w-roster-hero__stat">
-        <span class="stat-num">50+</span>
+        <span class="stat-num">{{ collection.all_products_count }}</span>
         <span class="stat-lbl">Nations</span>
       </div>
       <div class="w1w-roster-hero__stat-div"></div>
@@ -51,9 +63,9 @@
   display: flex;
   align-items: flex-end;
   overflow: hidden;
-  background: #050505;
+  background: radial-gradient(ellipse at 80% 20%, rgba(243,255,202,0.06), transparent 50%), #0E0E0E;
   isolation: isolate;
-  padding: 0 32px 48px;
+  padding: 80px 32px 48px;
 }
 .w1w-roster-hero__bg {
   position: absolute;
@@ -82,6 +94,29 @@
   width: 100%;
   margin: 0 auto;
 }
+/* Breadcrumbs */
+.w1w-roster-hero__crumbs {
+  display: flex;
+  gap: 8px;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: #737373;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 500;
+}
+.w1w-roster-hero__crumbs a {
+  color: #737373;
+  text-decoration: none;
+  transition: color 0.15s;
+}
+.w1w-roster-hero__crumbs a:hover {
+  color: #F3FFCA;
+}
+.w1w-roster-hero__crumbs span:last-child {
+  color: #D4D4D4;
+}
 .w1w-roster-hero__eyebrow {
   display: flex;
   align-items: center;
@@ -107,12 +142,21 @@
 }
 .w1w-roster-hero__title {
   font-family: 'Space Grotesk', sans-serif;
-  font-size: clamp(3.5rem, 9vw, 8rem);
+  font-size: clamp(3.5rem, 10vw, 9rem);
   font-weight: 900;
   color: #FFFFFF;
   text-transform: uppercase;
   letter-spacing: -0.04em;
   line-height: 0.88;
+  margin: 0 0 24px;
+}
+/* Description */
+.w1w-roster-hero__desc {
+  color: #D4D4D4;
+  max-width: 640px;
+  font-size: 18px;
+  font-family: 'Inter', sans-serif;
+  line-height: 1.6;
   margin: 0 0 36px;
 }
 .w1w-roster-hero__stats {
@@ -151,10 +195,14 @@
 @media (max-width: 768px) {
   .w1w-roster-hero {
     min-height: 300px;
-    padding: 0 16px 36px;
+    padding: 48px 16px 36px;
   }
   .w1w-roster-hero__title {
     font-size: clamp(2.5rem, 12vw, 4rem);
+    margin-bottom: 16px;
+  }
+  .w1w-roster-hero__desc {
+    font-size: 15px;
     margin-bottom: 24px;
   }
   .w1w-roster-hero__stats {

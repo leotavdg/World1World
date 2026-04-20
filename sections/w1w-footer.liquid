@@ -4,7 +4,7 @@
 
       <!-- Brand -->
       <div class="w1w-footer-brand">
-        <h3 class="w1w-footer-logo">WORLD 1 WORLD</h3>
+        <h3 class="w1w-footer-logo">WORLD<span class="w1w-footer-dot"></span>1<span class="w1w-footer-dot"></span>WORLD</h3>
         <p class="w1w-footer-tagline">{{ section.settings.tagline }}</p>
         <div class="w1w-footer-social">
           {%- if section.settings.instagram_url != blank -%}
@@ -128,6 +128,16 @@
   text-transform: uppercase;
   margin-bottom: 16px;
   line-height: 0.95;
+}
+.w1w-footer-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--lime-hot, #CAFD00);
+  margin: 0 6px 2px;
+  vertical-align: middle;
+  box-shadow: 0 0 12px var(--lime-hot, #CAFD00);
 }
 .w1w-footer-tagline {
   font-size: 14px;

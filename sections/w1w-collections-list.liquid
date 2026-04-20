@@ -1,0 +1,312 @@
+{%- comment -%}
+  W1W Collections List — "COLLECTIONS." page
+  Displays all collections in a 2-column card grid with the first card spanning full width.
+{%- endcomment -%}
+
+<!-- Hero -->
+<section class="w1w-collist-hero">
+  <div class="wrap">
+    <span class="w1w-collist-eyebrow">{{ section.settings.eyebrow }}</span>
+    <h1 class="w1w-collist-title">{{ section.settings.title }}</h1>
+    <p class="w1w-collist-desc">{{ section.settings.description }}</p>
+  </div>
+</section>
+
+<!-- Collection Cards Grid -->
+<div class="wrap">
+  <div class="w1w-collist-grid">
+    {%- assign col_index = 0 -%}
+    {%- for collection in collections -%}
+      {%- if collection.all_products_count == 0 -%}{%- continue -%}{%- endif -%}
+      {%- assign col_index = col_index | plus: 1 -%}
+      {%- assign total_cols = collections.size -%}
+
+      {%- comment -%} Pick a color from the collection or cycle through defaults {%- endcomment -%}
+      {%- assign color_cycle = col_index | modulo: 6 -%}
+      {%- case color_cycle -%}
+        {%- when 1 -%}{%- assign card_color = '#D72638' -%}
+        {%- when 2 -%}{%- assign card_color = '#2563EB' -%}
+        {%- when 3 -%}{%- assign card_color = '#16A34A' -%}
+        {%- when 4 -%}{%- assign card_color = '#F4C430' -%}
+        {%- when 5 -%}{%- assign card_color = '#9333EA' -%}
+        {%- when 0 -%}{%- assign card_color = '#F97316' -%}
+      {%- endcase -%}
+
+      <a
+        class="w1w-col-card{% if col_index == 1 %} w1w-col-card--hero{% endif %}"
+        href="{{ collection.url }}"
+        style="--c1:{{ card_color }};--c2:#F3FFCA;--c3:#0E0E0E"
+      >
+        <div class="w1w-col-card__stripes"></div>
+
+        {%- if collection.image != blank and col_index == 1 -%}
+          <div class="w1w-col-card__photo">
+            {{ collection.image | image_url: width: 800 | image_tag: loading: 'lazy', alt: collection.title }}
+          </div>
+        {%- endif -%}
+
+        <div class="w1w-col-card__top">
+          <span class="w1w-col-card__num">{{ col_index | prepend: '00' | slice: -2, 2 }} / {{ total_cols | prepend: '00' | slice: -2, 2 }}</span>
+          <h2 class="w1w-col-card__title">{{ collection.title | upcase }}</h2>
+          {%- if collection.description != blank -%}
+            <p class="w1w-col-card__blurb">{{ collection.description | strip_html | truncate: 160 }}</p>
+          {%- endif -%}
+        </div>
+
+        <div class="w1w-col-card__bottom">
+          <div class="w1w-col-card__meta">
+            <div class="w1w-col-card__stat">
+              <span class="w1w-col-card__stat-label">Nations</span>
+              <strong class="w1w-col-card__stat-val">{{ collection.all_products_count }}</strong>
+            </div>
+            <div class="w1w-col-card__stat">
+              <span class="w1w-col-card__stat-label">Edition</span>
+              <strong class="w1w-col-card__stat-val">2026</strong>
+            </div>
+          </div>
+          <span class="w1w-col-card__cta">EXPLORE &rarr;</span>
+        </div>
+
+        <div class="w1w-col-card__stripe"></div>
+      </a>
+    {%- endfor -%}
+  </div>
+</div>
+
+{% stylesheet %}
+/* ── Collections List Hero ── */
+.w1w-collist-hero {
+  padding: 80px 0 40px;
+  border-bottom: 1px solid var(--line, rgba(243,255,202,0.12));
+  background: var(--bg-0, #0E0E0E);
+}
+.w1w-collist-eyebrow {
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: 0.5em;
+  text-transform: uppercase;
+  color: #F3FFCA;
+}
+.w1w-collist-title {
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-weight: 700;
+  font-size: clamp(56px, 9vw, 120px);
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+  color: #FFF;
+  margin-top: 16px;
+}
+.w1w-collist-desc {
+  color: #D4D4D4;
+  max-width: 560px;
+  margin-top: 24px;
+  font-size: 18px;
+  font-family: 'Inter', sans-serif;
+  line-height: 1.6;
+}
+
+/* ── Collections Card Grid ── */
+.w1w-collist-grid {
+  padding: 48px 0 120px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+}
+
+/* ── Collection Card ── */
+.w1w-col-card {
+  position: relative;
+  min-height: 480px;
+  padding: 48px;
+  background: #131313;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border: 1px solid rgba(243,255,202,0.12);
+  transition: border-color 0.2s, transform 0.2s;
+  text-decoration: none;
+  color: inherit;
+}
+.w1w-col-card:hover {
+  border-color: rgba(243,255,202,0.25);
+  transform: translateY(-3px);
+}
+
+/* Hero card (first, spans 2 cols) */
+.w1w-col-card--hero {
+  grid-column: span 2;
+  min-height: 560px;
+  background: #1C1C1C;
+}
+
+/* Card number */
+.w1w-col-card__num {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  color: #F3FFCA;
+  text-transform: uppercase;
+}
+
+/* Card title */
+.w1w-col-card__title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: clamp(36px, 5vw, 64px);
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  color: #FFF;
+  margin: 16px 0;
+}
+
+/* Card blurb */
+.w1w-col-card__blurb {
+  color: #D4D4D4;
+  max-width: 440px;
+  font-size: 15px;
+  line-height: 1.6;
+  font-family: 'Inter', sans-serif;
+  margin-bottom: 24px;
+}
+
+/* Card meta */
+.w1w-col-card__meta {
+  display: flex;
+  gap: 32px;
+  margin-bottom: 24px;
+}
+.w1w-col-card__stat {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: #ADAAAA;
+  text-transform: uppercase;
+}
+.w1w-col-card__stat-label {
+  display: block;
+}
+.w1w-col-card__stat-val {
+  display: block;
+  color: #F3FFCA;
+  font-size: 22px;
+  letter-spacing: 0;
+  margin-top: 4px;
+  font-weight: 700;
+}
+
+/* CTA button */
+.w1w-col-card__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px 20px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  border: 1px solid #F3FFCA;
+  color: #F3FFCA;
+  background: transparent;
+  transition: background 0.18s, color 0.18s;
+}
+.w1w-col-card:hover .w1w-col-card__cta {
+  background: #F3FFCA;
+  color: #516700;
+}
+
+/* Decorative stripe at bottom */
+.w1w-col-card__stripe {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 8px;
+  background: linear-gradient(90deg, var(--c1), var(--c2), var(--c3));
+}
+
+/* Decorative diagonal stripes */
+.w1w-col-card__stripes {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 50%;
+  height: 100%;
+  background: repeating-linear-gradient(-30deg, var(--c1, #F3FFCA) 0 20px, transparent 20px 60px);
+  opacity: 0.1;
+  pointer-events: none;
+}
+
+/* Photo overlay (hero card) */
+.w1w-col-card__photo {
+  position: absolute;
+  top: 0;
+  right: -10%;
+  width: 60%;
+  height: 100%;
+  background: radial-gradient(ellipse at 30% 50%, rgba(243,255,202,0.08), transparent 60%);
+  pointer-events: none;
+}
+.w1w-col-card__photo img {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  width: 100%;
+  opacity: 0.5;
+  mix-blend-mode: screen;
+}
+
+/* ── Responsive ── */
+@media (max-width: 800px) {
+  .w1w-collist-grid {
+    grid-template-columns: 1fr;
+  }
+  .w1w-col-card--hero {
+    grid-column: auto;
+  }
+  .w1w-col-card {
+    min-height: 380px;
+    padding: 32px;
+  }
+  .w1w-collist-hero {
+    padding: 48px 0 32px;
+  }
+}
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "W1W Collections List",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow text",
+      "default": "Curated Drops · 2026"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Page title",
+      "default": "COLLECTIONS."
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Page description",
+      "default": "Not every band is just a nation. Some are moments, eras, rivalries. The themed drops below are built to tell a story together."
+    }
+  ],
+  "presets": [
+    {
+      "name": "W1W Collections List"
+    }
+  ]
+}
+{% endschema %}
