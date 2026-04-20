@@ -1,0 +1,48 @@
+<section class="w1w-blog-hero">
+  <div class="wrap">
+    {%- if section.settings.eyebrow != blank -%}
+      <span class="eyebrow">{{ section.settings.eyebrow }}</span>
+    {%- endif -%}
+    <h1 class="w1w-blog-hero-h" style="margin-top:16px">
+      {%- if section.settings.heading != blank -%}
+        {{ section.settings.heading }}
+      {%- else -%}
+        {{ blog.title | upcase }}.
+      {%- endif -%}
+    </h1>
+    {%- if section.settings.description != blank -%}
+      <p class="w1w-blog-hero-desc">{{ section.settings.description }}</p>
+    {%- endif -%}
+  </div>
+</section>
+
+{% stylesheet %}
+.w1w-blog-hero {
+  padding: 80px 0 40px;
+  border-bottom: 1px solid var(--line);
+}
+.w1w-blog-hero-h {
+  font-size: clamp(56px, 9vw, 120px);
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+}
+.w1w-blog-hero-desc {
+  color: var(--ink-2);
+  font-size: 16px;
+  max-width: 520px;
+  margin-top: 20px;
+  line-height: 1.6;
+}
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "W1W Blog Hero",
+  "settings": [
+    { "type": "text",     "id": "eyebrow",     "label": "Eyebrow text",  "default": "Stories · Culture · The Beautiful Game" },
+    { "type": "text",     "id": "heading",      "label": "Heading (blank = blog title)", "default": "THE JOURNAL." },
+    { "type": "textarea", "id": "description",  "label": "Description",   "default": "Dispatches from the pitch. Culture, drops, and the stories behind every band." }
+  ],
+  "presets": [{ "name": "W1W Blog Hero" }]
+}
+{% endschema %}

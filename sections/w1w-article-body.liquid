@@ -1,0 +1,539 @@
+<div class="w1w-article-wrap">
+  <div class="wrap">
+    <div class="w1w-article-layout">
+
+      <!-- Main content -->
+      <article class="w1w-article-content">
+        {%- if article.image != blank and section.settings.show_featured_image -%}
+          <div class="w1w-article-featured-img">
+            {{ article.image | image_url: width: 1200 | image_tag: loading: 'eager', class: 'w1w-article-feat-img', alt: article.title }}
+          </div>
+        {%- endif -%}
+
+        <div class="w1w-article-rte">
+          {{ article.content }}
+        </div>
+
+        <!-- Share -->
+        {%- if section.settings.show_share -%}
+          <div class="w1w-article-share">
+            <span class="w1w-article-share-label">Share</span>
+            <div class="w1w-article-share-links">
+              <a href="https://twitter.com/intent/tweet?text={{ article.title | url_encode }}&url={{ shop.url }}{{ article.url }}" target="_blank" rel="noopener" class="w1w-article-share-btn" aria-label="Share on X">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18 3h3l-7.5 8.6L22 21h-6.8l-5-6.5L4 21H1l8.1-9.3L1 3h7l4.6 6z"/></svg>
+              </a>
+              <button class="w1w-article-share-btn" aria-label="Copy link" onclick="navigator.clipboard.writeText(window.location.href);this.innerHTML='✓';setTimeout(()=>{this.innerHTML='<svg width=\'16\' height=\'16\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'1.6\'><rect x=\'9\' y=\'9\' width=\'13\' height=\'13\' rx=\'2\'/><path d=\'M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1\'/></svg>'},1500)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              </button>
+            </div>
+          </div>
+        {%- endif -%}
+      </article>
+
+      <!-- Sidebar -->
+      <aside class="w1w-article-sidebar">
+        {%- if section.settings.show_author_bio -%}
+          <div class="w1w-article-sidebar-card">
+            <div class="w1w-article-sidebar-label">Author</div>
+            <p class="w1w-article-sidebar-author">{{ article.author }}</p>
+          </div>
+        {%- endif -%}
+
+        <div class="w1w-article-sidebar-card">
+          <div class="w1w-article-sidebar-label">Published</div>
+          <p class="w1w-article-sidebar-text">{{ article.published_at | date: '%B %d, %Y' }}</p>
+        </div>
+
+        {%- if article.tags.size > 0 -%}
+          <div class="w1w-article-sidebar-card">
+            <div class="w1w-article-sidebar-label">Tags</div>
+            <div class="w1w-article-sidebar-tags">
+              {%- for tag in article.tags -%}
+                <a href="{{ blog.url }}/tagged/{{ tag | handle }}" class="w1w-article-sidebar-tag">{{ tag }}</a>
+              {%- endfor -%}
+            </div>
+          </div>
+        {%- endif -%}
+
+        {%- if section.settings.show_cta -%}
+          <div class="w1w-article-sidebar-cta">
+            <h3 class="w1w-article-sidebar-cta-h">{{ section.settings.cta_heading }}</h3>
+            <p class="w1w-article-sidebar-cta-text">{{ section.settings.cta_text }}</p>
+            <a href="{{ section.settings.cta_url }}" class="btn btn-primary" style="width:100%">{{ section.settings.cta_label }}</a>
+          </div>
+        {%- endif -%}
+      </aside>
+
+    </div>
+  </div>
+</div>
+
+<!-- Related articles -->
+{%- if section.settings.show_related and blog.articles.size > 1 -%}
+  <div class="w1w-article-related">
+    <div class="wrap">
+      <div class="w1w-article-related-head">
+        <span class="eyebrow">{{ section.settings.related_eyebrow }}</span>
+        <h2 class="w1w-article-related-h">{{ section.settings.related_heading }}</h2>
+      </div>
+      <div class="w1w-article-related-grid">
+        {%- assign count = 0 -%}
+        {%- for related in blog.articles -%}
+          {%- if related.id != article.id and count < 3 -%}
+            <a href="{{ related.url }}" class="w1w-blog-card">
+              <div class="w1w-blog-card-media">
+                {%- if related.image != blank -%}
+                  {{ related.image | image_url: width: 600 | image_tag: loading: 'lazy', class: 'w1w-blog-card-img', alt: related.title }}
+                {%- else -%}
+                  <div class="w1w-blog-card-placeholder">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+                  </div>
+                {%- endif -%}
+                {%- if related.tags.size > 0 -%}
+                  <span class="w1w-blog-card-tag">{{ related.tags | first }}</span>
+                {%- endif -%}
+              </div>
+              <div class="w1w-blog-card-body">
+                <div class="w1w-blog-card-meta">
+                  <time datetime="{{ related.published_at | date: '%Y-%m-%d' }}">{{ related.published_at | date: '%b %d, %Y' }}</time>
+                </div>
+                <h2 class="w1w-blog-card-title">{{ related.title }}</h2>
+                <span class="w1w-blog-card-read">Read More →</span>
+              </div>
+            </a>
+            {%- assign count = count | plus: 1 -%}
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+    </div>
+  </div>
+{%- endif -%}
+
+{%- if section.settings.show_comments and blog.comments_enabled? -%}
+  <div class="w1w-article-comments">
+    <div class="wrap">
+      <div class="w1w-article-comments-inner">
+        <h3 class="w1w-article-comments-h">
+          {{ article.comments_count }} {{ article.comments_count | pluralize: 'Comment', 'Comments' }}
+        </h3>
+
+        {%- for comment in article.comments -%}
+          <div class="w1w-comment">
+            <div class="w1w-comment-meta">
+              <span class="w1w-comment-author">{{ comment.author }}</span>
+              <span class="w1w-comment-date">{{ comment.created_at | date: '%b %d, %Y' }}</span>
+            </div>
+            <div class="w1w-comment-body">{{ comment.content }}</div>
+          </div>
+        {%- endfor -%}
+
+        <div class="w1w-comment-form-wrap">
+          <h4 class="w1w-comment-form-h">Leave a Comment</h4>
+          {%- form 'new_comment', article, class: 'w1w-comment-form' -%}
+            {%- if form.errors -%}
+              <div class="w1w-cform-errors">{{ form.errors | default_errors }}</div>
+            {%- endif -%}
+            {%- if form.posted_successfully? -%}
+              <div class="w1w-cform-success">✓ COMMENT SUBMITTED</div>
+            {%- endif -%}
+            <div class="w1w-comment-form-row">
+              <div class="w1w-comment-form-field">
+                <label for="comment-author">Name</label>
+                <input type="text" id="comment-author" name="comment[author]" required placeholder="Your name" autocomplete="name">
+              </div>
+              <div class="w1w-comment-form-field">
+                <label for="comment-email">Email</label>
+                <input type="email" id="comment-email" name="comment[email]" required placeholder="you@domain.com" autocomplete="email">
+              </div>
+            </div>
+            <div class="w1w-comment-form-field">
+              <label for="comment-body">Comment</label>
+              <textarea id="comment-body" name="comment[body]" rows="4" required placeholder="Share your thoughts"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Post Comment →</button>
+          {%- endform -%}
+        </div>
+      </div>
+    </div>
+  </div>
+{%- endif -%}
+
+{% stylesheet %}
+
+.w1w-article-wrap {
+  padding: 48px 0 80px;
+}
+
+/* Two-column layout */
+.w1w-article-layout {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 64px;
+  align-items: start;
+}
+
+/* Featured image in body */
+.w1w-article-featured-img {
+  margin-bottom: 40px;
+  border: 1px solid var(--line);
+  overflow: hidden;
+}
+.w1w-article-feat-img {
+  width: 100%;
+  display: block;
+}
+
+/* Rich text content */
+.w1w-article-rte {
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.8;
+  color: var(--ink-1);
+}
+.w1w-article-rte h2,
+.w1w-article-rte h3,
+.w1w-article-rte h4 {
+  font-family: var(--font-display);
+  color: var(--ink-0);
+  margin: 40px 0 16px;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+}
+.w1w-article-rte h2 { font-size: 28px; }
+.w1w-article-rte h3 { font-size: 22px; }
+.w1w-article-rte h4 { font-size: 18px; }
+.w1w-article-rte p {
+  margin: 0 0 20px;
+}
+.w1w-article-rte a {
+  color: var(--lime);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.w1w-article-rte a:hover {
+  color: var(--lime-hot);
+}
+.w1w-article-rte img {
+  max-width: 100%;
+  height: auto;
+  border: 1px solid var(--line);
+  margin: 24px 0;
+}
+.w1w-article-rte blockquote {
+  border-left: 3px solid var(--lime);
+  padding: 16px 0 16px 24px;
+  margin: 32px 0;
+  color: var(--ink-0);
+  font-size: 18px;
+  font-style: italic;
+  font-family: var(--font-display);
+}
+.w1w-article-rte ul,
+.w1w-article-rte ol {
+  padding-left: 24px;
+  margin: 16px 0;
+}
+.w1w-article-rte li {
+  margin-bottom: 8px;
+}
+
+/* Share */
+.w1w-article-share {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-top: 40px;
+  margin-top: 40px;
+  border-top: 1px solid var(--line);
+}
+.w1w-article-share-label {
+  font-family: var(--font-display);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+}
+.w1w-article-share-links {
+  display: flex;
+  gap: 8px;
+}
+.w1w-article-share-btn {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink-1);
+  cursor: pointer;
+  text-decoration: none;
+  transition: all .15s;
+  font-size: 13px;
+}
+.w1w-article-share-btn:hover {
+  border-color: var(--lime);
+  color: var(--lime);
+}
+
+/* Sidebar */
+.w1w-article-sidebar {
+  position: sticky;
+  top: calc(var(--header-height, 112px) + 24px);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.w1w-article-sidebar-card {
+  background: var(--bg-1);
+  border: 1px solid var(--line);
+  padding: 24px;
+}
+.w1w-article-sidebar-label {
+  font-family: var(--font-display);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--lime);
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.w1w-article-sidebar-author {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ink-0);
+  text-transform: uppercase;
+}
+.w1w-article-sidebar-text {
+  color: var(--ink-1);
+  font-size: 14px;
+}
+.w1w-article-sidebar-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.w1w-article-sidebar-tag {
+  padding: 5px 12px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--ink-1);
+  text-decoration: none;
+  transition: all .15s;
+}
+.w1w-article-sidebar-tag:hover {
+  border-color: var(--lime);
+  color: var(--lime);
+}
+
+/* Sidebar CTA */
+.w1w-article-sidebar-cta {
+  background: var(--bg-1);
+  border: 1px solid var(--line);
+  padding: 24px;
+  margin-top: 0;
+}
+.w1w-article-sidebar-cta-h {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  color: var(--ink-0);
+  margin-bottom: 8px;
+}
+.w1w-article-sidebar-cta-text {
+  color: var(--ink-2);
+  font-size: 13px;
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+/* Related articles */
+.w1w-article-related {
+  padding: 64px 0 80px;
+  border-top: 1px solid var(--line);
+  background: var(--bg-0);
+}
+.w1w-article-related-head {
+  margin-bottom: 40px;
+}
+.w1w-article-related-h {
+  font-size: var(--fs-h2);
+  margin-top: 12px;
+}
+.w1w-article-related-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+}
+
+/* Comments */
+.w1w-article-comments {
+  padding: 64px 0 80px;
+  border-top: 1px solid var(--line);
+}
+.w1w-article-comments-inner {
+  max-width: 720px;
+}
+.w1w-article-comments-h {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  margin-bottom: 32px;
+}
+.w1w-comment {
+  padding: 24px 0;
+  border-bottom: 1px solid var(--line);
+}
+.w1w-comment-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.w1w-comment-author {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  text-transform: uppercase;
+  color: var(--ink-0);
+}
+.w1w-comment-date {
+  font-size: 12px;
+  color: var(--ink-3);
+  letter-spacing: 0.1em;
+}
+.w1w-comment-body {
+  color: var(--ink-1);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+/* Comment form */
+.w1w-comment-form-wrap {
+  margin-top: 48px;
+  padding-top: 32px;
+  border-top: 1px solid var(--line);
+}
+.w1w-comment-form-h {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+}
+.w1w-comment-form {
+  display: grid;
+  gap: 16px;
+}
+.w1w-comment-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.w1w-comment-form-field label {
+  font-family: var(--font-display);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: var(--ink-2);
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 8px;
+}
+.w1w-comment-form-field input,
+.w1w-comment-form-field textarea {
+  width: 100%;
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  color: var(--ink-0);
+  padding: 14px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  outline: none;
+  resize: vertical;
+  transition: border-color .2s;
+}
+.w1w-comment-form-field input:focus,
+.w1w-comment-form-field textarea:focus {
+  border-color: var(--lime);
+}
+.w1w-comment-form-field input::placeholder,
+.w1w-comment-form-field textarea::placeholder {
+  color: var(--ink-3);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .w1w-article-layout {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  .w1w-article-sidebar {
+    position: static;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .w1w-article-sidebar-card {
+    flex: 1;
+    min-width: 160px;
+  }
+  .w1w-article-sidebar-cta {
+    flex: 1 1 100%;
+  }
+  .w1w-article-related-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
+@media (max-width: 600px) {
+  .w1w-article-wrap {
+    padding: 32px 0 60px;
+  }
+  .w1w-comment-form-row {
+    grid-template-columns: 1fr;
+  }
+  .w1w-article-related-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "W1W Article Body",
+  "settings": [
+    { "type": "checkbox", "id": "show_featured_image", "label": "Show featured image in body", "default": false },
+    { "type": "checkbox", "id": "show_share",          "label": "Show share buttons",          "default": true },
+    { "type": "checkbox", "id": "show_author_bio",     "label": "Show author in sidebar",      "default": true },
+    { "type": "checkbox", "id": "show_comments",       "label": "Show comments section",       "default": true },
+    {
+      "type": "header",
+      "content": "Related articles"
+    },
+    { "type": "checkbox", "id": "show_related",      "label": "Show related articles",  "default": true },
+    { "type": "text",     "id": "related_eyebrow",   "label": "Related eyebrow",        "default": "Keep Reading" },
+    { "type": "text",     "id": "related_heading",   "label": "Related heading",        "default": "MORE FROM THE JOURNAL." },
+    {
+      "type": "header",
+      "content": "Sidebar CTA"
+    },
+    { "type": "checkbox", "id": "show_cta",    "label": "Show sidebar CTA",    "default": true },
+    { "type": "text",     "id": "cta_heading", "label": "CTA heading",         "default": "WEAR YOUR NATION." },
+    { "type": "textarea", "id": "cta_text",    "label": "CTA text",            "default": "$5 per band. 50+ nations. Stack the squad." },
+    { "type": "url",      "id": "cta_url",     "label": "CTA button link" },
+    { "type": "text",     "id": "cta_label",   "label": "CTA button label",    "default": "SHOP NOW →" }
+  ],
+  "presets": [{ "name": "W1W Article Body" }]
+}
+{% endschema %}

@@ -1,0 +1,174 @@
+<section class="w1w-article-hero">
+  {%- if article.image != blank -%}
+    <div class="w1w-article-hero-bg">
+      {{ article.image | image_url: width: 2000 | image_tag: loading: 'eager', class: 'w1w-article-hero-bg-img', alt: article.title }}
+      <div class="w1w-article-hero-overlay"></div>
+    </div>
+  {%- endif -%}
+  <div class="wrap w1w-article-hero-inner">
+    <!-- Breadcrumbs -->
+    <div class="w1w-article-crumbs">
+      <a href="/blogs/{{ blog.handle }}">{{ blog.title }}</a>
+      <span>/</span>
+      <span>{{ article.title | truncate: 40 }}</span>
+    </div>
+
+    {%- if article.tags.size > 0 -%}
+      <div class="w1w-article-hero-tags">
+        {%- for tag in article.tags -%}
+          <span class="w1w-article-hero-tag">{{ tag }}</span>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+    <h1 class="w1w-article-hero-title">{{ article.title }}</h1>
+
+    <div class="w1w-article-hero-meta">
+      <time datetime="{{ article.published_at | date: '%Y-%m-%d' }}">{{ article.published_at | date: '%B %d, %Y' }}</time>
+      {%- if article.author != blank -%}
+        <span class="w1w-article-hero-sep">·</span>
+        <span>By {{ article.author }}</span>
+      {%- endif -%}
+      {%- if section.settings.show_read_time -%}
+        {%- assign words = article.content | strip_html | split: ' ' | size -%}
+        {%- assign minutes = words | divided_by: 200 -%}
+        {%- if minutes < 1 -%}{%- assign minutes = 1 -%}{%- endif -%}
+        <span class="w1w-article-hero-sep">·</span>
+        <span>{{ minutes }} min read</span>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+
+.w1w-article-hero {
+  position: relative;
+  min-height: 420px;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+  background: var(--bg-0);
+  isolation: isolate;
+  padding: 80px 0 48px;
+}
+
+/* Background image */
+.w1w-article-hero-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+.w1w-article-hero-bg-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  opacity: 0.3;
+  mix-blend-mode: luminosity;
+}
+.w1w-article-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to right, rgba(14,14,14,0.9) 30%, rgba(14,14,14,0.5) 100%),
+    linear-gradient(to top, var(--bg-0) 0%, transparent 50%);
+}
+
+.w1w-article-hero-inner {
+  position: relative;
+  z-index: 1;
+  max-width: 900px;
+}
+
+/* Breadcrumbs */
+.w1w-article-crumbs {
+  display: flex;
+  gap: 8px;
+  font-family: var(--font-display);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: var(--ink-3);
+  text-transform: uppercase;
+  font-weight: 500;
+  margin-bottom: 24px;
+}
+.w1w-article-crumbs a {
+  color: var(--ink-3);
+  text-decoration: none;
+  transition: color .15s;
+}
+.w1w-article-crumbs a:hover {
+  color: var(--lime);
+}
+.w1w-article-crumbs span:last-child {
+  color: var(--ink-1);
+}
+
+/* Tags */
+.w1w-article-hero-tags {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.w1w-article-hero-tag {
+  padding: 4px 10px;
+  background: var(--lime);
+  color: var(--lime-dark);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+/* Title */
+.w1w-article-hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(32px, 5vw, 56px);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  text-transform: uppercase;
+  color: var(--ink-0);
+  margin-bottom: 20px;
+}
+
+/* Meta */
+.w1w-article-hero-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-display);
+  font-size: 12px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 500;
+}
+.w1w-article-hero-sep {
+  color: var(--lime);
+}
+
+@media (max-width: 768px) {
+  .w1w-article-hero {
+    min-height: 320px;
+    padding: 60px 0 36px;
+  }
+  .w1w-article-hero-title {
+    font-size: clamp(28px, 7vw, 40px);
+  }
+}
+
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "W1W Article Hero",
+  "settings": [
+    { "type": "checkbox", "id": "show_read_time", "label": "Show read time", "default": true }
+  ],
+  "presets": [{ "name": "W1W Article Hero" }]
+}
+{% endschema %}
