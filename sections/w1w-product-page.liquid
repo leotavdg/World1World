@@ -459,6 +459,42 @@ document.addEventListener('DOMContentLoaded', function () {
     var ts=document.getElementById('w1wTotalSaved'); if(ts) ts.textContent=disc>0?'Saved $'+disc.toFixed(2):'';
   }
   recalc();
+
+  // ── AJAX add-to-cart (intercept form submit) ──
+  var form = document.getElementById('w1w-product-form');
+  if (form) {
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var addBtn = document.getElementById('w1wAddBtn');
+      if (addBtn) { addBtn.disabled = true; addBtn.textContent = 'ADDING…'; }
+
+      var variantId = document.getElementById('w1wVariantId').value;
+      var qtyVal = document.getElementById('w1wQtyInput');
+      var quantity = qtyVal ? parseInt(qtyVal.value) || 1 : 1;
+
+      fetch('/cart/add.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ items: [{ id: parseInt(variantId), quantity: quantity }] })
+      })
+      .then(function (r) { return r.json(); })
+      .then(function () {
+        if (addBtn) { addBtn.textContent = 'ADDED ✓'; }
+        if (window.W1W) {
+          window.W1W.fetchCart(function () {
+            window.W1W.openDrawer();
+          });
+        }
+        setTimeout(function () {
+          if (addBtn) { addBtn.disabled = false; addBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg> ADD TO BAG'; }
+        }, 1500);
+      })
+      .catch(function () {
+        if (addBtn) { addBtn.disabled = false; addBtn.textContent = 'ADD TO BAG'; }
+      });
+    });
+  }
 });
 </script>
 

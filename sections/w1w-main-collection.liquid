@@ -5,40 +5,51 @@
 
 {%- paginate collection.products by products_per_page -%}
 
-{%- comment -%} Build JS product data for client-side filter/search {%- endcomment -%}
-<script>
-window.W1W_SHOP_PRODUCTS = [
-  {%- for product in collection.products -%}
-  {
-    id: {{ product.id }},
-    title: {{ product.title | json }},
-    handle: {{ product.handle | json }},
-    url: {{ product.url | json }},
-    price: {{ product.price | divided_by: 100.0 }},
-    type: {{ product.type | json }},
-    tags: {{ product.tags | json }},
-    vendor: {{ product.vendor | json }},
-    available: {{ product.available }},
-    image: "{% if product.featured_image %}{{ product.featured_image | image_url: width: 600 }}{% endif %}"
-  }{% unless forloop.last %},{% endunless %}
-  {%- endfor -%}
-];
-</script>
+{%- comment -%} Collect unique continents dynamically from metafields {%- endcomment -%}
+{%- liquid
+  assign continent_list = ''
+  for product in collection.products
+    assign cont = product.metafields.custom.continent | strip
+    if cont != blank
+      if continent_list == ''
+        assign continent_list = cont
+      else
+        assign continent_arr = continent_list | split: '|||'
+        assign found = false
+        for c in continent_arr
+          if c == cont
+            assign found = true
+            break
+          endif
+        endfor
+        unless found
+          assign continent_list = continent_list | append: '|||' | append: cont
+        endunless
+      endif
+    endif
+  endfor
+  assign continents = continent_list | split: '|||' | sort
+-%}
 
 <section class="w1w-shop">
 
-  <!-- Confederation chips -->
+  <!-- Dynamic Continent chips from metafields -->
   <div class="w1w-shop-chips-bar">
     <div class="w1w-shop-chips-bar__inner">
-      <button class="w1w-chip w1w-chip--active" data-confed="all">
-        ALL <span class="w1w-chip__count" id="chip-count-all">{{ collection.products_count }}</span>
+      <button class="w1w-chip w1w-chip--active" data-continent="all">
+        ALL <span class="w1w-chip__count">{{ collection.products_count }}</span>
       </button>
-      <button class="w1w-chip" data-confed="concacaf">CONCACAF <span class="w1w-chip__count" id="chip-count-concacaf"></span></button>
-      <button class="w1w-chip" data-confed="conmebol">CONMEBOL <span class="w1w-chip__count" id="chip-count-conmebol"></span></button>
-      <button class="w1w-chip" data-confed="uefa">UEFA <span class="w1w-chip__count" id="chip-count-uefa"></span></button>
-      <button class="w1w-chip" data-confed="caf">CAF <span class="w1w-chip__count" id="chip-count-caf"></span></button>
-      <button class="w1w-chip" data-confed="afc">AFC <span class="w1w-chip__count" id="chip-count-afc"></span></button>
-      <button class="w1w-chip" data-confed="ofc">OFC <span class="w1w-chip__count" id="chip-count-ofc"></span></button>
+      {%- for cont in continents -%}
+        {%- assign cont_count = 0 -%}
+        {%- for product in collection.products -%}
+          {%- if product.metafields.custom.continent == cont -%}
+            {%- assign cont_count = cont_count | plus: 1 -%}
+          {%- endif -%}
+        {%- endfor -%}
+        <button class="w1w-chip" data-continent="{{ cont | handleize }}">
+          {{ cont | upcase }} <span class="w1w-chip__count">{{ cont_count }}</span>
+        </button>
+      {%- endfor -%}
     </div>
   </div>
 
@@ -48,23 +59,85 @@ window.W1W_SHOP_PRODUCTS = [
     <aside class="w1w-shop-sidebar" id="w1w-shop-sidebar">
       <div class="w1w-shop-sidebar__sticky">
 
+        <!-- Close button (mobile) -->
+        <button class="w1w-shop-sidebar__close" id="w1w-sidebar-close" aria-label="Close filters">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+
         <!-- Search -->
         <div class="w1w-shop-filter-group">
           <div class="w1w-shop-search">
             <svg class="w1w-shop-search__icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-            <input type="text" id="w1w-shop-search-input" placeholder="Search nations…" class="w1w-shop-search__input" autocomplete="off">
+            <input type="text" id="w1w-shop-search-input" placeholder="Search nations..." class="w1w-shop-search__input" autocomplete="off">
           </div>
         </div>
 
-        <!-- Quick tags -->
-        <div class="w1w-shop-filter-group">
-          <h3 class="w1w-shop-filter-label">QUICK FILTER</h3>
-          <div class="w1w-shop-tags">
-            <button class="w1w-shop-tag" data-tag="host">HOST NATIONS</button>
-            <button class="w1w-shop-tag" data-tag="featured">FEATURED</button>
-            <button class="w1w-shop-tag" data-tag="all">SHOW ALL</button>
+        <!-- Continent filter (dynamic from metafields) -->
+        {%- if continents.size > 0 -%}
+          <div class="w1w-shop-filter-group">
+            <h3 class="w1w-shop-filter-label">CONTINENT</h3>
+            <ul class="w1w-shop-filter-list" id="w1w-continent-filter">
+              {%- for cont in continents -%}
+                {%- assign cont_count = 0 -%}
+                {%- for product in collection.products -%}
+                  {%- if product.metafields.custom.continent == cont -%}
+                    {%- assign cont_count = cont_count | plus: 1 -%}
+                  {%- endif -%}
+                {%- endfor -%}
+                <li>
+                  <button class="w1w-shop-filter-btn" data-filter-continent="{{ cont | handleize }}" data-filter-label="{{ cont }}">
+                    <span class="w1w-shop-filter-check"></span>
+                    <span>{{ cont }}</span>
+                    <span class="w1w-shop-filter-cnt">{{ cont_count }}</span>
+                  </button>
+                </li>
+              {%- endfor -%}
+            </ul>
           </div>
-        </div>
+        {%- endif -%}
+
+        <!-- Country filter (dynamic from metafields) -->
+        {%- liquid
+          assign country_list = ''
+          for product in collection.products
+            assign cntry = product.metafields.custom.country | default: product.title | strip
+            if cntry != blank
+              if country_list == ''
+                assign country_list = cntry
+              else
+                assign country_arr = country_list | split: '|||'
+                assign found_c = false
+                for cc in country_arr
+                  if cc == cntry
+                    assign found_c = true
+                    break
+                  endif
+                endfor
+                unless found_c
+                  assign country_list = country_list | append: '|||' | append: cntry
+                endunless
+              endif
+            endif
+          endfor
+          assign countries_sorted = country_list | split: '|||' | sort
+        -%}
+        {%- if countries_sorted.size > 0 -%}
+          <div class="w1w-shop-filter-group">
+            <h3 class="w1w-shop-filter-label">COUNTRY</h3>
+            <div class="w1w-shop-filter-scroll" id="w1w-country-filter">
+              <ul class="w1w-shop-filter-list">
+                {%- for cntry in countries_sorted -%}
+                  <li>
+                    <button class="w1w-shop-filter-btn" data-filter-country="{{ cntry | handleize }}" data-filter-label="{{ cntry }}">
+                      <span class="w1w-shop-filter-check"></span>
+                      <span>{{ cntry }}</span>
+                    </button>
+                  </li>
+                {%- endfor -%}
+              </ul>
+            </div>
+          </div>
+        {%- endif -%}
 
         <!-- Sort -->
         <div class="w1w-shop-filter-group">
@@ -79,7 +152,7 @@ window.W1W_SHOP_PRODUCTS = [
           </div>
         </div>
 
-        <!-- Shopify filters -->
+        <!-- Shopify native filters -->
         {%- if collection.filters.size > 0 -%}
           {%- for filter in collection.filters -%}
             <div class="w1w-shop-filter-group">
@@ -90,7 +163,7 @@ window.W1W_SHOP_PRODUCTS = [
                     value="{{ filter.min_value.value | divided_by: 100.0 }}"
                     placeholder="Min" class="w1w-shop-price-input" min="0"
                     max="{{ filter.range_max | divided_by: 100.0 }}">
-                  <span>–</span>
+                  <span>-</span>
                   <input type="number" name="{{ filter.max_value.param_name }}"
                     value="{{ filter.max_value.value | divided_by: 100.0 }}"
                     placeholder="Max" class="w1w-shop-price-input" min="0"
@@ -102,7 +175,7 @@ window.W1W_SHOP_PRODUCTS = [
                     <li>
                       {%- if value.active -%}
                         <a href="{{ value.url_to_remove }}" class="w1w-shop-filter-link active">
-                          <span class="w1w-shop-filter-check">✓</span>
+                          <span class="w1w-shop-filter-check w1w-shop-filter-check--on"></span>
                           <span>{{ value.label }}</span>
                           <span class="w1w-shop-filter-cnt">{{ value.count }}</span>
                         </a>
@@ -140,24 +213,30 @@ window.W1W_SHOP_PRODUCTS = [
         <span class="w1w-shop-topbar__count">
           <span id="w1w-visible-count">{{ collection.products_count }}</span> NATIONS
         </span>
+        <!-- Active filter tags -->
+        <div class="w1w-shop-active-filters" id="w1w-active-filters"></div>
         <button class="w1w-shop-topbar__filter-toggle" id="w1w-filter-toggle" aria-label="Toggle filters">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/></svg>
           FILTERS
         </button>
       </div>
 
-      <!-- Product grid (Shopify server-rendered products as data, JS renders bracelets) -->
+      <!-- Product grid -->
       <div class="w1w-shop-grid" id="w1w-shop-grid">
         {%- if collection.products.size == 0 -%}
           <p class="w1w-shop-empty">No products found in this collection.</p>
         {%- else -%}
           {%- for product in collection.products -%}
+            {%- assign p_continent = product.metafields.custom.continent | strip | default: '' -%}
+            {%- assign p_country = product.metafields.custom.country | default: product.title | strip -%}
             <div
               class="w1w-nation-card"
               data-handle="{{ product.handle }}"
               data-title="{{ product.title | downcase | escape }}"
               data-available="{{ product.available }}"
               data-tags="{{ product.tags | join: ',' | downcase }}"
+              data-continent="{{ p_continent | handleize }}"
+              data-country="{{ p_country | handleize }}"
             >
               <a href="{{ product.url }}" class="w1w-nation-card__link">
                 <div class="w1w-nation-card__scene" data-bracelet-handle="{{ product.handle }}">
@@ -165,6 +244,7 @@ window.W1W_SHOP_PRODUCTS = [
                     {{ product.featured_image | image_url: width: 600 | image_tag:
                       loading: 'lazy',
                       class: 'w1w-nation-card__img',
+                      sizes: '(max-width: 480px) 50vw, (max-width: 768px) 50vw, (max-width: 1280px) 33vw, 25vw',
                       alt: product.featured_image.alt | escape }}
                   {%- else -%}
                     <div class="w1w-nation-card__bracelet-ph"></div>
@@ -174,7 +254,12 @@ window.W1W_SHOP_PRODUCTS = [
                 <div class="w1w-nation-card__info">
                   <div class="w1w-nation-card__meta">
                     <span class="w1w-nation-card__swatch" data-swatch-handle="{{ product.handle }}"></span>
-                    <span class="w1w-nation-card__name">{{ product.title }}</span>
+                    <div class="w1w-nation-card__text">
+                      <span class="w1w-nation-card__name">{{ product.title }}</span>
+                      {%- if p_continent != blank -%}
+                        <span class="w1w-nation-card__continent">{{ p_continent }}</span>
+                      {%- endif -%}
+                    </div>
                   </div>
                   <span class="w1w-nation-card__price">{{ product.price | money_without_trailing_zeros }}</span>
                 </div>
@@ -196,16 +281,20 @@ window.W1W_SHOP_PRODUCTS = [
         {%- endif -%}
       </div>
 
-      <!-- No results message (hidden by default) -->
+      <!-- No results message -->
       <div class="w1w-shop-no-results" id="w1w-shop-no-results" style="display:none">
-        <p>No nations match your search. <button class="w1w-shop-no-results__reset" id="w1w-reset-filters">Reset filters</button></p>
+        <div class="w1w-shop-no-results__inner">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(243,255,202,0.3)" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <p>No nations match your filters.</p>
+          <button class="w1w-shop-no-results__reset" id="w1w-reset-filters">Reset all filters</button>
+        </div>
       </div>
 
       <!-- Pagination -->
       {%- if paginate.pages > 1 -%}
         <div class="w1w-shop-pagination">
           {%- if paginate.previous -%}
-            <a href="{{ paginate.previous.url }}" class="w1w-shop-pg-btn">←</a>
+            <a href="{{ paginate.previous.url }}" class="w1w-shop-pg-btn">&larr;</a>
           {%- endif -%}
           {%- for part in paginate.parts -%}
             {%- if part.is_link -%}
@@ -214,12 +303,12 @@ window.W1W_SHOP_PRODUCTS = [
               {%- if part.title == paginate.current_page -%}
                 <span class="w1w-shop-pg-num active">{{ part.title }}</span>
               {%- else -%}
-                <span class="w1w-shop-pg-ellipsis">…</span>
+                <span class="w1w-shop-pg-ellipsis">&hellip;</span>
               {%- endif -%}
             {%- endif -%}
           {%- endfor -%}
           {%- if paginate.next -%}
-            <a href="{{ paginate.next.url }}" class="w1w-shop-pg-btn">→</a>
+            <a href="{{ paginate.next.url }}" class="w1w-shop-pg-btn">&rarr;</a>
           {%- endif -%}
         </div>
       {%- endif -%}
@@ -231,14 +320,16 @@ window.W1W_SHOP_PRODUCTS = [
 {%- endpaginate -%}
 
 {% stylesheet %}
-/* ── Shop Page Layout ── */
+/* ── Prevent horizontal scroll ── */
 .w1w-shop {
   background: #0E0E0E;
   min-height: 60vh;
   padding-bottom: 96px;
+  overflow-x: hidden;
+  max-width: 100vw;
 }
 
-/* Confederation chips bar */
+/* ── Continent chips bar ── */
 .w1w-shop-chips-bar {
   background: #0E0E0E;
   border-bottom: 1px solid rgba(243,255,202,0.08);
@@ -252,46 +343,45 @@ window.W1W_SHOP_PRODUCTS = [
   margin: 0 auto;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
   overflow-x: auto;
   scrollbar-width: none;
-  padding: 12px 0;
+  padding: 14px 0;
 }
 .w1w-shop-chips-bar__inner::-webkit-scrollbar { display: none; }
 .w1w-chip {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 14px;
+  padding: 7px 16px;
   border-radius: 999px;
-  border: 1px solid rgba(243,255,202,0.15);
+  border: 1px solid rgba(243,255,202,0.12);
   background: transparent;
-  color: rgba(255,255,255,0.55);
+  color: rgba(255,255,255,0.5);
   font-family: 'Space Grotesk', sans-serif;
   font-size: 0.6875rem;
   font-weight: 700;
-  letter-spacing: 0.15em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   white-space: nowrap;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.25s ease;
 }
 .w1w-chip:hover {
-  border-color: rgba(243,255,202,0.4);
+  border-color: rgba(243,255,202,0.35);
   color: #F3FFCA;
 }
 .w1w-chip--active {
   background: #F3FFCA;
   border-color: #F3FFCA;
-  color: #516700;
+  color: #1a2600;
 }
 .w1w-chip__count {
   font-size: 0.5625rem;
-  opacity: 0.7;
+  opacity: 0.6;
 }
-.w1w-chip--active .w1w-chip__count { opacity: 0.6; }
 
-/* Inner layout */
+/* ── Inner layout ── */
 .w1w-shop__inner {
   max-width: 1536px;
   margin: 0 auto;
@@ -300,38 +390,58 @@ window.W1W_SHOP_PRODUCTS = [
   grid-template-columns: 240px 1fr;
   gap: 48px;
   align-items: start;
+  min-width: 0;
 }
 
 /* ── Sidebar ── */
+.w1w-shop-sidebar {
+  min-width: 0;
+}
+.w1w-shop-sidebar__close {
+  display: none;
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.5);
+  cursor: pointer;
+  padding: 4px;
+  margin-left: auto;
+}
 .w1w-shop-sidebar__sticky {
   position: sticky;
   top: calc(var(--header-group-height, 80px) + 60px);
   display: flex;
   flex-direction: column;
-  gap: 36px;
+  gap: 32px;
 }
-.w1w-shop-filter-group { display: flex; flex-direction: column; gap: 12px; }
+.w1w-shop-filter-group { display: flex; flex-direction: column; gap: 10px; }
 .w1w-shop-filter-label {
   font-family: 'Space Grotesk', sans-serif;
   font-size: 0.5625rem;
   font-weight: 700;
   letter-spacing: 0.25em;
   text-transform: uppercase;
-  color: rgba(255,255,255,0.35);
+  color: rgba(255,255,255,0.3);
   margin: 0;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(243,255,202,0.06);
 }
+
 /* Search */
 .w1w-shop-search {
   display: flex;
   align-items: center;
-  gap: 8px;
-  background: #1A1A1A;
-  border: 1px solid rgba(243,255,202,0.12);
+  gap: 10px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(243,255,202,0.1);
+  border-radius: 6px;
   padding: 10px 14px;
-  transition: border-color 0.2s;
+  transition: all 0.25s ease;
 }
-.w1w-shop-search:focus-within { border-color: rgba(243,255,202,0.4); }
-.w1w-shop-search__icon { color: rgba(255,255,255,0.3); flex-shrink: 0; }
+.w1w-shop-search:focus-within {
+  border-color: rgba(243,255,202,0.4);
+  background: rgba(255,255,255,0.06);
+}
+.w1w-shop-search__icon { color: rgba(255,255,255,0.25); flex-shrink: 0; }
 .w1w-shop-search__input {
   background: transparent;
   border: none;
@@ -341,42 +451,83 @@ window.W1W_SHOP_PRODUCTS = [
   font-size: 0.8125rem;
   width: 100%;
 }
-.w1w-shop-search__input::placeholder { color: rgba(255,255,255,0.3); }
-/* Quick tags */
-.w1w-shop-tags { display: flex; flex-wrap: wrap; gap: 6px; }
-.w1w-shop-tag {
-  padding: 5px 12px;
-  border-radius: 999px;
-  border: 1px solid rgba(243,255,202,0.15);
-  background: transparent;
+.w1w-shop-search__input::placeholder { color: rgba(255,255,255,0.25); }
+
+/* Filter scroll container */
+.w1w-shop-filter-scroll {
+  max-height: 200px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(243,255,202,0.15) transparent;
+}
+.w1w-shop-filter-scroll::-webkit-scrollbar { width: 4px; }
+.w1w-shop-filter-scroll::-webkit-scrollbar-track { background: transparent; }
+.w1w-shop-filter-scroll::-webkit-scrollbar-thumb { background: rgba(243,255,202,0.15); border-radius: 2px; }
+
+/* Filter list & buttons */
+.w1w-shop-filter-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 4px; }
+.w1w-shop-filter-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 6px 4px;
   color: rgba(255,255,255,0.5);
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 0.625rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.w1w-shop-tag:hover, .w1w-shop-tag.active {
-  border-color: #F3FFCA;
-  color: #F3FFCA;
-}
-/* Sort */
-.w1w-shop-sort-list { display: flex; flex-direction: column; gap: 8px; }
-.w1w-shop-sort-link {
   font-family: 'Inter', sans-serif;
   font-size: 0.8125rem;
   font-weight: 500;
-  color: rgba(255,255,255,0.45);
-  text-decoration: none;
-  text-transform: capitalize;
-  transition: color 0.2s;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-radius: 4px;
+  text-align: left;
 }
-.w1w-shop-sort-link:hover { color: #FFF; }
-.w1w-shop-sort-link.active { color: #F3FFCA; }
-/* Filter list */
-.w1w-shop-filter-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
+.w1w-shop-filter-btn:hover {
+  color: #FFF;
+  background: rgba(255,255,255,0.04);
+}
+.w1w-shop-filter-btn.active {
+  color: #F3FFCA;
+}
+.w1w-shop-filter-btn.active .w1w-shop-filter-check {
+  background: #F3FFCA;
+  border-color: #F3FFCA;
+}
+.w1w-shop-filter-btn.active .w1w-shop-filter-check::after {
+  content: '';
+  width: 6px;
+  height: 6px;
+  background: #0E0E0E;
+  border-radius: 1px;
+}
+.w1w-shop-filter-check {
+  width: 14px;
+  height: 14px;
+  border: 1px solid rgba(243,255,202,0.2);
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+.w1w-shop-filter-check--on {
+  background: #F3FFCA;
+  border-color: #F3FFCA;
+}
+.w1w-shop-filter-check--on::after {
+  content: '';
+  width: 6px;
+  height: 6px;
+  background: #0E0E0E;
+  border-radius: 1px;
+}
+.w1w-shop-filter-cnt {
+  margin-left: auto;
+  font-size: 0.625rem;
+  color: rgba(255,255,255,0.2);
+}
 .w1w-shop-filter-link {
   display: flex;
   align-items: center;
@@ -387,26 +538,27 @@ window.W1W_SHOP_PRODUCTS = [
   font-size: 0.8125rem;
   font-weight: 500;
   transition: color 0.2s;
+  padding: 4px 0;
 }
 .w1w-shop-filter-link:hover { color: #FFF; }
 .w1w-shop-filter-link.active { color: #F3FFCA; }
 .w1w-shop-filter-link.disabled { opacity: 0.3; pointer-events: none; }
-.w1w-shop-filter-check {
-  width: 14px;
-  height: 14px;
-  border: 1px solid rgba(243,255,202,0.2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.5625rem;
-  color: #F3FFCA;
-  flex-shrink: 0;
+
+/* Sort */
+.w1w-shop-sort-list { display: flex; flex-direction: column; gap: 6px; }
+.w1w-shop-sort-link {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: rgba(255,255,255,0.4);
+  text-decoration: none;
+  text-transform: capitalize;
+  transition: color 0.2s;
+  padding: 2px 0;
 }
-.w1w-shop-filter-cnt {
-  margin-left: auto;
-  font-size: 0.625rem;
-  color: rgba(255,255,255,0.3);
-}
+.w1w-shop-sort-link:hover { color: #FFF; }
+.w1w-shop-sort-link.active { color: #F3FFCA; }
+
 /* Price */
 .w1w-shop-price-row {
   display: flex;
@@ -417,8 +569,9 @@ window.W1W_SHOP_PRODUCTS = [
 }
 .w1w-shop-price-input {
   width: 72px;
-  background: #1A1A1A;
-  border: 1px solid rgba(243,255,202,0.12);
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(243,255,202,0.1);
+  border-radius: 4px;
   color: #FFF;
   padding: 8px 10px;
   font-family: 'Inter', sans-serif;
@@ -426,6 +579,7 @@ window.W1W_SHOP_PRODUCTS = [
   outline: none;
 }
 .w1w-shop-price-input:focus { border-color: rgba(243,255,202,0.4); }
+
 /* Clear */
 .w1w-shop-clear {
   font-family: 'Inter', sans-serif;
@@ -437,12 +591,16 @@ window.W1W_SHOP_PRODUCTS = [
 .w1w-shop-clear:hover { color: #F3FFCA; }
 
 /* ── Main grid area ── */
+.w1w-shop-main {
+  min-width: 0;
+}
 .w1w-shop-topbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 32px;
-  padding-bottom: 20px;
+  gap: 16px;
+  margin-bottom: 28px;
+  padding-bottom: 16px;
   border-bottom: 1px solid rgba(243,255,202,0.08);
 }
 .w1w-shop-topbar__count {
@@ -451,6 +609,37 @@ window.W1W_SHOP_PRODUCTS = [
   font-weight: 700;
   letter-spacing: 0.2em;
   color: rgba(255,255,255,0.35);
+  white-space: nowrap;
+}
+.w1w-shop-active-filters {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  flex: 1;
+}
+.w1w-shop-active-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  background: rgba(243,255,202,0.1);
+  border: 1px solid rgba(243,255,202,0.15);
+  border-radius: 999px;
+  color: #F3FFCA;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.5625rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.w1w-shop-active-tag:hover {
+  background: rgba(243,255,202,0.2);
+}
+.w1w-shop-active-tag svg {
+  opacity: 0.6;
 }
 .w1w-shop-topbar__filter-toggle {
   display: none;
@@ -458,6 +647,7 @@ window.W1W_SHOP_PRODUCTS = [
   gap: 8px;
   background: transparent;
   border: 1px solid rgba(243,255,202,0.15);
+  border-radius: 6px;
   color: rgba(255,255,255,0.6);
   font-family: 'Space Grotesk', sans-serif;
   font-size: 0.6875rem;
@@ -466,16 +656,17 @@ window.W1W_SHOP_PRODUCTS = [
   padding: 8px 14px;
   cursor: pointer;
   transition: all 0.2s;
+  white-space: nowrap;
 }
 .w1w-shop-topbar__filter-toggle:hover {
   border-color: rgba(243,255,202,0.4);
   color: #F3FFCA;
 }
 
-/* ── Nation Cards Grid ── */
+/* ── Nation Cards Grid — uniform columns ── */
 .w1w-shop-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 2px;
 }
 .w1w-nation-card {
@@ -483,6 +674,8 @@ window.W1W_SHOP_PRODUCTS = [
   background: #131313;
   display: flex;
   flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
 }
 .w1w-nation-card__link {
   display: flex;
@@ -490,6 +683,7 @@ window.W1W_SHOP_PRODUCTS = [
   text-decoration: none;
   color: inherit;
   flex: 1;
+  min-width: 0;
 }
 .w1w-nation-card__scene {
   position: relative;
@@ -506,7 +700,7 @@ window.W1W_SHOP_PRODUCTS = [
   transition: transform 0.6s ease;
   display: block;
 }
-.w1w-nation-card:hover .w1w-nation-card__img { transform: scale(1.06); }
+.w1w-nation-card:hover .w1w-nation-card__img { transform: scale(1.05); }
 .w1w-nation-card__bracelet-ph {
   width: 70%;
   aspect-ratio: 3 / 1;
@@ -520,26 +714,29 @@ window.W1W_SHOP_PRODUCTS = [
 .w1w-nation-card__overlay {
   position: absolute;
   inset: 0;
-  background: rgba(14,14,14,0);
-  transition: background 0.3s;
+  background: linear-gradient(to top, rgba(14,14,14,0.3) 0%, transparent 50%);
+  opacity: 0;
+  transition: opacity 0.3s;
   pointer-events: none;
 }
 .w1w-nation-card:hover .w1w-nation-card__overlay {
-  background: rgba(14,14,14,0.2);
+  opacity: 1;
 }
 .w1w-nation-card__info {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 14px 8px;
+  padding: 12px 14px 10px;
   gap: 8px;
   border-top: 1px solid rgba(243,255,202,0.06);
+  min-width: 0;
 }
 .w1w-nation-card__meta {
   display: flex;
   align-items: center;
   gap: 8px;
   min-width: 0;
+  flex: 1;
 }
 .w1w-nation-card__swatch {
   width: 20px;
@@ -548,6 +745,12 @@ window.W1W_SHOP_PRODUCTS = [
   flex-shrink: 0;
   background: #333;
   display: block;
+}
+.w1w-nation-card__text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
 }
 .w1w-nation-card__name {
   font-family: 'Space Grotesk', sans-serif;
@@ -560,6 +763,14 @@ window.W1W_SHOP_PRODUCTS = [
   overflow: hidden;
   text-overflow: ellipsis;
   transition: color 0.2s;
+}
+.w1w-nation-card__continent {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.5625rem;
+  font-weight: 500;
+  color: rgba(255,255,255,0.25);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
 }
 .w1w-nation-card:hover .w1w-nation-card__name { color: #F3FFCA; }
 .w1w-nation-card__price {
@@ -575,7 +786,7 @@ window.W1W_SHOP_PRODUCTS = [
   background: transparent;
   border: none;
   border-top: 1px solid rgba(243,255,202,0.06);
-  color: rgba(255,255,255,0.35);
+  color: rgba(255,255,255,0.3);
   font-family: 'Space Grotesk', sans-serif;
   font-size: 0.5625rem;
   font-weight: 700;
@@ -583,17 +794,17 @@ window.W1W_SHOP_PRODUCTS = [
   text-transform: uppercase;
   padding: 10px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.25s ease;
 }
 .w1w-nation-card__atc:hover {
   background: #F3FFCA;
-  color: #516700;
+  color: #1a2600;
   border-top-color: #F3FFCA;
 }
 .w1w-nation-card--hidden { display: none !important; }
 
 /* Empty / no results */
-.w1w-shop-empty, .w1w-shop-no-results {
+.w1w-shop-empty {
   grid-column: 1 / -1;
   text-align: center;
   padding: 80px 0;
@@ -601,13 +812,38 @@ window.W1W_SHOP_PRODUCTS = [
   font-family: 'Inter', sans-serif;
   font-size: 0.9375rem;
 }
+.w1w-shop-no-results {
+  text-align: center;
+  padding: 80px 0;
+}
+.w1w-shop-no-results__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+.w1w-shop-no-results__inner p {
+  color: rgba(255,255,255,0.3);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9375rem;
+  margin: 0;
+}
 .w1w-shop-no-results__reset {
-  background: none;
-  border: none;
+  background: rgba(243,255,202,0.1);
+  border: 1px solid rgba(243,255,202,0.2);
+  border-radius: 6px;
   color: #F3FFCA;
   cursor: pointer;
-  text-decoration: underline;
-  font-size: inherit;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 10px 20px;
+  transition: all 0.2s;
+}
+.w1w-shop-no-results__reset:hover {
+  background: rgba(243,255,202,0.2);
 }
 
 /* Pagination */
@@ -626,8 +862,9 @@ window.W1W_SHOP_PRODUCTS = [
   min-width: 40px;
   height: 40px;
   padding: 0 8px;
-  background: #1A1A1A;
-  border: 1px solid rgba(243,255,202,0.1);
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(243,255,202,0.08);
+  border-radius: 4px;
   color: #FFF;
   font-family: 'Space Grotesk', sans-serif;
   font-size: 0.875rem;
@@ -642,14 +879,14 @@ window.W1W_SHOP_PRODUCTS = [
 .w1w-shop-pg-num.active {
   background: #F3FFCA;
   border-color: #F3FFCA;
-  color: #516700;
+  color: #1a2600;
   pointer-events: none;
 }
 .w1w-shop-pg-ellipsis { color: rgba(255,255,255,0.3); padding: 0 6px; }
 
 /* ── Responsive ── */
 @media (max-width: 1280px) {
-  .w1w-shop-grid { grid-template-columns: repeat(3, 1fr); }
+  .w1w-shop-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 @media (max-width: 1024px) {
   .w1w-shop__inner {
@@ -657,7 +894,7 @@ window.W1W_SHOP_PRODUCTS = [
     gap: 32px;
     padding: 32px 24px 0;
   }
-  .w1w-shop-grid { grid-template-columns: repeat(2, 1fr); }
+  .w1w-shop-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 768px) {
   .w1w-shop-chips-bar { padding: 0 16px; }
@@ -677,27 +914,27 @@ window.W1W_SHOP_PRODUCTS = [
     overflow-y: auto;
     padding: 24px;
   }
+  .w1w-shop-sidebar.open .w1w-shop-sidebar__close { display: block; }
   .w1w-shop-topbar__filter-toggle { display: flex; }
-  .w1w-shop-grid { grid-template-columns: repeat(2, 1fr); gap: 1px; }
+  .w1w-shop-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; }
 }
 @media (max-width: 480px) {
-  .w1w-shop-grid { grid-template-columns: repeat(2, 1fr); }
+  .w1w-shop-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .w1w-nation-card__name { font-size: 0.625rem; }
+  .w1w-nation-card__continent { display: none; }
 }
 {% endstylesheet %}
 
 <script>
 (function() {
-  // Wait for W1W_COUNTRIES to be available
   function initShop() {
     var countries = window.W1W_COUNTRIES || [];
-    var products = window.W1W_SHOP_PRODUCTS || [];
     var cards = document.querySelectorAll('.w1w-nation-card');
-    var grid = document.getElementById('w1w-shop-grid');
     var noResults = document.getElementById('w1w-shop-no-results');
     var visibleCount = document.getElementById('w1w-visible-count');
+    var activeFiltersEl = document.getElementById('w1w-active-filters');
 
-    // Map handle → country data
+    // Map handle -> country data
     var countryByHandle = {};
     countries.forEach(function(c) { countryByHandle[c.slug] = c; });
 
@@ -728,59 +965,69 @@ window.W1W_SHOP_PRODUCTS = [
       }
     });
 
-    // Confederation chip counts
-    var confedMap = {
-      concacaf: ['concacaf'],
-      conmebol: ['southamerica'],
-      uefa: ['europe'],
-      caf: ['africa'],
-      afc: ['asia'],
-      ofc: ['oceania']
-    };
-    Object.keys(confedMap).forEach(function(confed) {
-      var regions = confedMap[confed];
-      var cnt = 0;
-      cards.forEach(function(card) {
-        var country = countryByHandle[card.dataset.handle];
-        if (country && regions.indexOf(country.region) !== -1) cnt++;
-      });
-      var el = document.getElementById('chip-count-' + confed);
-      if (el) el.textContent = cnt;
-    });
-
     // Filter state
-    var state = { confed: 'all', tag: 'all', search: '' };
+    var state = { continent: 'all', countries: [], search: '' };
+
+    function renderActiveTags() {
+      if (!activeFiltersEl) return;
+      var html = '';
+      if (state.continent !== 'all') {
+        var chipBtn = document.querySelector('.w1w-chip[data-continent="' + state.continent + '"]');
+        var label = chipBtn ? chipBtn.textContent.replace(/\d+/g, '').trim() : state.continent;
+        html += '<button class="w1w-shop-active-tag" data-remove="continent">' + label + ' <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>';
+      }
+      state.countries.forEach(function(c) {
+        var btn = document.querySelector('[data-filter-country="' + c + '"]');
+        var label = btn ? btn.dataset.filterLabel : c;
+        html += '<button class="w1w-shop-active-tag" data-remove-country="' + c + '">' + label + ' <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>';
+      });
+      activeFiltersEl.innerHTML = html;
+
+      // Bind remove handlers
+      activeFiltersEl.querySelectorAll('[data-remove="continent"]').forEach(function(tag) {
+        tag.addEventListener('click', function() {
+          state.continent = 'all';
+          document.querySelectorAll('.w1w-chip').forEach(function(b) { b.classList.remove('w1w-chip--active'); });
+          var allChip = document.querySelector('.w1w-chip[data-continent="all"]');
+          if (allChip) allChip.classList.add('w1w-chip--active');
+          document.querySelectorAll('[data-filter-continent]').forEach(function(b) { b.classList.remove('active'); });
+          applyFilters();
+        });
+      });
+      activeFiltersEl.querySelectorAll('[data-remove-country]').forEach(function(tag) {
+        tag.addEventListener('click', function() {
+          var val = tag.dataset.removeCountry;
+          state.countries = state.countries.filter(function(c) { return c !== val; });
+          var btn = document.querySelector('[data-filter-country="' + val + '"]');
+          if (btn) btn.classList.remove('active');
+          applyFilters();
+        });
+      });
+    }
 
     function applyFilters() {
-      var regions = state.confed !== 'all' ? (confedMap[state.confed] || []) : null;
       var visible = 0;
 
       cards.forEach(function(card) {
-        var handle = card.dataset.handle;
-        var country = countryByHandle[handle];
         var title = card.dataset.title || '';
-        var tags = card.dataset.tags || '';
+        var cardContinent = card.dataset.continent || '';
+        var cardCountry = card.dataset.country || '';
         var show = true;
 
-        // Confed filter
-        if (regions && country) {
-          if (regions.indexOf(country.region) === -1) show = false;
+        // Continent filter
+        if (state.continent !== 'all' && cardContinent !== state.continent) {
+          show = false;
         }
 
-        // Tag filter
-        if (show && state.tag !== 'all') {
-          if (state.tag === 'host') {
-            show = country && country.host === true;
-          } else if (state.tag === 'featured') {
-            show = country && country.featured === true;
-          }
+        // Country filter (multi-select)
+        if (show && state.countries.length > 0) {
+          if (state.countries.indexOf(cardCountry) === -1) show = false;
         }
 
         // Search
         if (show && state.search) {
           var q = state.search.toLowerCase();
-          var sub = country ? (country.sub || '').toLowerCase() : '';
-          show = title.indexOf(q) !== -1 || sub.indexOf(q) !== -1;
+          show = title.indexOf(q) !== -1;
         }
 
         card.classList.toggle('w1w-nation-card--hidden', !show);
@@ -789,24 +1036,63 @@ window.W1W_SHOP_PRODUCTS = [
 
       if (visibleCount) visibleCount.textContent = visible;
       if (noResults) noResults.style.display = visible === 0 ? 'block' : 'none';
+      renderActiveTags();
     }
 
-    // Confed chips
+    // Continent chips
     document.querySelectorAll('.w1w-chip').forEach(function(btn) {
       btn.addEventListener('click', function() {
         document.querySelectorAll('.w1w-chip').forEach(function(b) { b.classList.remove('w1w-chip--active'); });
         btn.classList.add('w1w-chip--active');
-        state.confed = btn.dataset.confed;
+        state.continent = btn.dataset.continent;
+        // Sync sidebar continent filter
+        document.querySelectorAll('[data-filter-continent]').forEach(function(b) {
+          b.classList.toggle('active', b.dataset.filterContinent === state.continent);
+        });
         applyFilters();
       });
     });
 
-    // Quick tags
-    document.querySelectorAll('.w1w-shop-tag').forEach(function(btn) {
+    // Sidebar continent filter buttons
+    document.querySelectorAll('[data-filter-continent]').forEach(function(btn) {
       btn.addEventListener('click', function() {
-        document.querySelectorAll('.w1w-shop-tag').forEach(function(b) { b.classList.remove('active'); });
-        btn.classList.add('active');
-        state.tag = btn.dataset.tag;
+        var val = btn.dataset.filterContinent;
+        var isActive = btn.classList.contains('active');
+
+        // Toggle off => reset to all
+        document.querySelectorAll('[data-filter-continent]').forEach(function(b) { b.classList.remove('active'); });
+        document.querySelectorAll('.w1w-chip').forEach(function(b) { b.classList.remove('w1w-chip--active'); });
+
+        if (isActive) {
+          state.continent = 'all';
+          var allChip = document.querySelector('.w1w-chip[data-continent="all"]');
+          if (allChip) allChip.classList.add('w1w-chip--active');
+        } else {
+          btn.classList.add('active');
+          state.continent = val;
+          var matchChip = document.querySelector('.w1w-chip[data-continent="' + val + '"]');
+          if (matchChip) matchChip.classList.add('w1w-chip--active');
+          else {
+            var allChip2 = document.querySelector('.w1w-chip[data-continent="all"]');
+            if (allChip2) allChip2.classList.add('w1w-chip--active');
+          }
+        }
+        applyFilters();
+      });
+    });
+
+    // Country filter buttons (multi-select)
+    document.querySelectorAll('[data-filter-country]').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var val = btn.dataset.filterCountry;
+        var idx = state.countries.indexOf(val);
+        if (idx !== -1) {
+          state.countries.splice(idx, 1);
+          btn.classList.remove('active');
+        } else {
+          state.countries.push(val);
+          btn.classList.add('active');
+        }
         applyFilters();
       });
     });
@@ -824,12 +1110,13 @@ window.W1W_SHOP_PRODUCTS = [
     var resetBtn = document.getElementById('w1w-reset-filters');
     if (resetBtn) {
       resetBtn.addEventListener('click', function() {
-        state = { confed: 'all', tag: 'all', search: '' };
+        state = { continent: 'all', countries: [], search: '' };
         if (searchInput) searchInput.value = '';
         document.querySelectorAll('.w1w-chip').forEach(function(b) { b.classList.remove('w1w-chip--active'); });
-        var allChip = document.querySelector('.w1w-chip[data-confed="all"]');
+        var allChip = document.querySelector('.w1w-chip[data-continent="all"]');
         if (allChip) allChip.classList.add('w1w-chip--active');
-        document.querySelectorAll('.w1w-shop-tag').forEach(function(b) { b.classList.remove('active'); });
+        document.querySelectorAll('[data-filter-continent]').forEach(function(b) { b.classList.remove('active'); });
+        document.querySelectorAll('[data-filter-country]').forEach(function(b) { b.classList.remove('active'); });
         applyFilters();
       });
     }
@@ -837,16 +1124,27 @@ window.W1W_SHOP_PRODUCTS = [
     // Mobile filter toggle
     var filterToggle = document.getElementById('w1w-filter-toggle');
     var sidebar = document.getElementById('w1w-shop-sidebar');
+    var sidebarClose = document.getElementById('w1w-sidebar-close');
     if (filterToggle && sidebar) {
       filterToggle.addEventListener('click', function() {
-        sidebar.classList.toggle('open');
+        sidebar.classList.add('open');
+        document.body.style.overflow = 'hidden';
       });
+      if (sidebarClose) {
+        sidebarClose.addEventListener('click', function() {
+          sidebar.classList.remove('open');
+          document.body.style.overflow = '';
+        });
+      }
       sidebar.addEventListener('click', function(e) {
-        if (e.target === sidebar) sidebar.classList.remove('open');
+        if (e.target === sidebar) {
+          sidebar.classList.remove('open');
+          document.body.style.overflow = '';
+        }
       });
     }
 
-    // ATC buttons → W1W cart drawer
+    // ATC buttons
     document.querySelectorAll('.w1w-nation-card__atc').forEach(function(btn) {
       btn.addEventListener('click', function(e) {
         e.preventDefault();
@@ -867,7 +1165,6 @@ window.W1W_SHOP_PRODUCTS = [
     });
   }
 
-  // Run after W1W_COUNTRIES is available (loaded in w1w-data.js)
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initShop);
   } else {

@@ -130,10 +130,11 @@ document.addEventListener('DOMContentLoaded', function () {
   var openMega = null;
 
   // Set --header-height for other sticky elements to reference
-  if (nav) {
-    var navH = nav.offsetHeight;
-    document.body.style.setProperty('--header-height', navH + 'px');
-    document.body.style.setProperty('--header-group-height', navH + 'px');
+  var headerGroup = document.getElementById('header-group');
+  if (headerGroup) {
+    var groupH = headerGroup.offsetHeight;
+    document.body.style.setProperty('--header-height', groupH + 'px');
+    document.body.style.setProperty('--header-group-height', groupH + 'px');
   }
 
   // ── Mega menu ──
@@ -216,15 +217,20 @@ document.addEventListener('DOMContentLoaded', function () {
 {% stylesheet %}
 
 /* ── Sticky nav ── */
-.w1w-nav {
+/* Make the entire header-group sticky so both announcement + nav stick */
+#header-group {
   position: sticky;
   top: 0;
   z-index: 50;
+}
+.w1w-nav {
   background: rgba(14,14,14,0.85);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--line);
   transition: box-shadow .3s;
+  position: relative;
+  z-index: 50;
 }
 .w1w-nav.scrolled {
   box-shadow: 0 4px 24px rgba(0,0,0,0.4);

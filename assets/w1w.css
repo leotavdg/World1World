@@ -785,15 +785,19 @@ footer .shopify-section > *:not(.section-background) {
   background: var(--bg-3);
 }
 
-/* ── W1W Nav (overrides existing header) ── */
-.w1w-nav {
+/* ── W1W Nav ── */
+#header-group {
   position: sticky;
   top: 0;
   z-index: 50;
+}
+.w1w-nav {
   background: rgba(14,14,14,0.85);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--line);
+  position: relative;
+  z-index: 50;
 }
 .w1w-nav-inner {
   height: var(--nav-h);

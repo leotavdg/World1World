@@ -284,9 +284,8 @@ document.addEventListener('DOMContentLoaded', function () {
       .then(function (r) { return r.json(); })
       .then(function () {
         btn.textContent = 'ADDED ✓';
-        // Open cart drawer if available, else redirect to cart
-        if (window.W1W && window.W1W.openDrawer) {
-          window.W1W.openDrawer();
+        if (window.W1W && window.W1W.fetchCart) {
+          window.W1W.fetchCart(function () { window.W1W.openDrawer(); });
         } else {
           window.location.href = '/cart';
         }
