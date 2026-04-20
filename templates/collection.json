@@ -13,7 +13,7 @@
       "type": "w1w-collection-hero",
       "settings": {
         "bg_image": "shopify://shop_images/220831_Eagle_SeatingBowl_InternalView.jpg",
-        "title": "THE ROSTER.",
+        "title": "",
         "tag": "DROP 03",
         "drop_line": "HOST NATIONS LIVE NOW"
       }
@@ -29,13 +29,13 @@
       "settings": {
         "newsletter_title_line1": "Enter the",
         "newsletter_title_line2": "Inner Circle",
-        "newsletter_desc": "Join the World 1 World collective for early access to limited edition drops and stadium events.",
+        "newsletter_desc": "Join the World 1 World collective for early access to limited edition drops and exclusive colorways.",
         "email_placeholder": "Your email",
         "submit_label": "Join",
         "success_message": "You're in the squad!",
-        "card1_title_line1": "Stadium",
-        "card1_title_line2": "Pass",
-        "card1_label": "Exclusive Membership",
+        "card1_title_line1": "Stack",
+        "card1_title_line2": "Builder",
+        "card1_label": "Bundle & Save Up To 20%",
         "card1_link": "",
         "card2_title_line1": "Global",
         "card2_title_line2": "Shipping",

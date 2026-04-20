@@ -130,12 +130,13 @@
   color: rgba(243,255,202,0.7);
 }
 .w1w-roster-hero__tag {
-  background: #F3FFCA;
-  color: #516700;
-  padding: 4px 10px;
-  font-size: 0.5625rem;
+  background: var(--lime, #F3FFCA);
+  color: var(--lime-dark, #516700);
+  padding: 5px 12px;
+  font-size: 11px;
   font-weight: 900;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.15em;
+  line-height: 1;
 }
 .w1w-roster-hero__tag-sep {
   color: rgba(243,255,202,0.3);
@@ -227,7 +228,7 @@
       "type": "text",
       "id": "title",
       "label": "Hero title (leave blank to use collection title)",
-      "default": "THE ROSTER."
+      "default": ""
     },
     {
       "type": "text",

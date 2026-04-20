@@ -147,24 +147,26 @@
     display: flex;
   }
   .w1w-promo-newsletter__input {
-    background: #262626;
-    border: none;
-    color: #fff;
-    font-family: "Space Grotesk", sans-serif;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    padding: 16px;
+    background: var(--bg-2, #1C1C1C);
+    border: 1px solid var(--line, rgba(243,255,202,0.12));
+    color: var(--ink-0, #fff);
+    font-family: var(--font-body, "Inter", sans-serif);
+    font-size: 14px;
+    padding: 14px 16px;
     flex: 1;
     outline: none;
     width: 100%;
     border-radius: 0;
+    -webkit-appearance: none;
+    appearance: none;
+    transition: border-color .2s ease;
   }
   .w1w-promo-newsletter__input::placeholder {
-    color: rgba(255, 255, 255, 0.3);
+    color: var(--ink-3, #737373);
   }
   .w1w-promo-newsletter__input:focus {
-    outline: 1px solid #f3ffca;
+    border-color: var(--lime, #f3ffca);
+    outline: none;
   }
   .w1w-promo-newsletter__submit {
     background: #f3ffca;
@@ -331,7 +333,7 @@
       "type": "textarea",
       "id": "newsletter_desc",
       "label": "Description",
-      "default": "Join the World 1 World collective for early access to limited edition drops and stadium events."
+      "default": "Join the World 1 World collective for early access to limited edition drops and exclusive colorways."
     },
     {
       "type": "text",
@@ -359,19 +361,19 @@
       "type": "text",
       "id": "card1_title_line1",
       "label": "Title line 1",
-      "default": "Stadium"
+      "default": "Stack"
     },
     {
       "type": "text",
       "id": "card1_title_line2",
       "label": "Title line 2",
-      "default": "Pass"
+      "default": "Builder"
     },
     {
       "type": "text",
       "id": "card1_label",
       "label": "Label",
-      "default": "Exclusive Membership"
+      "default": "Bundle & Save Up To 20%"
     },
     {
       "type": "url",
