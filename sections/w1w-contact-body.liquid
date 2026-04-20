@@ -1,0 +1,319 @@
+{%- liquid
+  assign cards = section.blocks | where: 'type', 'contact_card'
+-%}
+
+<div class="w1w-contact-wrap">
+  <div class="wrap">
+    <div class="w1w-cbody">
+
+      <!-- Contact info cards -->
+      <div class="w1w-ccards">
+        {%- for block in cards -%}
+          <div class="w1w-ccard" {{ block.shopify_attributes }}>
+            {%- if block.settings.label != blank -%}
+              <div class="w1w-ccard-label">{{ block.settings.label }}</div>
+            {%- endif -%}
+            {%- if block.settings.heading != blank -%}
+              <h3 class="w1w-ccard-h">{{ block.settings.heading }}</h3>
+            {%- endif -%}
+            {%- if block.settings.email != blank -%}
+              <a href="mailto:{{ block.settings.email }}" class="w1w-ccard-link">{{ block.settings.email }}</a>
+            {%- endif -%}
+            {%- if block.settings.detail != blank -%}
+              <p class="w1w-ccard-detail">{{ block.settings.detail }}</p>
+            {%- endif -%}
+            {%- if block.settings.address != blank -%}
+              <p class="w1w-ccard-address">{{ block.settings.address }}</p>
+            {%- endif -%}
+          </div>
+        {%- endfor -%}
+      </div>
+
+      <!-- Contact form -->
+      <div class="w1w-cform-wrap">
+        {%- form 'contact', class: 'w1w-cform' -%}
+
+          {%- if form.posted_successfully? -%}
+            <div class="w1w-cform-success">
+              ✓ {{ section.settings.success_message }}
+            </div>
+          {%- endif -%}
+
+          {%- if form.errors -%}
+            <div class="w1w-cform-errors">
+              {{ form.errors | default_errors }}
+            </div>
+          {%- endif -%}
+
+          {%- if section.settings.show_topic -%}
+            <div class="w1w-cform-field">
+              <label for="w1w-contact-topic">{{ section.settings.topic_label }}</label>
+              <select id="w1w-contact-topic" name="contact[topic]" required>
+                <option value="">{{ section.settings.topic_placeholder }}</option>
+                {%- assign topics = section.settings.topic_options | split: ',' -%}
+                {%- for topic in topics -%}
+                  {%- assign t = topic | strip -%}
+                  <option value="{{ t }}">{{ t }}</option>
+                {%- endfor -%}
+              </select>
+            </div>
+          {%- endif -%}
+
+          <div class="w1w-cform-field">
+            <label for="w1w-contact-name">{{ section.settings.name_label }}</label>
+            <input type="text" id="w1w-contact-name" name="contact[name]" required placeholder="{{ section.settings.name_placeholder }}" autocomplete="name">
+          </div>
+
+          <div class="w1w-cform-field">
+            <label for="w1w-contact-email">{{ section.settings.email_label }}</label>
+            <input type="email" id="w1w-contact-email" name="contact[email]" required placeholder="{{ section.settings.email_placeholder }}" autocomplete="email">
+          </div>
+
+          {%- if section.settings.show_country_field -%}
+            <div class="w1w-cform-field">
+              <label for="w1w-contact-country">{{ section.settings.country_label }}</label>
+              <input type="text" id="w1w-contact-country" name="contact[country_team]" placeholder="{{ section.settings.country_placeholder }}">
+            </div>
+          {%- endif -%}
+
+          <div class="w1w-cform-field">
+            <label for="w1w-contact-message">{{ section.settings.message_label }}</label>
+            <textarea id="w1w-contact-message" name="contact[body]" rows="5" required placeholder="{{ section.settings.message_placeholder }}"></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-lg w1w-cform-submit">
+            {{ section.settings.button_text }}
+          </button>
+
+        {%- endform -%}
+      </div>
+
+    </div>
+  </div>
+</div>
+
+{% stylesheet %}
+
+.w1w-contact-wrap {
+  padding: 64px 0 120px;
+}
+
+/* Two-column layout */
+.w1w-cbody {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 64px;
+}
+
+/* Contact cards */
+.w1w-ccards {
+  display: grid;
+  gap: 4px;
+}
+.w1w-ccard {
+  background: var(--bg-1);
+  padding: 32px;
+  border: 1px solid var(--line);
+  transition: border-color .2s ease;
+}
+.w1w-ccard:hover {
+  border-color: var(--line-strong);
+}
+.w1w-ccard-label {
+  font-family: var(--font-display);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: var(--lime);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.w1w-ccard-h {
+  font-size: 24px;
+  margin-bottom: 8px;
+  letter-spacing: -0.01em;
+}
+.w1w-ccard-link {
+  color: var(--ink-1);
+  font-size: 15px;
+  text-decoration: none;
+  transition: color .15s ease;
+}
+.w1w-ccard-link:hover {
+  color: var(--lime);
+}
+.w1w-ccard-detail {
+  color: var(--ink-3);
+  font-size: 12px;
+  margin-top: 8px;
+  line-height: 1.5;
+}
+.w1w-ccard-address {
+  color: var(--ink-1);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+/* Form */
+.w1w-cform {
+  display: grid;
+  gap: 16px;
+  background: var(--bg-1);
+  padding: 32px;
+  border: 1px solid var(--line);
+}
+.w1w-cform-field label {
+  font-family: var(--font-display);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: var(--ink-2);
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 8px;
+}
+.w1w-cform-field input,
+.w1w-cform-field textarea,
+.w1w-cform-field select {
+  width: 100%;
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  color: var(--ink-0);
+  padding: 14px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  outline: none;
+  resize: vertical;
+  transition: border-color .2s ease;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.w1w-cform-field select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7' fill='none'%3E%3Cpath stroke='%23ADAAAA' stroke-width='1.5' d='m1 1 5 5 5-5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 40px;
+  cursor: pointer;
+}
+.w1w-cform-field input:focus,
+.w1w-cform-field textarea:focus,
+.w1w-cform-field select:focus {
+  border-color: var(--lime);
+}
+.w1w-cform-field input::placeholder,
+.w1w-cform-field textarea::placeholder {
+  color: var(--ink-3);
+}
+
+/* Success message */
+.w1w-cform-success {
+  padding: 16px;
+  background: rgba(243, 255, 202, 0.04);
+  border: 1px solid var(--lime);
+  color: var(--lime);
+  font-family: var(--font-display);
+  font-size: 13px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+/* Error message */
+.w1w-cform-errors {
+  padding: 16px;
+  background: rgba(215, 38, 56, 0.08);
+  border: 1px solid var(--red);
+  color: var(--red);
+  font-size: 13px;
+}
+.w1w-cform-errors a {
+  color: var(--red);
+  text-decoration: underline;
+}
+
+/* Submit button */
+.w1w-cform-submit {
+  width: 100%;
+  margin-top: 8px;
+}
+
+/* Responsive */
+@media (max-width: 800px) {
+  .w1w-cbody {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+}
+@media (max-width: 600px) {
+  .w1w-ccard {
+    padding: 24px;
+  }
+  .w1w-ccard-h {
+    font-size: 20px;
+  }
+  .w1w-cform {
+    padding: 24px;
+  }
+  .w1w-contact-wrap {
+    padding: 40px 0 80px;
+  }
+}
+
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "W1W Contact Body",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Topic field"
+    },
+    { "type": "checkbox", "id": "show_topic", "label": "Show topic dropdown", "default": true },
+    { "type": "text", "id": "topic_label", "label": "Topic label", "default": "Topic" },
+    { "type": "text", "id": "topic_placeholder", "label": "Topic placeholder", "default": "Choose one..." },
+    { "type": "text", "id": "topic_options", "label": "Topic options (comma-separated)", "default": "Order support, Custom / team order, Press inquiry, Wholesale, Just saying hi" },
+    {
+      "type": "header",
+      "content": "Form fields"
+    },
+    { "type": "text", "id": "name_label", "label": "Name label", "default": "Name" },
+    { "type": "text", "id": "name_placeholder", "label": "Name placeholder", "default": "Your name" },
+    { "type": "text", "id": "email_label", "label": "Email label", "default": "Email" },
+    { "type": "text", "id": "email_placeholder", "label": "Email placeholder", "default": "you@domain.com" },
+    { "type": "checkbox", "id": "show_country_field", "label": "Show country/team field", "default": true },
+    { "type": "text", "id": "country_label", "label": "Country field label", "default": "Country / Team" },
+    { "type": "text", "id": "country_placeholder", "label": "Country field placeholder", "default": "Which side do you support?" },
+    { "type": "text", "id": "message_label", "label": "Message label", "default": "Message" },
+    { "type": "text", "id": "message_placeholder", "label": "Message placeholder", "default": "Tell us what's up" },
+    {
+      "type": "header",
+      "content": "Button & messages"
+    },
+    { "type": "text", "id": "button_text", "label": "Submit button text", "default": "SEND MESSAGE →" },
+    { "type": "text", "id": "success_message", "label": "Success message", "default": "MESSAGE SENT. WE'LL REPLY WITHIN 24H." }
+  ],
+  "blocks": [
+    {
+      "type": "contact_card",
+      "name": "Contact card",
+      "settings": [
+        { "type": "text", "id": "label", "label": "Label", "default": "General" },
+        { "type": "text", "id": "heading", "label": "Heading", "default": "SAY HELLO." },
+        { "type": "text", "id": "email", "label": "Email", "default": "hello@world1world.com" },
+        { "type": "textarea", "id": "detail", "label": "Detail text" },
+        { "type": "textarea", "id": "address", "label": "Address (for HQ card)" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "W1W Contact Body",
+      "blocks": [
+        { "type": "contact_card", "settings": { "label": "General", "heading": "SAY HELLO.", "email": "hello@world1world.com" } },
+        { "type": "contact_card", "settings": { "label": "Support", "heading": "ORDER HELP.", "email": "support@world1world.com", "detail": "Avg. response: 6 hours · Mon–Fri" } },
+        { "type": "contact_card", "settings": { "label": "Teams & Custom", "heading": "25+ BAND ORDERS.", "email": "teams@world1world.com", "detail": "Custom colorways, club crests, corporate. 3-week lead time." } },
+        { "type": "contact_card", "settings": { "label": "Press", "heading": "MEDIA & PARTNERS.", "email": "press@world1world.com" } },
+        { "type": "contact_card", "settings": { "label": "HQ", "heading": "TORONTO, CA.", "address": "250 Spadina Ave, Suite 500\nToronto, ON M5T 2C2\nCanada" } }
+      ]
+    }
+  ]
+}
+{% endschema %}
