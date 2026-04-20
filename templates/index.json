@@ -186,26 +186,6 @@
         "shipping_title": "Global Shipping",
         "quality_title": "Elite Quality"
       }
-    },
-    "w1w_footer_BnV37h": {
-      "type": "w1w-footer",
-      "name": "W1W Footer",
-      "settings": {
-        "tagline": "Technical collectibles for the most beautiful game. Engineered for the floodlit stage.",
-        "instagram_url": "",
-        "tiktok_url": "",
-        "twitter_url": "",
-        "shop_heading": "SHOP",
-        "shop_menu": "",
-        "support_heading": "SUPPORT",
-        "support_menu": "",
-        "newsletter_heading": "JOIN THE RANKS",
-        "newsletter_desc": "First access to drops and exclusive editions.",
-        "email_placeholder": "EMAIL ADDRESS",
-        "submit_label": "JOIN",
-        "success_message": "You're on the list.",
-        "copyright_text": "© 2026 World 1 World. All prices in USD."
-      }
     }
   },
   "order": [
@@ -215,7 +195,6 @@
     "w1w_regions",
     "w1w_lifestyle",
     "w1w_marquee_2",
-    "w1w_bento",
-    "w1w_footer_BnV37h"
+    "w1w_bento"
   ]
 }
