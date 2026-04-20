@@ -88,7 +88,6 @@ html, body {
   font-size: 16px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
 }
 
 /* Kill any white/light background the framework injects */

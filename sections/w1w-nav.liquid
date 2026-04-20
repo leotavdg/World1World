@@ -129,6 +129,13 @@ document.addEventListener('DOMContentLoaded', function () {
   var nav = document.getElementById('w1wNav');
   var openMega = null;
 
+  // Set --header-height for other sticky elements to reference
+  if (nav) {
+    var navH = nav.offsetHeight;
+    document.body.style.setProperty('--header-height', navH + 'px');
+    document.body.style.setProperty('--header-group-height', navH + 'px');
+  }
+
   // ── Mega menu ──
   document.querySelectorAll('[data-has-mega]').forEach(function (trigger, idx) {
     trigger.addEventListener('mouseenter', function () { showMega(idx); });
@@ -224,7 +231,7 @@ document.addEventListener('DOMContentLoaded', function () {
 }
 
 .w1w-nav-inner {
-  height: 64px;
+  height: var(--nav-h, 72px);
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
