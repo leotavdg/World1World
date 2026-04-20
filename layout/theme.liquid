@@ -84,44 +84,16 @@
         background-color: #0E0E0E !important;
       }
 
-      /* Header: glassmorphism */
-      #header-group header-component,
-      #header-group header-component header,
-      #header-group .header-section {
-        background: rgba(14,14,14,0.88) !important;
-        backdrop-filter: blur(16px) !important;
-        -webkit-backdrop-filter: blur(16px) !important;
-        border-bottom: 1px solid rgba(243,255,202,0.12) !important;
-        color: #FFFFFF !important;
-      }
-
-      /* Force header links/text white */
-      #header-group .header *,
-      #header-group header-component * {
-        color: #FFFFFF;
-      }
-      #header-group .header__heading-link,
-      #header-group .nav-brand-text {
-        color: #F3FFCA !important;
-      }
-
-      /* Announcement bar: lime forced */
+      /* Hide framework announcement bar (we use w1w-announcement) */
       .announcement-bar,
       .shopify-section .announcement-bar,
-      aside.announcement-bar {
-        background: #F3FFCA !important;
-        color: #516700 !important;
-      }
-      .announcement-bar *,
-      .announcement-bar__text {
-        color: #516700 !important;
-        font-weight: 700 !important;
-        letter-spacing: 0.18em !important;
-        text-transform: uppercase !important;
-      }
-      /* Hide framework's slideshow arrows in announcement bar */
+      aside.announcement-bar { display: none !important; }
       .announcement-bar slideshow-arrows,
       .announcement-bar .slideshow-control { display: none !important; }
+
+      /* Hide framework header (we use w1w-nav) */
+      #header-group header-component,
+      #header-group .header-section { display: none !important; }
 
       /* Footer dark */
       footer,

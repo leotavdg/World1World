@@ -1,0 +1,521 @@
+{%- liquid
+  assign menu = linklists[section.settings.menu]
+-%}
+
+<nav class="w1w-nav" id="w1wNav">
+  <div class="wrap w1w-nav-inner">
+
+    <!-- Brand -->
+    <a href="/" class="w1w-nav-brand">
+      {%- if section.settings.logo != blank -%}
+        {{ section.settings.logo | image_url: width: 200 | image_tag: alt: shop.name, class: 'w1w-nav-logo-img' }}
+      {%- else -%}
+        {{ section.settings.brand_text_1 }}<span class="w1w-nav-dot"></span>{{ section.settings.brand_text_2 }}<span class="w1w-nav-dot"></span>{{ section.settings.brand_text_3 }}
+      {%- endif -%}
+    </a>
+
+    <!-- Desktop nav links (from Shopify menu) -->
+    {%- if menu -%}
+      <div class="w1w-nav-links">
+        {%- for link in menu.links -%}
+          <a
+            class="w1w-nav-link{% if link.active %} active{% endif %}"
+            href="{{ link.url }}"
+            {%- if link.links.size > 0 %} data-has-mega="true"{% endif -%}
+          >{{ link.title }}</a>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+    <!-- Tools -->
+    <div class="w1w-nav-tools">
+      {%- if section.settings.show_search -%}
+        <a href="/search" class="w1w-icon-btn" aria-label="Search">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><path d="m21 21-5-5"/></svg>
+        </a>
+      {%- endif -%}
+
+      {%- if section.settings.show_account -%}
+        <a href="{%- if customer -%}/account{%- else -%}/account/login{%- endif -%}" class="w1w-icon-btn" aria-label="Account">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>
+        </a>
+      {%- endif -%}
+
+      <button class="w1w-icon-btn" aria-label="Bag" id="w1wCartBtn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 7h12l-1.5 13h-9L6 7z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg>
+        <span class="w1w-cart-badge" id="w1wCartBadge" style="{% if cart.item_count == 0 %}display:none{% endif %}">{{ cart.item_count }}</span>
+      </button>
+
+      <!-- Mobile hamburger -->
+      <button class="w1w-icon-btn w1w-hamburger" id="w1wHamburger" aria-label="Menu">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Mega menu (for links with children) -->
+  {%- if menu -%}
+    {%- for link in menu.links -%}
+      {%- if link.links.size > 0 -%}
+        <div class="w1w-mega" id="w1wMega-{{ forloop.index0 }}" data-mega-for="{{ forloop.index0 }}">
+          <div class="wrap">
+            <div class="w1w-mega-grid">
+              {%- for child in link.links -%}
+                <div class="w1w-mega-col">
+                  {%- if child.links.size > 0 -%}
+                    <h4 class="w1w-mega-heading">{{ child.title }}</h4>
+                    <ul class="w1w-mega-list">
+                      {%- for grandchild in child.links -%}
+                        <li><a href="{{ grandchild.url }}">{{ grandchild.title }}</a></li>
+                      {%- endfor -%}
+                      {%- if child.url != blank and child.url != '#' -%}
+                        <li><a href="{{ child.url }}" class="w1w-mega-viewall">View all →</a></li>
+                      {%- endif -%}
+                    </ul>
+                  {%- else -%}
+                    <a href="{{ child.url }}" class="w1w-mega-heading w1w-mega-heading--link">{{ child.title }}</a>
+                  {%- endif -%}
+                </div>
+              {%- endfor -%}
+            </div>
+          </div>
+        </div>
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endif -%}
+</nav>
+
+<!-- Mobile drawer -->
+<div class="w1w-mobile-scrim" id="w1wMobileScrim"></div>
+<aside class="w1w-mobile-drawer" id="w1wMobileDrawer" aria-label="Mobile menu">
+  <div class="w1w-mobile-drawer-head">
+    <a href="/" class="w1w-nav-brand">
+      {%- if section.settings.logo != blank -%}
+        {{ section.settings.logo | image_url: width: 160 | image_tag: alt: shop.name, class: 'w1w-nav-logo-img' }}
+      {%- else -%}
+        {{ section.settings.brand_text_1 }}<span class="w1w-nav-dot"></span>{{ section.settings.brand_text_2 }}<span class="w1w-nav-dot"></span>{{ section.settings.brand_text_3 }}
+      {%- endif -%}
+    </a>
+    <button class="w1w-icon-btn" id="w1wMobileClose" aria-label="Close">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="m6 6 12 12M18 6 6 18"/></svg>
+    </button>
+  </div>
+  {%- if menu -%}
+    <div class="w1w-mobile-links">
+      {%- for link in menu.links -%}
+        {%- if link.links.size > 0 -%}
+          <div class="w1w-mobile-group">
+            <button class="w1w-mobile-link w1w-mobile-parent" data-mobile-toggle="{{ forloop.index0 }}">
+              {{ link.title }}
+              <span class="w1w-mobile-arrow">›</span>
+            </button>
+            <div class="w1w-mobile-sub" id="w1wMobileSub-{{ forloop.index0 }}">
+              {%- for child in link.links -%}
+                <a href="{{ child.url }}" class="w1w-mobile-sub-link">{{ child.title }}</a>
+              {%- endfor -%}
+            </div>
+          </div>
+        {%- else -%}
+          <a href="{{ link.url }}" class="w1w-mobile-link{% if link.active %} active{% endif %}">{{ link.title }}</a>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+  {%- endif -%}
+</aside>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var nav = document.getElementById('w1wNav');
+  var openMega = null;
+
+  // ── Mega menu ──
+  document.querySelectorAll('[data-has-mega]').forEach(function (trigger, idx) {
+    trigger.addEventListener('mouseenter', function () { showMega(idx); });
+    trigger.addEventListener('click', function (e) {
+      e.preventDefault();
+      openMega === idx ? hideMega() : showMega(idx);
+    });
+  });
+
+  document.querySelectorAll('.w1w-mega').forEach(function (m) {
+    m.addEventListener('mouseenter', function () { /* keep open */ });
+    m.addEventListener('mouseleave', function () { hideMega(); });
+  });
+
+  document.querySelectorAll('[data-has-mega]').forEach(function (trigger) {
+    trigger.addEventListener('mouseleave', function (e) {
+      var related = e.relatedTarget;
+      if (!related || !related.closest || !related.closest('.w1w-mega')) hideMega();
+    });
+  });
+
+  function showMega(idx) {
+    hideMega();
+    var m = document.getElementById('w1wMega-' + idx);
+    if (m) { m.classList.add('open'); openMega = idx; }
+  }
+  function hideMega() {
+    document.querySelectorAll('.w1w-mega.open').forEach(function (el) { el.classList.remove('open'); });
+    openMega = null;
+  }
+  document.addEventListener('click', function (e) {
+    if (!e.target.closest('.w1w-nav')) hideMega();
+  });
+
+  // ── Sticky + scroll-hide logic ──
+  var lastY = 0;
+  window.addEventListener('scroll', function () {
+    var y = window.scrollY;
+    if (y > 120) nav.classList.add('scrolled');
+    else nav.classList.remove('scrolled');
+    lastY = y;
+  }, { passive: true });
+
+  // ── Cart button → open drawer ──
+  var cartBtn = document.getElementById('w1wCartBtn');
+  if (cartBtn) {
+    cartBtn.addEventListener('click', function () {
+      if (window.W1W && window.W1W.openDrawer) window.W1W.openDrawer();
+      else window.location.href = '/cart';
+    });
+  }
+
+  // ── Mobile drawer ──
+  var hamburger   = document.getElementById('w1wHamburger');
+  var drawer      = document.getElementById('w1wMobileDrawer');
+  var scrim       = document.getElementById('w1wMobileScrim');
+  var closeBtn    = document.getElementById('w1wMobileClose');
+
+  function openMobile()  { drawer.classList.add('open'); scrim.classList.add('open'); document.body.style.overflow = 'hidden'; }
+  function closeMobile() { drawer.classList.remove('open'); scrim.classList.remove('open'); document.body.style.overflow = ''; }
+
+  if (hamburger) hamburger.addEventListener('click', openMobile);
+  if (closeBtn)  closeBtn.addEventListener('click', closeMobile);
+  if (scrim)     scrim.addEventListener('click', closeMobile);
+
+  // Mobile sub-menu accordion
+  document.querySelectorAll('[data-mobile-toggle]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var idx = btn.dataset.mobileToggle;
+      var sub = document.getElementById('w1wMobileSub-' + idx);
+      if (sub) sub.classList.toggle('open');
+      btn.classList.toggle('open');
+    });
+  });
+});
+</script>
+
+{% stylesheet %}
+
+/* ── Sticky nav ── */
+.w1w-nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(14,14,14,0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--line);
+  transition: box-shadow .3s;
+}
+.w1w-nav.scrolled {
+  box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+}
+
+.w1w-nav-inner {
+  height: 64px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 24px;
+}
+
+/* ── Brand ── */
+.w1w-nav-brand {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: 0.05em;
+  color: var(--lime);
+  white-space: nowrap;
+  text-decoration: none;
+}
+.w1w-nav-brand:hover { color: var(--lime); }
+.w1w-nav-logo-img { height: 28px; width: auto; }
+.w1w-nav-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--lime-hot);
+  margin: 0 6px 2px;
+  vertical-align: middle;
+  box-shadow: 0 0 12px var(--lime-hot);
+}
+
+/* ── Nav links ── */
+.w1w-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  justify-self: center;
+}
+.w1w-nav-link {
+  position: relative;
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-1);
+  text-decoration: none;
+  transition: color .15s;
+  font-family: var(--font-display);
+}
+.w1w-nav-link:hover { color: var(--ink-0); }
+.w1w-nav-link.active { color: var(--ink-0); }
+.w1w-nav-link.active::after {
+  content: '';
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 4px;
+  height: 1px;
+  background: var(--lime);
+}
+
+/* ── Tools ── */
+.w1w-nav-tools {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 4px;
+}
+.w1w-icon-btn {
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-1);
+  border-radius: 4px;
+  position: relative;
+  transition: color .15s, background .15s;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+}
+.w1w-icon-btn:hover { color: var(--lime); background: var(--lime-soft); }
+.w1w-hamburger { display: none; }
+.w1w-cart-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  background: var(--lime-hot);
+  color: var(--lime-dark);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 10px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+/* ── Mega menu ── */
+.w1w-mega {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  background: var(--bg-1);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding: 32px 0;
+  display: none;
+  animation: w1wFadeDown .2s ease both;
+}
+.w1w-mega.open { display: block; }
+@keyframes w1wFadeDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.w1w-mega-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 32px;
+}
+.w1w-mega-heading {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--lime);
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+}
+.w1w-mega-heading--link {
+  display: block;
+  text-decoration: none;
+  transition: color .15s;
+}
+.w1w-mega-heading--link:hover { color: var(--lime-hot); }
+.w1w-mega-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0;
+  margin: 0;
+}
+.w1w-mega-list a {
+  font-size: 13px;
+  color: var(--ink-1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  text-decoration: none;
+  transition: color .12s, transform .12s;
+  font-family: var(--font-body);
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.w1w-mega-list a:hover { color: var(--lime); transform: translateX(4px); }
+.w1w-mega-viewall { color: var(--lime) !important; font-weight: 700 !important; font-family: var(--font-display) !important; }
+
+/* ── Mobile scrim + drawer ── */
+.w1w-mobile-scrim {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 99;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .25s;
+}
+.w1w-mobile-scrim.open { opacity: 1; pointer-events: auto; }
+.w1w-mobile-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 320px;
+  max-width: 85vw;
+  height: 100dvh;
+  background: var(--bg-0);
+  border-left: 1px solid var(--line);
+  z-index: 100;
+  transform: translateX(100%);
+  transition: transform .3s ease;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+.w1w-mobile-drawer.open { transform: translateX(0); }
+.w1w-mobile-drawer-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--line);
+}
+.w1w-mobile-links {
+  flex: 1;
+  padding: 16px 0;
+}
+.w1w-mobile-link {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 14px 24px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-1);
+  text-decoration: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color .15s;
+}
+.w1w-mobile-link:hover,
+.w1w-mobile-link.active { color: var(--lime); }
+.w1w-mobile-arrow {
+  font-size: 18px;
+  transition: transform .2s;
+  color: var(--ink-3);
+}
+.w1w-mobile-parent.open .w1w-mobile-arrow { transform: rotate(90deg); color: var(--lime); }
+.w1w-mobile-sub {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height .3s ease;
+  background: var(--bg-1);
+}
+.w1w-mobile-sub.open { max-height: 600px; }
+.w1w-mobile-sub-link {
+  display: block;
+  padding: 10px 32px;
+  font-size: 13px;
+  color: var(--ink-2);
+  text-decoration: none;
+  transition: color .12s;
+  font-family: var(--font-body);
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.w1w-mobile-sub-link:hover { color: var(--lime); }
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .w1w-nav-links { display: none; }
+  .w1w-hamburger { display: inline-flex; }
+  .w1w-nav-inner { grid-template-columns: 1fr 1fr; }
+  .w1w-mega-grid { grid-template-columns: 1fr 1fr; }
+}
+
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "W1W Navigation",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Brand"
+    },
+    { "type": "image_picker", "id": "logo",         "label": "Logo image (optional — leave blank for text logo)" },
+    { "type": "text",         "id": "brand_text_1",  "label": "Brand text part 1", "default": "WORLD" },
+    { "type": "text",         "id": "brand_text_2",  "label": "Brand text part 2", "default": "1" },
+    { "type": "text",         "id": "brand_text_3",  "label": "Brand text part 3", "default": "WORLD" },
+    {
+      "type": "header",
+      "content": "Navigation"
+    },
+    { "type": "link_list", "id": "menu", "label": "Menu", "default": "main-menu" },
+    {
+      "type": "header",
+      "content": "Tools"
+    },
+    { "type": "checkbox", "id": "show_search",  "label": "Show search icon",  "default": true },
+    { "type": "checkbox", "id": "show_account", "label": "Show account icon", "default": true }
+  ],
+  "enabled_on": {
+    "groups": ["header"]
+  },
+  "presets": [{ "name": "W1W Navigation" }]
+}
+{% endschema %}
