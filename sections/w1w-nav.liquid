@@ -217,10 +217,9 @@ document.addEventListener('DOMContentLoaded', function () {
 {% stylesheet %}
 
 /* ── Sticky nav ── */
-/* Make the entire header-group sticky so both announcement + nav stick */
+/* Only the nav is sticky; announcement bar scrolls away */
 #header-group {
-  position: sticky;
-  top: 0;
+  position: relative;
   z-index: 50;
 }
 .w1w-nav {
@@ -229,7 +228,8 @@ document.addEventListener('DOMContentLoaded', function () {
   -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--line);
   transition: box-shadow .3s;
-  position: relative;
+  position: sticky;
+  top: 0;
   z-index: 50;
 }
 .w1w-nav.scrolled {

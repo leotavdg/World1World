@@ -393,10 +393,17 @@
 .w1w-shop-sidebar__sticky {
   position: sticky;
   top: calc(var(--header-group-height, 80px) + 60px);
+  max-height: calc(100vh - var(--header-group-height, 80px) - 80px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(243,255,202,0.15) transparent;
   display: flex;
   flex-direction: column;
   gap: 32px;
 }
+.w1w-shop-sidebar__sticky::-webkit-scrollbar { width: 4px; }
+.w1w-shop-sidebar__sticky::-webkit-scrollbar-track { background: transparent; }
+.w1w-shop-sidebar__sticky::-webkit-scrollbar-thumb { background: rgba(243,255,202,0.15); border-radius: 2px; }
 .w1w-shop-filter-group { display: flex; flex-direction: column; gap: 10px; }
 .w1w-shop-filter-label {
   font-family: 'Space Grotesk', sans-serif;

@@ -31,10 +31,6 @@
                   {{ 'product-1' | placeholder_svg_tag: 'w1w-product-card__img w1w-product-card__img--placeholder' }}
                 </a>
               {%- endif -%}
-              <span class="w1w-product-card__badge">
-                {%- if product.tags contains 'featured' -%}FEATURED
-                {%- else -%}NEW{%- endif -%}
-              </span>
               <div class="w1w-product-card__overlay"></div>
               <button class="w1w-product-card__quick-add" data-product-id="{{ product.variants.first.id }}" aria-label="Quick add {{ product.title | escape }}">
                 {{ section.settings.quick_add_label }}
@@ -253,7 +249,7 @@
       "type": "text",
       "id": "heading",
       "label": "Heading",
-      "default": "Featured Kit"
+      "default": "Featured Nations"
     },
     {
       "type": "collection",
