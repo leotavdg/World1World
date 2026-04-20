@@ -1,8 +1,77 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "main": {
       "type": "w1w-product-page",
-      "settings": {}
+      "settings": {
+        "show_breadcrumb": true,
+        "breadcrumb_home": "Home",
+        "breadcrumb_shop_label": "Shop",
+        "breadcrumb_shop_url": "",
+        "show_flag_stripe": true,
+        "show_glow": true,
+        "drop_tag": "DROP 03",
+        "show_corner_labels": true,
+        "corner_tl": "N° 2026",
+        "corner_br": "product_title",
+        "show_edition_strip": true,
+        "edition_1_label": "Material",
+        "edition_1_val": "Paracord 550",
+        "edition_2_label": "Release",
+        "edition_2_val": "Drop 03",
+        "edition_3_label": "Year",
+        "edition_3_val": "2026",
+        "default_sub": "WORLD 1 WORLD EDITION",
+        "show_vendor": true,
+        "meta_confederation_label": "Confederation",
+        "edition_label": "N°/2026",
+        "meta_edition_label": "Edition",
+        "show_stock_status": true,
+        "meta_status_label": "Status",
+        "in_stock_label": "In Stock",
+        "sold_out_label": "Sold Out",
+        "price_note": "Free shipping on 3+",
+        "size_label": "Size",
+        "size_guide_label": "Size guide →",
+        "show_tier_pricing": true,
+        "tier_label": "Stack & Save",
+        "tier_note": "More = Less",
+        "tier_1_label": "SINGLE",
+        "tier_2_label": "TRIO",
+        "tier_2_qty": 3,
+        "tier_2_pct": 10,
+        "tier_3_label": "FIVE-A-SIDE",
+        "tier_3_qty": 5,
+        "tier_3_pct": 15,
+        "tier_4_label": "STARTING XI",
+        "tier_4_qty": 8,
+        "tier_4_pct": 20,
+        "total_label": "Total",
+        "show_quantity": true,
+        "quantity_label": "Quantity",
+        "ships_note": "Ships in 24h · Worldwide",
+        "add_to_cart_label": "ADD TO BAG",
+        "sold_out_button_label": "SOLD OUT",
+        "secondary_cta_label": "STACK MORE NATIONS",
+        "secondary_cta_url": "",
+        "show_feature_tiles": true,
+        "feat_1_title": "Paracord 550",
+        "feat_1_desc": "7-strand military-grade",
+        "feat_2_title": "Water & Sweat Proof",
+        "feat_2_desc": "Stadium to street",
+        "feat_3_title": "Ships in 24h",
+        "feat_3_desc": "73 countries",
+        "feat_4_title": "30-Day Returns",
+        "feat_4_desc": "No questions asked"
+      }
     },
     "strip": {
       "type": "w1w-marquee",
@@ -24,7 +93,29 @@
     },
     "upsell": {
       "type": "w1w-pdp-upsell",
-      "settings": {}
+      "settings": {
+        "nations_collection": "africa",
+        "mf_namespace": "custom",
+        "mf_color_1": "color_1",
+        "mf_color_2": "color_2",
+        "mf_color_3": "color_3",
+        "show_banner": true,
+        "banner_heading": "Stack 3+ nations and save up to 20%.",
+        "banner_body": "Discount applied automatically at checkout — no code needed.",
+        "tier_1_qty": 3,
+        "tier_1_pct": 10,
+        "tier_2_qty": 5,
+        "tier_2_pct": 15,
+        "tier_3_qty": 8,
+        "tier_3_pct": 20,
+        "eyebrow": "Build Your Squad",
+        "title": "STACK THE NATIONS.",
+        "hint": "Pick up to 11 nations. Build the starting XI, gift the supporters, dress the group chat.",
+        "related_eyebrow": "More From This Region",
+        "related_title": "RELATED NATIONS",
+        "related_cta_label": "VIEW ALL →",
+        "related_cta_url": "shopify://collections/all"
+      }
     }
   },
   "order": [
