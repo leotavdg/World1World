@@ -32,13 +32,10 @@
               </div>
 
               <div class="w1w-cart-item-body">
-                  <h3 class="w1w-cart-item-name">{{ item.product_title | upcase }}</h3>
+                  <h3 class="w1w-cart-item-name">{{ item.product.title | upcase }}</h3>
                 <p class="w1w-cart-item-meta">
                   {%- if item.variant_title and item.variant_title != 'Default Title' -%}
                     Size {{ item.variant_title }}
-                  {%- endif -%}
-                  {%- if item.product.metafields.custom.continent != blank -%}
-                    · {{ item.product.metafields.custom.continent | remove: '[' | remove: ']' | remove: '"' }}
                   {%- endif -%}
                 </p>
                 <div class="w1w-cart-item-controls">
