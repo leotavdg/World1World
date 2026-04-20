@@ -804,7 +804,8 @@ footer .shopify-section > *:not(.section-background) {
 
 /* ── W1W Nav ── */
 #header-group {
-  position: relative;
+  position: sticky;
+  top: -40px;
   z-index: 50;
 }
 .w1w-nav {
@@ -812,8 +813,7 @@ footer .shopify-section > *:not(.section-background) {
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--line);
-  position: sticky;
-  top: 0;
+  position: relative;
   z-index: 50;
 }
 .w1w-nav-inner {
