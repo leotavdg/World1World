@@ -1,124 +1,126 @@
 {%- assign threshold_cents = section.settings.free_ship_threshold | times: 100 -%}
 
-<div class="w1w-cart-wrap">
+<div class="w1w-cart-section">
+  <div class="wrap">
 
-  {%- if cart.item_count == 0 -%}
+    {%- if cart.item_count == 0 -%}
 
-    <div class="w1w-cart-empty">
-      <h2 class="w1w-cart-empty-h">{{ section.settings.empty_heading }}</h2>
-      <p class="w1w-cart-empty-p">{{ section.settings.empty_subtext }}</p>
-      <a href="{{ section.settings.empty_cta_url }}" class="btn btn-primary btn-lg">{{ section.settings.empty_cta_label }}</a>
-    </div>
-
-  {%- else -%}
-
-    <div class="cart-body">
-
-      <!-- Line items -->
-      <div class="cart-list" id="w1wCartList">
-        {%- for item in cart.items -%}
-          <div class="cart-line" data-key="{{ item.key }}" data-qty="{{ item.quantity }}">
-
-            <div class="cart-line-img">
-              {%- if item.image -%}
-                {{ item.image | image_url: width: 300 | image_tag: loading: 'lazy', alt: item.title, class: 'cart-img' }}
-              {%- else -%}
-                <div class="bracelet-scene" style="aspect-ratio:1;height:100%">
-                  <div class="floor"></div>
-                  <div class="bracelet-ph" style="width:90%"></div>
-                </div>
-              {%- endif -%}
-            </div>
-
-            <div class="cart-line-info">
-              <h3 class="cart-line-name">{{ item.product_title | upcase }}</h3>
-              <div class="meta">
-                {%- if item.variant_title and item.variant_title != 'Default Title' -%}
-                  Size {{ item.variant_title }}
-                  {%- if item.product.type != blank %} · {{ item.product.type }}{%- endif -%}
-                {%- elsif item.product.type != blank -%}
-                  {{ item.product.type }}
-                {%- endif -%}
-              </div>
-              <div class="cart-line-ctrls">
-                <div class="w1w-qty-ctrl">
-                  <button class="w1w-qty-btn" data-key="{{ item.key }}" data-delta="-1" aria-label="Decrease quantity">−</button>
-                  <span class="w1w-qty-val">{{ item.quantity }}</span>
-                  <button class="w1w-qty-btn" data-key="{{ item.key }}" data-delta="1" aria-label="Increase quantity">+</button>
-                </div>
-                <button class="cart-line-rm" data-key="{{ item.key }}" data-remove="true">{{ section.settings.remove_label }}</button>
-              </div>
-            </div>
-
-            <div class="cart-line-price">{{ item.line_price | money }}</div>
-
-          </div>
-        {%- endfor -%}
+      <div class="w1w-cart-empty">
+        <h2 class="w1w-cart-empty-h">{{ section.settings.empty_heading }}</h2>
+        <p class="w1w-cart-empty-p">{{ section.settings.empty_subtext }}</p>
+        <a href="{{ section.settings.empty_cta_url }}" class="btn btn-primary btn-lg">{{ section.settings.empty_cta_label }}</a>
       </div>
 
-      <!-- Order summary sidebar -->
-      <aside class="cart-summary" id="w1wCartSummary">
-        <h2 class="cart-summary-h">{{ section.settings.summary_heading }}</h2>
+    {%- else -%}
 
-        <div class="sum-row">
-          <span class="k">{{ section.settings.subtotal_label }}</span>
-          <span>{{ cart.original_total_price | money }}</span>
+      <div class="w1w-cart-grid">
+
+        <!-- ── Left: Line items ── -->
+        <div class="w1w-cart-lines" id="w1wCartLines">
+          {%- for item in cart.items -%}
+            <div class="w1w-cart-item" data-key="{{ item.key }}" data-qty="{{ item.quantity }}">
+
+              <div class="w1w-cart-item-img">
+                {%- if item.image -%}
+                  {{ item.image | image_url: width: 300 | image_tag: loading: 'lazy', alt: item.title, class: 'w1w-cart-item-photo' }}
+                {%- else -%}
+                  <div class="bracelet-scene" style="aspect-ratio:1;height:100%">
+                    <div class="floor"></div>
+                    <div class="bracelet-ph" style="width:88%"></div>
+                  </div>
+                {%- endif -%}
+              </div>
+
+              <div class="w1w-cart-item-body">
+                <h3 class="w1w-cart-item-name">{{ item.product_title | upcase }}</h3>
+                <p class="w1w-cart-item-meta">
+                  {%- if item.variant_title and item.variant_title != 'Default Title' -%}
+                    Size {{ item.variant_title }}
+                    {%- if item.product.type != blank %} · {{ item.product.type }}{%- endif -%}
+                  {%- elsif item.product.type != blank -%}
+                    {{ item.product.type }}
+                  {%- endif -%}
+                </p>
+                <div class="w1w-cart-item-controls">
+                  <div class="w1w-cart-qty">
+                    <button class="w1w-cart-qty-btn" data-key="{{ item.key }}" data-delta="-1" aria-label="Decrease quantity">−</button>
+                    <span class="w1w-cart-qty-num">{{ item.quantity }}</span>
+                    <button class="w1w-cart-qty-btn" data-key="{{ item.key }}" data-delta="1" aria-label="Increase quantity">+</button>
+                  </div>
+                  <button class="w1w-cart-remove" data-key="{{ item.key }}">{{ section.settings.remove_label }}</button>
+                </div>
+              </div>
+
+              <div class="w1w-cart-item-price">{{ item.line_price | money }}</div>
+
+            </div>
+          {%- endfor -%}
         </div>
 
-        {%- if cart.total_discount > 0 -%}
-          <div class="sum-row disc">
-            <span class="k">{{ section.settings.discount_label }}</span>
-            <span>− {{ cart.total_discount | money }}</span>
-          </div>
-        {%- endif -%}
+        <!-- ── Right: Order summary ── -->
+        <aside class="w1w-cart-summary" id="w1wCartSummary">
+          <h2 class="w1w-cart-summary-h">{{ section.settings.summary_heading }}</h2>
 
-        <div class="sum-row">
-          <span class="k">{{ section.settings.shipping_label }}</span>
-          <span>
-            {%- if cart.total_price >= threshold_cents -%}
-              {{ section.settings.free_shipping_text }}
-            {%- else -%}
-              {{ section.settings.shipping_cost_text }}
+          <div class="w1w-cart-sum-rows">
+            <div class="w1w-sum-row">
+              <span class="w1w-sum-label">{{ section.settings.subtotal_label }}</span>
+              <span class="w1w-sum-val">{{ cart.original_total_price | money }}</span>
+            </div>
+
+            {%- if cart.total_discount > 0 -%}
+              <div class="w1w-sum-row w1w-sum-row--disc">
+                <span class="w1w-sum-label">{{ section.settings.discount_label }}</span>
+                <span class="w1w-sum-val">− {{ cart.total_discount | money }}</span>
+              </div>
             {%- endif -%}
-          </span>
-        </div>
 
-        <div class="sum-row">
-          <span class="k">{{ section.settings.tax_label }}</span>
-          <span>{{ section.settings.tax_text }}</span>
-        </div>
+            <div class="w1w-sum-row">
+              <span class="w1w-sum-label">{{ section.settings.shipping_label }}</span>
+              <span class="w1w-sum-val">
+                {%- if cart.total_price >= threshold_cents -%}
+                  {{ section.settings.free_shipping_text }}
+                {%- else -%}
+                  {{ section.settings.shipping_cost_text }}
+                {%- endif -%}
+              </span>
+            </div>
 
-        <div class="sum-row total">
-          <span class="k">{{ section.settings.total_label }}</span>
-          <span>{{ cart.total_price | money }}</span>
-        </div>
+            <div class="w1w-sum-row">
+              <span class="w1w-sum-label">{{ section.settings.tax_label }}</span>
+              <span class="w1w-sum-val">{{ section.settings.tax_text }}</span>
+            </div>
 
-        <a href="/checkout" class="btn btn-primary btn-lg sum-btn">{{ section.settings.checkout_label }}</a>
-        <a href="{{ section.settings.keep_shopping_url }}" class="btn btn-ghost sum-btn" style="margin-top:12px;display:block;text-align:center">{{ section.settings.keep_shopping_label }}</a>
-
-        {%- if section.blocks.size > 0 -%}
-          <div class="trust">
-            {%- for block in section.blocks -%}
-              {%- if block.type == 'trust_badge' and block.settings.text != blank -%}
-                <span {{ block.shopify_attributes }}>★ {{ block.settings.text }}</span>
-              {%- endif -%}
-            {%- endfor -%}
+            <div class="w1w-sum-row w1w-sum-row--total">
+              <span class="w1w-sum-label w1w-sum-label--total">{{ section.settings.total_label }}</span>
+              <span class="w1w-sum-val w1w-sum-val--total">{{ cart.total_price | money }}</span>
+            </div>
           </div>
-        {%- endif -%}
-      </aside>
 
-    </div>
+          <a href="/checkout" class="btn btn-primary btn-lg w1w-sum-cta">{{ section.settings.checkout_label }}</a>
+          <a href="{{ section.settings.keep_shopping_url }}" class="btn btn-ghost w1w-sum-cta w1w-sum-cta--ghost">{{ section.settings.keep_shopping_label }}</a>
 
-  {%- endif -%}
+          {%- if section.blocks.size > 0 -%}
+            <div class="w1w-cart-trust">
+              {%- for block in section.blocks -%}
+                {%- if block.type == 'trust_badge' and block.settings.text != blank -%}
+                  <span {{ block.shopify_attributes }}>★ {{ block.settings.text }}</span>
+                {%- endif -%}
+              {%- endfor -%}
+            </div>
+          {%- endif -%}
+        </aside>
 
+      </div>
+
+    {%- endif -%}
+
+  </div>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-  function updateItem(key, qty) {
-    var btn = document.activeElement;
-    if (btn) btn.disabled = true;
-
+  function updateItem(key, qty, triggerEl) {
+    if (triggerEl) triggerEl.disabled = true;
     fetch('/cart/change.js', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -126,25 +128,21 @@ document.addEventListener('DOMContentLoaded', function () {
     })
     .then(function (r) { return r.json(); })
     .then(function () { location.reload(); })
-    .catch(function () { if (btn) btn.disabled = false; });
+    .catch(function () { if (triggerEl) triggerEl.disabled = false; });
   }
 
-  // Qty buttons
-  document.querySelectorAll('.w1w-qty-btn').forEach(function (btn) {
+  document.querySelectorAll('.w1w-cart-qty-btn').forEach(function (btn) {
     btn.addEventListener('click', function () {
-      var key = btn.dataset.key;
-      var line = btn.closest('.cart-line');
-      var currentQty = parseInt(line.dataset.qty);
+      var item = btn.closest('.w1w-cart-item');
+      var currentQty = parseInt(item.dataset.qty);
       var delta = parseInt(btn.dataset.delta);
-      var newQty = Math.max(0, currentQty + delta);
-      updateItem(key, newQty);
+      updateItem(btn.dataset.key, Math.max(0, currentQty + delta), btn);
     });
   });
 
-  // Remove buttons
-  document.querySelectorAll('[data-remove="true"]').forEach(function (btn) {
+  document.querySelectorAll('.w1w-cart-remove').forEach(function (btn) {
     btn.addEventListener('click', function () {
-      updateItem(btn.dataset.key, 0);
+      updateItem(btn.dataset.key, 0, btn);
     });
   });
 });
@@ -152,11 +150,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
 {% stylesheet %}
 
-.w1w-cart-wrap {
+.w1w-cart-section {
   padding: 48px 0 120px;
 }
 
-/* Empty state */
+/* ── Empty state ── */
 .w1w-cart-empty {
   text-align: center;
   padding: 80px 0;
@@ -165,26 +163,34 @@ document.addEventListener('DOMContentLoaded', function () {
   font-size: clamp(32px, 5vw, 48px);
   margin-bottom: 16px;
   letter-spacing: -0.02em;
+  line-height: 1;
 }
 .w1w-cart-empty-p {
   color: var(--ink-2);
   margin-bottom: 32px;
   font-size: 15px;
+  font-family: var(--font-body);
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
 }
 
-/* Cart body layout */
-.cart-body {
+/* ── Two-column grid: items | summary ── */
+.w1w-cart-grid {
   display: grid;
-  grid-template-columns: 1.6fr 1fr;
+  grid-template-columns: 1fr 360px;
+  grid-template-areas: "lines summary";
   gap: 48px;
   align-items: start;
 }
+.w1w-cart-lines  { grid-area: lines; }
+.w1w-cart-summary { grid-area: summary; }
 
-/* Line items */
-.cart-list {
+/* ── Line items ── */
+.w1w-cart-lines {
   border-top: 1px solid var(--line);
 }
-.cart-line {
+.w1w-cart-item {
   display: grid;
   grid-template-columns: 120px 1fr auto;
   gap: 24px;
@@ -192,77 +198,73 @@ document.addEventListener('DOMContentLoaded', function () {
   border-bottom: 1px solid var(--line);
   align-items: center;
 }
-.cart-line-img {
+.w1w-cart-item-img {
   width: 120px;
   aspect-ratio: 1;
   background: var(--bg-1);
   overflow: hidden;
+  flex-shrink: 0;
 }
-.cart-line-img .cart-img {
+.w1w-cart-item-photo {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: block;
 }
-.cart-line-name {
+.w1w-cart-item-name {
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 20px;
   letter-spacing: -0.01em;
+  line-height: 1.1;
+  margin: 0 0 4px;
 }
-.cart-line-info .meta {
+.w1w-cart-item-meta {
   font-size: 12px;
   color: var(--ink-2);
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  margin: 4px 0 12px;
+  margin: 0 0 12px;
+  font-family: var(--font-display);
+  font-weight: 700;
 }
-.cart-line-ctrls {
+.w1w-cart-item-controls {
   display: flex;
   gap: 16px;
   align-items: center;
 }
-.cart-line-price {
+.w1w-cart-item-price {
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 24px;
   color: var(--lime);
-  align-self: start;
+  align-self: flex-start;
   text-align: right;
+  white-space: nowrap;
 }
-.cart-line-rm {
-  color: var(--ink-3);
-  font-size: 11px;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  font-weight: 700;
-  font-family: var(--font-display);
-  background: none;
-  border: none;
-  cursor: pointer;
-  transition: color .15s;
-}
-.cart-line-rm:hover { color: #ef4444; }
 
-/* Qty control */
-.w1w-qty-ctrl {
+/* Qty stepper */
+.w1w-cart-qty {
   display: inline-flex;
   border: 1px solid var(--line);
+  align-items: center;
 }
-.w1w-qty-btn {
+.w1w-cart-qty-btn {
   width: 36px;
   height: 36px;
   font-family: var(--font-display);
-  font-size: 16px;
-  font-weight: 700;
+  font-size: 18px;
+  font-weight: 500;
   background: none;
   border: none;
   cursor: pointer;
   color: var(--ink-0);
-  transition: background .15s;
+  transition: background .12s;
+  line-height: 1;
 }
-.w1w-qty-btn:hover { background: var(--bg-2); }
-.w1w-qty-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-.w1w-qty-val {
+.w1w-cart-qty-btn:hover { background: var(--bg-2); }
+.w1w-cart-qty-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.w1w-cart-qty-num {
   width: 40px;
   display: inline-flex;
   align-items: center;
@@ -272,81 +274,129 @@ document.addEventListener('DOMContentLoaded', function () {
   font-size: 15px;
   border-left: 1px solid var(--line);
   border-right: 1px solid var(--line);
+  height: 36px;
 }
+.w1w-cart-remove {
+  color: var(--ink-3);
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  font-weight: 700;
+  font-family: var(--font-display);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color .12s;
+  padding: 0;
+}
+.w1w-cart-remove:hover { color: #ef4444; }
 
-/* Summary sidebar */
-.cart-summary {
+/* ── Summary sidebar ── */
+.w1w-cart-summary {
   background: var(--bg-1);
   border: 1px solid var(--line);
   padding: 32px;
   position: sticky;
   top: calc(var(--header-height, 72px) + 24px);
 }
-.cart-summary-h {
-  font-size: 24px;
-  margin-bottom: 24px;
+.w1w-cart-summary-h {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0 0 20px;
   letter-spacing: -0.01em;
+  color: var(--ink-0);
 }
-.sum-row {
+
+/* Price rows */
+.w1w-cart-sum-rows {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+.w1w-sum-row {
   display: flex;
   justify-content: space-between;
-  padding: 12px 0;
-  font-size: 14px;
+  align-items: center;
+  padding: 10px 0;
   border-bottom: 1px solid var(--line);
 }
-.sum-row:last-of-type { border-bottom: none; }
-.sum-row.disc { color: var(--lime); }
-.sum-row.total {
+.w1w-sum-row:last-child { border-bottom: none; }
+.w1w-sum-row--disc .w1w-sum-label,
+.w1w-sum-row--disc .w1w-sum-val { color: var(--lime); }
+.w1w-sum-label {
+  font-size: 12px;
+  color: var(--ink-2);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 24px;
-  color: var(--lime);
+}
+.w1w-sum-val {
+  font-size: 14px;
+  color: var(--ink-0);
+  font-family: var(--font-display);
+  font-weight: 500;
+}
+.w1w-sum-row--total {
   border-top: 1px solid var(--line);
   border-bottom: none;
   padding-top: 16px;
+  margin-top: 4px;
+}
+.w1w-sum-label--total {
+  font-size: 14px;
+  color: var(--ink-0);
+  letter-spacing: 0.1em;
+}
+.w1w-sum-val--total {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 28px;
+  color: var(--lime);
+}
+
+/* CTAs */
+.w1w-sum-cta {
+  display: block;
+  width: 100%;
+  text-align: center;
+  margin-top: 12px;
+}
+.w1w-sum-cta--ghost {
   margin-top: 8px;
 }
-.sum-row .k {
-  color: var(--ink-2);
-  font-size: 12px;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-}
-.sum-row.total .k {
-  color: var(--ink-0);
-  font-size: 14px;
-  letter-spacing: 0.1em;
-  align-self: center;
-}
-.sum-btn {
-  width: 100%;
-  margin-top: 16px;
-  display: block;
-  text-align: center;
-}
-.trust {
+
+/* Trust badges */
+.w1w-cart-trust {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   margin-top: 16px;
   flex-wrap: wrap;
-  font-size: 11px;
+  font-size: 10px;
   color: var(--ink-3);
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   font-family: var(--font-display);
   font-weight: 700;
 }
 
-@media (max-width: 900px) {
-  .cart-body { grid-template-columns: 1fr; }
-  .cart-summary { position: static; }
-  .cart-line { grid-template-columns: 80px 1fr auto; gap: 16px; }
-  .cart-line-img { width: 80px; }
+/* ── Responsive ── */
+@media (max-width: 1000px) {
+  .w1w-cart-grid { grid-template-columns: 1fr 300px; gap: 32px; }
+}
+@media (max-width: 800px) {
+  .w1w-cart-grid {
+    grid-template-columns: 1fr;
+    grid-template-areas: "lines" "summary";
+  }
+  .w1w-cart-summary { position: static; }
 }
 @media (max-width: 600px) {
-  .cart-line { grid-template-columns: 72px 1fr; }
-  .cart-line-price { grid-column: 2; grid-row: 1; text-align: right; align-self: start; font-size: 18px; }
-  .cart-line-info { grid-column: 2; }
+  .w1w-cart-item { grid-template-columns: 80px 1fr; gap: 16px; }
+  .w1w-cart-item-img { width: 80px; }
+  .w1w-cart-item-price { grid-column: 2; grid-row: 1; align-self: start; font-size: 18px; }
+  .w1w-cart-item-body { grid-column: 2; }
 }
 
 {% endstylesheet %}
@@ -359,21 +409,21 @@ document.addEventListener('DOMContentLoaded', function () {
       "type": "header",
       "content": "Empty state"
     },
-    { "type": "text",     "id": "empty_heading",  "label": "Empty heading",  "default": "YOUR BAG IS EMPTY." },
-    { "type": "text",     "id": "empty_subtext",  "label": "Empty subtext",  "default": "Pick a nation. Wear it proud." },
-    { "type": "text",     "id": "empty_cta_label","label": "Empty CTA label","default": "BROWSE ALL NATIONS" },
-    { "type": "url",      "id": "empty_cta_url",  "label": "Empty CTA URL",  "default": "/collections/all" },
+    { "type": "text", "id": "empty_heading",  "label": "Empty heading",  "default": "YOUR BAG IS EMPTY." },
+    { "type": "text", "id": "empty_subtext",  "label": "Empty subtext",  "default": "Pick a nation. Wear it proud." },
+    { "type": "text", "id": "empty_cta_label","label": "Empty CTA label","default": "BROWSE ALL NATIONS" },
+    { "type": "url",  "id": "empty_cta_url",  "label": "Empty CTA URL",  "default": "/collections/all" },
     {
       "type": "header",
       "content": "Summary labels"
     },
-    { "type": "text", "id": "summary_heading",    "label": "Summary heading",     "default": "SUMMARY" },
-    { "type": "text", "id": "subtotal_label",     "label": "Subtotal label",      "default": "Subtotal" },
-    { "type": "text", "id": "discount_label",     "label": "Discount label",      "default": "Stack discount" },
-    { "type": "text", "id": "shipping_label",     "label": "Shipping label",      "default": "Shipping" },
-    { "type": "text", "id": "tax_label",          "label": "Tax label",           "default": "Tax" },
-    { "type": "text", "id": "tax_text",           "label": "Tax value text",      "default": "Calculated at checkout" },
-    { "type": "text", "id": "total_label",        "label": "Total label",         "default": "Total" },
+    { "type": "text", "id": "summary_heading",   "label": "Summary heading",  "default": "SUMMARY" },
+    { "type": "text", "id": "subtotal_label",     "label": "Subtotal label",   "default": "Subtotal" },
+    { "type": "text", "id": "discount_label",     "label": "Discount label",   "default": "Stack discount" },
+    { "type": "text", "id": "shipping_label",     "label": "Shipping label",   "default": "Shipping" },
+    { "type": "text", "id": "tax_label",          "label": "Tax label",        "default": "Tax" },
+    { "type": "text", "id": "tax_text",           "label": "Tax value text",   "default": "Calculated at checkout" },
+    { "type": "text", "id": "total_label",        "label": "Total label",      "default": "Total" },
     {
       "type": "header",
       "content": "Shipping threshold"
@@ -383,12 +433,12 @@ document.addEventListener('DOMContentLoaded', function () {
     { "type": "text",   "id": "shipping_cost_text",  "label": "Paid shipping text",            "default": "Calculated at checkout" },
     {
       "type": "header",
-      "content": "CTA buttons"
+      "content": "Buttons"
     },
-    { "type": "text", "id": "checkout_label",      "label": "Checkout button label",     "default": "CHECKOUT →" },
-    { "type": "text", "id": "keep_shopping_label", "label": "Keep shopping label",       "default": "KEEP SHOPPING" },
-    { "type": "url",  "id": "keep_shopping_url",   "label": "Keep shopping URL",         "default": "/collections/all" },
-    { "type": "text", "id": "remove_label",        "label": "Remove item label",         "default": "Remove" }
+    { "type": "text", "id": "checkout_label",      "label": "Checkout button label",  "default": "CHECKOUT →" },
+    { "type": "text", "id": "keep_shopping_label", "label": "Keep shopping label",    "default": "KEEP SHOPPING" },
+    { "type": "url",  "id": "keep_shopping_url",   "label": "Keep shopping URL",      "default": "/collections/all" },
+    { "type": "text", "id": "remove_label",        "label": "Remove item label",      "default": "Remove" }
   ],
   "blocks": [
     {
