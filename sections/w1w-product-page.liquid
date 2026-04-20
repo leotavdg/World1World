@@ -502,7 +502,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 {% stylesheet %}
 
-.w1w-pdp-wrap { background: var(--bg-0); color: var(--ink-0); }
+.w1w-pdp-wrap { background: var(--bg-0); color: var(--ink-0); overflow-x: hidden; }
 
 .w1w-crumbs { padding: 24px 0 16px; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--ink-3); display: flex; gap: 8px; align-items: center; }
 .w1w-crumbs a { color: var(--ink-3); transition: color .12s; }
@@ -613,6 +613,14 @@ document.addEventListener('DOMContentLoaded', function () {
   .w1w-pdp-price { font-size: 44px; }
   .w1w-pdp-feats { grid-template-columns: 1fr; }
   .w1w-pdp-corner { display: none; }
+  .w1w-pdp-meta { grid-template-columns: 1fr; }
+  .w1w-pdp-edition-strip { grid-template-columns: 1fr; }
+  .w1w-size-row { flex-wrap: wrap; }
+  .w1w-size-btn { flex: 0 0 calc(50% - 2px); }
+  .w1w-tier-row { grid-template-columns: repeat(2, 1fr); }
+  .w1w-pdp-total-v { font-size: 24px; }
+  .w1w-pdp-title { font-size: clamp(32px, 8vw, 44px); }
+  .w1w-pdp-thumbs { grid-template-columns: repeat(4, 1fr); gap: 2px; }
 }
 
 {% endstylesheet %}

@@ -42,13 +42,8 @@
       "type": "w1w-featured-products",
       "settings": {
         "label": "New Arrivals · Drop 03",
-<<<<<<< HEAD
-        "heading": "FEATURED KIT",
-        "collection": "featured",
-=======
         "heading": "FEATURED NATIONS",
-        "collection": "",
->>>>>>> 8f3132e (123)
+        "collection": "featured",
         "view_all_label": "VIEW ALL 50 NATIONS",
         "quick_add_label": "Quick Add"
       }
