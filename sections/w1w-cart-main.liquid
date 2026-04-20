@@ -38,7 +38,7 @@
                     Size {{ item.variant_title }}
                   {%- endif -%}
                   {%- if item.product.metafields.custom.continent != blank -%}
-                    · {{ item.product.metafields.custom.continent }}
+                    · {{ item.product.metafields.custom.continent | remove: '[' | remove: ']' | remove: '"' }}
                   {%- endif -%}
                 </p>
                 <div class="w1w-cart-item-controls">

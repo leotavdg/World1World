@@ -46,7 +46,7 @@
                   <a href="{{ product.url }}">{{ product.title }}</a>
                 </h3>
                 {%- if product.metafields.custom.subtitle != blank -%}
-                  <p class="w1w-product-card__subtitle">{{ product.metafields.custom.subtitle }}</p>
+                  <p class="w1w-product-card__subtitle">{{ product.metafields.custom.subtitle | remove: '[' | remove: ']' | remove: '"' | strip }}</p>
                 {%- else -%}
                   <p class="w1w-product-card__subtitle">{{ product.type }}</p>
                 {%- endif -%}

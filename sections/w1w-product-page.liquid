@@ -125,7 +125,7 @@
         {%- liquid
           assign sub_text = section.settings.default_sub
           if product.metafields.custom.sub != blank
-            assign sub_text = product.metafields.custom.sub
+            assign sub_text = product.metafields.custom.sub | remove: '[' | remove: ']' | remove: '"' | strip
           endif
         -%}
         <span class="w1w-pdp-sub" id="w1wSub">{{ sub_text }}</span>

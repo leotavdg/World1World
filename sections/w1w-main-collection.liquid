@@ -5,11 +5,12 @@
 
 {%- paginate collection.products by products_per_page -%}
 
-{%- comment -%} Collect unique continents dynamically from metafields {%- endcomment -%}
+{%- comment -%} Collect unique continents dynamically from metafields — strip JSON brackets/quotes {%- endcomment -%}
 {%- liquid
   assign continent_list = ''
   for product in collection.products
-    assign cont = product.metafields.custom.continent | strip
+    assign cont_raw = product.metafields.custom.continent | strip
+    assign cont = cont_raw | remove: '[' | remove: ']' | remove: '"' | strip
     if cont != blank
       if continent_list == ''
         assign continent_list = cont
@@ -31,6 +32,33 @@
   assign continents = continent_list | split: '|||' | sort
 -%}
 
+{%- comment -%} Collect unique countries dynamically from metafields {%- endcomment -%}
+{%- liquid
+  assign country_list = ''
+  for product in collection.products
+    assign cntry_raw = product.metafields.custom.country | default: product.title | strip
+    assign cntry = cntry_raw | remove: '[' | remove: ']' | remove: '"' | strip
+    if cntry != blank
+      if country_list == ''
+        assign country_list = cntry
+      else
+        assign country_arr = country_list | split: '|||'
+        assign found_c = false
+        for cc in country_arr
+          if cc == cntry
+            assign found_c = true
+            break
+          endif
+        endfor
+        unless found_c
+          assign country_list = country_list | append: '|||' | append: cntry
+        endunless
+      endif
+    endif
+  endfor
+  assign countries_sorted = country_list | split: '|||' | sort
+-%}
+
 <section class="w1w-shop">
 
   <!-- Dynamic Continent chips from metafields -->
@@ -42,7 +70,8 @@
       {%- for cont in continents -%}
         {%- assign cont_count = 0 -%}
         {%- for product in collection.products -%}
-          {%- if product.metafields.custom.continent == cont -%}
+          {%- assign check_cont = product.metafields.custom.continent | remove: '[' | remove: ']' | remove: '"' | strip -%}
+          {%- if check_cont == cont -%}
             {%- assign cont_count = cont_count | plus: 1 -%}
           {%- endif -%}
         {%- endfor -%}
@@ -72,55 +101,7 @@
           </div>
         </div>
 
-        <!-- Continent filter (dynamic from metafields) -->
-        {%- if continents.size > 0 -%}
-          <div class="w1w-shop-filter-group">
-            <h3 class="w1w-shop-filter-label">CONTINENT</h3>
-            <ul class="w1w-shop-filter-list" id="w1w-continent-filter">
-              {%- for cont in continents -%}
-                {%- assign cont_count = 0 -%}
-                {%- for product in collection.products -%}
-                  {%- if product.metafields.custom.continent == cont -%}
-                    {%- assign cont_count = cont_count | plus: 1 -%}
-                  {%- endif -%}
-                {%- endfor -%}
-                <li>
-                  <button class="w1w-shop-filter-btn" data-filter-continent="{{ cont | handleize }}" data-filter-label="{{ cont }}">
-                    <span class="w1w-shop-filter-check"></span>
-                    <span>{{ cont }}</span>
-                    <span class="w1w-shop-filter-cnt">{{ cont_count }}</span>
-                  </button>
-                </li>
-              {%- endfor -%}
-            </ul>
-          </div>
-        {%- endif -%}
-
         <!-- Country filter (dynamic from metafields) -->
-        {%- liquid
-          assign country_list = ''
-          for product in collection.products
-            assign cntry = product.metafields.custom.country | default: product.title | strip
-            if cntry != blank
-              if country_list == ''
-                assign country_list = cntry
-              else
-                assign country_arr = country_list | split: '|||'
-                assign found_c = false
-                for cc in country_arr
-                  if cc == cntry
-                    assign found_c = true
-                    break
-                  endif
-                endfor
-                unless found_c
-                  assign country_list = country_list | append: '|||' | append: cntry
-                endunless
-              endif
-            endif
-          endfor
-          assign countries_sorted = country_list | split: '|||' | sort
-        -%}
         {%- if countries_sorted.size > 0 -%}
           <div class="w1w-shop-filter-group">
             <h3 class="w1w-shop-filter-label">COUNTRY</h3>
@@ -163,7 +144,7 @@
                     value="{{ filter.min_value.value | divided_by: 100.0 }}"
                     placeholder="Min" class="w1w-shop-price-input" min="0"
                     max="{{ filter.range_max | divided_by: 100.0 }}">
-                  <span>-</span>
+                  <span class="w1w-shop-price-dash">&ndash;</span>
                   <input type="number" name="{{ filter.max_value.param_name }}"
                     value="{{ filter.max_value.value | divided_by: 100.0 }}"
                     placeholder="Max" class="w1w-shop-price-input" min="0"
@@ -172,17 +153,18 @@
               {%- elsif filter.type == 'boolean' or filter.type == 'list' -%}
                 <ul class="w1w-shop-filter-list">
                   {%- for value in filter.values -%}
+                    {%- assign clean_label = value.label | remove: '[' | remove: ']' | remove: '"' | strip -%}
                     <li>
                       {%- if value.active -%}
                         <a href="{{ value.url_to_remove }}" class="w1w-shop-filter-link active">
                           <span class="w1w-shop-filter-check w1w-shop-filter-check--on"></span>
-                          <span>{{ value.label }}</span>
+                          <span>{{ clean_label }}</span>
                           <span class="w1w-shop-filter-cnt">{{ value.count }}</span>
                         </a>
                       {%- else -%}
                         <a href="{{ value.url_to_add }}" class="w1w-shop-filter-link{% if value.count == 0 %} disabled{% endif %}">
                           <span class="w1w-shop-filter-check"></span>
-                          <span>{{ value.label }}</span>
+                          <span>{{ clean_label }}</span>
                           <span class="w1w-shop-filter-cnt">{{ value.count }}</span>
                         </a>
                       {%- endif -%}
@@ -227,8 +209,9 @@
           <p class="w1w-shop-empty">No products found in this collection.</p>
         {%- else -%}
           {%- for product in collection.products -%}
-            {%- assign p_continent = product.metafields.custom.continent | strip | default: '' -%}
-            {%- assign p_country = product.metafields.custom.country | default: product.title | strip -%}
+            {%- assign p_continent = product.metafields.custom.continent | remove: '[' | remove: ']' | remove: '"' | strip | default: '' -%}
+            {%- assign p_country = product.metafields.custom.country | remove: '[' | remove: ']' | remove: '"' | strip -%}
+            {%- if p_country == blank -%}{%- assign p_country = product.title | strip -%}{%- endif -%}
             <div
               class="w1w-nation-card"
               data-handle="{{ product.handle }}"
@@ -271,6 +254,7 @@
                 aria-label="Add {{ product.title | escape }} to bag"
               >
                 {%- if product.available -%}
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
                   ADD TO BAG
                 {%- else -%}
                   SOLD OUT
@@ -335,7 +319,7 @@
   border-bottom: 1px solid rgba(243,255,202,0.08);
   padding: 0 32px;
   position: sticky;
-  top: var(--header-group-height, 80px);
+  top: 0;
   z-index: 30;
 }
 .w1w-shop-chips-bar__inner {
@@ -564,21 +548,37 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  color: rgba(255,255,255,0.4);
+}
+.w1w-shop-price-dash {
+  color: rgba(255,255,255,0.3);
   font-size: 0.875rem;
 }
 .w1w-shop-price-input {
-  width: 72px;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(243,255,202,0.1);
+  flex: 1;
+  min-width: 0;
+  background: #1a1a1a;
+  border: 1px solid rgba(243,255,202,0.15);
   border-radius: 4px;
   color: #FFF;
-  padding: 8px 10px;
+  padding: 10px 12px;
   font-family: 'Inter', sans-serif;
   font-size: 0.8125rem;
   outline: none;
+  transition: border-color 0.2s;
+  -moz-appearance: textfield;
 }
-.w1w-shop-price-input:focus { border-color: rgba(243,255,202,0.4); }
+.w1w-shop-price-input::-webkit-outer-spin-button,
+.w1w-shop-price-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.w1w-shop-price-input::placeholder {
+  color: rgba(255,255,255,0.3);
+}
+.w1w-shop-price-input:focus {
+  border-color: rgba(243,255,202,0.5);
+  background: #222;
+}
 
 /* Clear */
 .w1w-shop-clear {
@@ -783,23 +783,35 @@
 }
 .w1w-nation-card__atc {
   width: 100%;
-  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: rgba(243,255,202,0.06);
   border: none;
   border-top: 1px solid rgba(243,255,202,0.06);
-  color: rgba(255,255,255,0.3);
+  color: rgba(255,255,255,0.5);
   font-family: 'Space Grotesk', sans-serif;
   font-size: 0.5625rem;
   font-weight: 700;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
-  padding: 10px;
+  padding: 11px 10px;
   cursor: pointer;
   transition: all 0.25s ease;
+}
+.w1w-nation-card__atc svg {
+  opacity: 0.6;
+  transition: opacity 0.2s;
 }
 .w1w-nation-card__atc:hover {
   background: #F3FFCA;
   color: #1a2600;
   border-top-color: #F3FFCA;
+}
+.w1w-nation-card__atc:hover svg {
+  opacity: 1;
+  stroke: #1a2600;
 }
 .w1w-nation-card--hidden { display: none !important; }
 
@@ -990,7 +1002,6 @@
           document.querySelectorAll('.w1w-chip').forEach(function(b) { b.classList.remove('w1w-chip--active'); });
           var allChip = document.querySelector('.w1w-chip[data-continent="all"]');
           if (allChip) allChip.classList.add('w1w-chip--active');
-          document.querySelectorAll('[data-filter-continent]').forEach(function(b) { b.classList.remove('active'); });
           applyFilters();
         });
       });
@@ -1039,44 +1050,12 @@
       renderActiveTags();
     }
 
-    // Continent chips
+    // Continent chips (top bar only)
     document.querySelectorAll('.w1w-chip').forEach(function(btn) {
       btn.addEventListener('click', function() {
         document.querySelectorAll('.w1w-chip').forEach(function(b) { b.classList.remove('w1w-chip--active'); });
         btn.classList.add('w1w-chip--active');
         state.continent = btn.dataset.continent;
-        // Sync sidebar continent filter
-        document.querySelectorAll('[data-filter-continent]').forEach(function(b) {
-          b.classList.toggle('active', b.dataset.filterContinent === state.continent);
-        });
-        applyFilters();
-      });
-    });
-
-    // Sidebar continent filter buttons
-    document.querySelectorAll('[data-filter-continent]').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        var val = btn.dataset.filterContinent;
-        var isActive = btn.classList.contains('active');
-
-        // Toggle off => reset to all
-        document.querySelectorAll('[data-filter-continent]').forEach(function(b) { b.classList.remove('active'); });
-        document.querySelectorAll('.w1w-chip').forEach(function(b) { b.classList.remove('w1w-chip--active'); });
-
-        if (isActive) {
-          state.continent = 'all';
-          var allChip = document.querySelector('.w1w-chip[data-continent="all"]');
-          if (allChip) allChip.classList.add('w1w-chip--active');
-        } else {
-          btn.classList.add('active');
-          state.continent = val;
-          var matchChip = document.querySelector('.w1w-chip[data-continent="' + val + '"]');
-          if (matchChip) matchChip.classList.add('w1w-chip--active');
-          else {
-            var allChip2 = document.querySelector('.w1w-chip[data-continent="all"]');
-            if (allChip2) allChip2.classList.add('w1w-chip--active');
-          }
-        }
         applyFilters();
       });
     });
@@ -1115,7 +1094,6 @@
         document.querySelectorAll('.w1w-chip').forEach(function(b) { b.classList.remove('w1w-chip--active'); });
         var allChip = document.querySelector('.w1w-chip[data-continent="all"]');
         if (allChip) allChip.classList.add('w1w-chip--active');
-        document.querySelectorAll('[data-filter-continent]').forEach(function(b) { b.classList.remove('active'); });
         document.querySelectorAll('[data-filter-country]').forEach(function(b) { b.classList.remove('active'); });
         applyFilters();
       });
