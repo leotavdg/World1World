@@ -619,6 +619,7 @@ footer .shopify-section > *:not(.section-background) {
 .w1w-cart-item-remove {
   display: inline-block;
   margin-top: 6px;
+  margin-left: 12px;
   padding: 0;
   border: none;
   background: transparent;
