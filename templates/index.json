@@ -54,85 +54,67 @@
         "region_europe": {
           "type": "region",
           "settings": {
-            "image": "shopify://shop_images/Europe.jpg",
-            "title": "Europe",
-            "tag": "THE ENGINE",
-            "confederation": "UEFA",
-            "blurb": "Tactical, technical, relentless. The modern machine.",
-            "nations_count": "16",
-            "editions_count": "16",
             "collection": "europe",
-            "url": ""
+            "tag": "THE ENGINE",
+            "subtitle": "",
+            "title_override": "",
+            "blurb_override": "",
+            "nations_count_override": ""
           }
         },
         "region_south_america": {
           "type": "region",
           "settings": {
-            "image": "shopify://shop_images/statue-Christ-the-Redeemer-Rio-de-Janiero-Brazil.webp",
-            "title": "South America",
-            "tag": "THE CORE",
-            "confederation": "CONMEBOL",
-            "blurb": "Where the game was perfected. Pure rhythm.",
-            "nations_count": "6",
-            "editions_count": "6",
             "collection": "south-america",
-            "url": ""
+            "tag": "THE CORE",
+            "subtitle": "",
+            "title_override": "",
+            "blurb_override": "",
+            "nations_count_override": ""
           }
         },
         "region_rJgETK": {
           "type": "region",
           "settings": {
-            "image": "shopify://shop_images/New-York-City-USA.jpg",
-            "title": "North America",
-            "tag": "HOSTS",
-            "confederation": "CONCACAF",
-            "blurb": "Home soil. The continent that lifts the curtain.",
-            "nations_count": "6",
-            "editions_count": "6",
             "collection": "north-america",
-            "url": ""
+            "tag": "HOSTS",
+            "subtitle": "",
+            "title_override": "",
+            "blurb_override": "",
+            "nations_count_override": ""
           }
         },
         "region_africa": {
           "type": "region",
           "settings": {
-            "image": "shopify://shop_images/Moroccan-Landmarks.jpg",
-            "title": "Africa",
+            "collection": "africa",
             "tag": "UNTAMED",
-            "confederation": "CAF",
-            "blurb": "Raw speed. Rising force. Nothing fears nothing.",
-            "nations_count": "9",
-            "editions_count": "9",
-            "collection": "",
-            "url": ""
+            "subtitle": "",
+            "title_override": "",
+            "blurb_override": "",
+            "nations_count_override": ""
           }
         },
         "region_asia": {
           "type": "region",
           "settings": {
-            "image": "shopify://shop_images/japan-1200x729.jpg",
-            "title": "Asia",
-            "tag": "RISING",
-            "confederation": "AFC",
-            "blurb": "Discipline meets dream. The fastest-climbing continent.",
-            "nations_count": "9",
-            "editions_count": "9",
             "collection": "asia",
-            "url": ""
+            "tag": "RISING",
+            "subtitle": "",
+            "title_override": "",
+            "blurb_override": "",
+            "nations_count_override": ""
           }
         },
         "region_aKGmhR": {
           "type": "region",
           "settings": {
-            "image": "shopify://shop_images/Circular-Quay_Charlotte-Karp.jpg",
-            "title": "Australia & Oceania",
-            "tag": "FRONTIER",
-            "confederation": "OFC",
-            "blurb": "The long journey. Every tournament earned twice over.",
-            "nations_count": "1",
-            "editions_count": "1",
             "collection": "australia-oceania",
-            "url": ""
+            "tag": "FRONTIER",
+            "subtitle": "",
+            "title_override": "",
+            "blurb_override": "",
+            "nations_count_override": ""
           }
         }
       },
@@ -145,6 +127,7 @@
         "region_aKGmhR"
       ],
       "settings": {
+        "eyebrow": "Shop by Continent",
         "heading": "EXPLORE REGIONS",
         "description": "Every confederation represented. Pick a continent, pick a side."
       }
