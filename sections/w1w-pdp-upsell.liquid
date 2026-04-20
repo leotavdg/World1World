@@ -1,32 +1,64 @@
+{%- liquid
+  assign nations_col = collections[section.settings.nations_collection]
+  assign current_handle = product.handle
+  assign mf_ns = section.settings.mf_namespace | default: 'custom'
+  assign mf_c1 = section.settings.mf_color_1 | default: 'color_1'
+  assign mf_c2 = section.settings.mf_color_2 | default: 'color_2'
+  assign mf_c3 = section.settings.mf_color_3 | default: 'color_3'
+-%}
+
+{%- comment %} Build a JSON array of all nation products for JS to consume {%- endcomment %}
+<script>
+window.W1W_NATIONS = [
+  {%- if nations_col -%}
+    {%- for p in nations_col.products -%}
+      {
+        "handle":    {{ p.handle | json }},
+        "title":     {{ p.title | json }},
+        "url":       {{ p.url | json }},
+        "vendor":    {{ p.vendor | json }},
+        "image":     {{ p.featured_image | image_url: width: 400 | json }},
+        "color1":    {{ p.metafields[mf_ns][mf_c1].value | default: '' | json }},
+        "color2":    {{ p.metafields[mf_ns][mf_c2].value | default: '' | json }},
+        "color3":    {{ p.metafields[mf_ns][mf_c3].value | default: '' | json }},
+        "variantId": {{ p.first_available_variant.id | json }},
+        "price":     {{ p.price | json }},
+        "available": {{ p.available | json }},
+        "isCurrent": {{ p.handle | json }} === {{ current_handle | json }}
+      }{%- unless forloop.last -%},{%- endunless -%}
+    {%- endfor -%}
+  {%- endif -%}
+];
+window.W1W_CURRENT_HANDLE = {{ current_handle | json }};
+</script>
+
 <!-- ── Upsell: Build Your Squad ── -->
 <section class="w1w-upsell-section">
   <div class="wrap">
 
-    <!-- Discount banner -->
     {%- if section.settings.show_banner -%}
-    <div class="w1w-upsell-banner">
-      <div class="w1w-upsell-banner__icon">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--lime-dark)" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+      <div class="w1w-upsell-banner">
+        <div class="w1w-upsell-banner__icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--lime-dark)" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+        </div>
+        <div class="w1w-upsell-banner__body">
+          <strong>{{ section.settings.banner_heading }}</strong>
+          {{ section.settings.banner_body }}
+        </div>
+        <div class="w1w-upsell-banner__tiers">
+          {%- if section.settings.tier_1_qty != blank -%}
+            <span>{{ section.settings.tier_1_qty }}× = <strong>{{ section.settings.tier_1_pct }}% off</strong></span>
+          {%- endif -%}
+          {%- if section.settings.tier_2_qty != blank -%}
+            <span>{{ section.settings.tier_2_qty }}× = <strong>{{ section.settings.tier_2_pct }}% off</strong></span>
+          {%- endif -%}
+          {%- if section.settings.tier_3_qty != blank -%}
+            <span>{{ section.settings.tier_3_qty }}× = <strong>{{ section.settings.tier_3_pct }}% off</strong></span>
+          {%- endif -%}
+        </div>
       </div>
-      <div class="w1w-upsell-banner__body">
-        <strong>{{ section.settings.banner_heading }}</strong>
-        {{ section.settings.banner_body }}
-      </div>
-      <div class="w1w-upsell-banner__tiers">
-        {%- if section.settings.tier_1_qty != blank -%}
-          <span>{{ section.settings.tier_1_qty }}× = <strong>{{ section.settings.tier_1_pct }}% off</strong></span>
-        {%- endif -%}
-        {%- if section.settings.tier_2_qty != blank -%}
-          <span>{{ section.settings.tier_2_qty }}× = <strong>{{ section.settings.tier_2_pct }}% off</strong></span>
-        {%- endif -%}
-        {%- if section.settings.tier_3_qty != blank -%}
-          <span>{{ section.settings.tier_3_qty }}× = <strong>{{ section.settings.tier_3_pct }}% off</strong></span>
-        {%- endif -%}
-      </div>
-    </div>
     {%- endif -%}
 
-    <!-- Section header -->
     <div class="w1w-upsell-head">
       <div>
         {%- if section.settings.eyebrow != blank -%}
@@ -41,20 +73,14 @@
 
     <div class="w1w-upsell-picker">
 
-      <!-- Left: country grid with region filter -->
       <div class="w1w-upsell-grid-wrap">
         <div class="w1w-region-tabs" id="w1wRegionTabs">
           <button class="w1w-region-tab active" data-region="">All</button>
-          <button class="w1w-region-tab" data-region="concacaf">CONCACAF</button>
-          <button class="w1w-region-tab" data-region="southamerica">CONMEBOL</button>
-          <button class="w1w-region-tab" data-region="europe">UEFA</button>
-          <button class="w1w-region-tab" data-region="africa">CAF</button>
-          <button class="w1w-region-tab" data-region="asia">AFC</button>
+          {%- comment %} Tabs are populated by JS from the actual vendor values {%- endcomment %}
         </div>
         <div class="w1w-upsell-grid" id="w1wBundleGrid"></div>
       </div>
 
-      <!-- Right: squad summary -->
       <div class="w1w-upsell-summary">
         <h4 class="w1w-upsell-summary-title">
           Your Squad
@@ -92,63 +118,94 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-  var COUNTRIES = window.W1W_COUNTRIES || [];
-  var TIERS = window.W1W_BUNDLE_TIERS || [
-    {qty:1,pct:0},{qty:3,pct:10},{qty:5,pct:15},{qty:8,pct:20}
+  var NATIONS = window.W1W_NATIONS || [];
+  var CURRENT_HANDLE = window.W1W_CURRENT_HANDLE || '';
+  var BASE_PRICE = (window.W1W_PRICE || 5);
+  var TIERS = [
+    { qty: 1,  pct: 0  },
+    { qty: {{ section.settings.tier_1_qty | default: 3 }},  pct: {{ section.settings.tier_1_pct | default: 10 }} },
+    { qty: {{ section.settings.tier_2_qty | default: 5 }},  pct: {{ section.settings.tier_2_pct | default: 15 }} },
+    { qty: {{ section.settings.tier_3_qty | default: 8 }},  pct: {{ section.settings.tier_3_pct | default: 20 }} }
   ];
-  var BASE_PRICE = window.W1W_PRICE || 5;
 
-  // Detect current product slug from URL
-  var pathParts = window.location.pathname.split('/');
-  var slug = pathParts[pathParts.indexOf('products') + 1] || '';
-  var country = COUNTRIES.find(function (c) { return c.slug === slug; });
+  // Price per unit from first available product (cents → dollars)
+  if (NATIONS.length) {
+    var firstPrice = NATIONS[0].price;
+    if (firstPrice > 100) BASE_PRICE = firstPrice / 100; // Shopify stores in cents
+  }
 
-  function braceletHTML(c) {
-    return '<div class="bracelet-scene"><div class="floor"></div>' +
-      '<div class="bracelet-ph" style="--c1:' + c.colors[0] + ';--c2:' + c.colors[1] + ';--c3:' + c.colors[2] + '"></div></div>';
+  function swatchStyle(n) {
+    if (n.color1 && n.color2 && n.color3) {
+      return 'background:linear-gradient(90deg,' + n.color1 + ' 33%,' + n.color2 + ' 33% 66%,' + n.color3 + ' 66%)';
+    }
+    if (n.image) return 'background-image:url(' + n.image + ');background-size:cover;background-position:center';
+    return 'background:var(--bg-3)';
+  }
+
+  function cardHTML(n, isPicked) {
+    return '<div class="w1w-upsell-card' + (isPicked ? ' picked' : '') + '" data-handle="' + n.handle + '">' +
+      '<div class="w1w-upsell-check">✓</div>' +
+      '<div class="w1w-upsell-swatch" style="' + swatchStyle(n) + '"></div>' +
+      '<div class="w1w-upsell-nm">' + n.title + '</div>' +
+      '</div>';
   }
 
   // ── Bundle Builder ──
   var bundleGrid = document.getElementById('w1wBundleGrid');
-  if (bundleGrid && COUNTRIES.length) {
+  var tabsEl     = document.getElementById('w1wRegionTabs');
+
+  if (bundleGrid && NATIONS.length) {
     var activeRegion = '';
-    var picked = new Set(country ? [country.slug] : []);
+    var picked = new Set();
+
+    // Pre-select the current product
+    var current = NATIONS.find(function (n) { return n.handle === CURRENT_HANDLE; });
+    if (current) picked.add(current.handle);
+
+    // Build region tabs from unique vendor values
+    var vendors = [];
+    NATIONS.forEach(function (n) {
+      if (n.vendor && vendors.indexOf(n.vendor) === -1) vendors.push(n.vendor);
+    });
+    vendors.sort();
+    vendors.forEach(function (v) {
+      var btn = document.createElement('button');
+      btn.className = 'w1w-region-tab';
+      btn.dataset.region = v;
+      btn.textContent = v;
+      tabsEl.appendChild(btn);
+    });
 
     function renderGrid() {
       var list = activeRegion
-        ? COUNTRIES.filter(function (c) { return c.region === activeRegion; })
-        : COUNTRIES;
+        ? NATIONS.filter(function (n) { return n.vendor === activeRegion; })
+        : NATIONS;
 
-      bundleGrid.innerHTML = list.map(function (c) {
-        return '<div class="w1w-upsell-card' + (picked.has(c.slug) ? ' picked' : '') + '" data-s="' + c.slug + '">' +
-          '<div class="w1w-upsell-check">✓</div>' +
-          '<div class="w1w-upsell-swatch" style="background:linear-gradient(90deg,' + c.colors[0] + ' 33%,' + c.colors[1] + ' 33% 66%,' + c.colors[2] + ' 66%)"></div>' +
-          '<div class="w1w-upsell-nm">' + c.name + '</div>' +
-          '</div>';
+      bundleGrid.innerHTML = list.map(function (n) {
+        return cardHTML(n, picked.has(n.handle));
       }).join('');
 
       bundleGrid.querySelectorAll('.w1w-upsell-card').forEach(function (el) {
         el.addEventListener('click', function () {
-          var s = el.dataset.s;
-          if (picked.has(s)) { picked.delete(s); el.classList.remove('picked'); }
-          else { picked.add(s); el.classList.add('picked'); }
+          var h = el.dataset.handle;
+          if (picked.has(h)) { picked.delete(h); el.classList.remove('picked'); }
+          else               { picked.add(h);    el.classList.add('picked');   }
           renderSummary();
         });
       });
     }
 
-    // Region tabs
-    document.querySelectorAll('.w1w-region-tab').forEach(function (tab) {
-      tab.addEventListener('click', function () {
-        document.querySelectorAll('.w1w-region-tab').forEach(function (t) { t.classList.remove('active'); });
-        tab.classList.add('active');
-        activeRegion = tab.dataset.region;
-        renderGrid();
-      });
+    tabsEl.addEventListener('click', function (e) {
+      var tab = e.target.closest('.w1w-region-tab');
+      if (!tab) return;
+      tabsEl.querySelectorAll('.w1w-region-tab').forEach(function (t) { t.classList.remove('active'); });
+      tab.classList.add('active');
+      activeRegion = tab.dataset.region;
+      renderGrid();
     });
 
     function renderSummary() {
-      var list = COUNTRIES.filter(function (c) { return picked.has(c.slug); });
+      var list = NATIONS.filter(function (n) { return picked.has(n.handle); });
       var n = list.length;
       var countEl = document.getElementById('w1wSquadCount');
       if (countEl) countEl.textContent = n ? '(' + n + ')' : '';
@@ -158,15 +215,16 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!list.length) {
           pickedEl.innerHTML = '<div class="w1w-upsell-empty">Pick your first nation →</div>';
         } else {
-          pickedEl.innerHTML = list.map(function (c) {
-            return '<span class="w1w-upsell-pill" data-s="' + c.slug + '">' +
-              '<span class="w1w-pill-swatch" style="background:linear-gradient(90deg,' + c.colors[0] + ' 33%,' + c.colors[1] + ' 33% 66%,' + c.colors[2] + ' 66%)"></span>' +
-              c.name + ' ×</span>';
+          pickedEl.innerHTML = list.map(function (n) {
+            return '<span class="w1w-upsell-pill" data-handle="' + n.handle + '">' +
+              '<span class="w1w-pill-swatch" style="' + swatchStyle(n) + '"></span>' +
+              n.title + ' ×</span>';
           }).join('');
-          pickedEl.querySelectorAll('.w1w-upsell-pill').forEach(function (el) {
-            el.addEventListener('click', function () {
-              picked.delete(el.dataset.s);
-              var card = bundleGrid.querySelector('[data-s="' + el.dataset.s + '"]');
+          pickedEl.querySelectorAll('.w1w-upsell-pill').forEach(function (pill) {
+            pill.addEventListener('click', function () {
+              var h = pill.dataset.handle;
+              picked.delete(h);
+              var card = bundleGrid.querySelector('[data-handle="' + h + '"]');
               if (card) card.classList.remove('picked');
               renderSummary();
             });
@@ -174,18 +232,21 @@ document.addEventListener('DOMContentLoaded', function () {
         }
       }
 
-      var unit = BASE_PRICE;
-      var gross = n * unit;
-      var discPct = n >= 8 ? 20 : n >= 5 ? 15 : n >= 3 ? 10 : 0;
-      var disc = gross * discPct / 100;
+      var discPct = 0;
+      for (var i = TIERS.length - 1; i >= 0; i--) {
+        if (n >= TIERS[i].qty) { discPct = TIERS[i].pct; break; }
+      }
+      var gross = n * BASE_PRICE;
+      var disc  = gross * discPct / 100;
       var total = gross - disc;
-      var nextTier = TIERS.find(function (t) { return t.qty > n; });
+      var nextTier = TIERS.find(function (t) { return t.qty > n && t.pct > 0; });
+
       var mathEl = document.getElementById('w1wBundleMath');
       if (mathEl) {
         mathEl.innerHTML = n > 0 ? (
-          '<div class="w1w-math-row"><span>' + n + ' band' + (n>1?'s':'') + ' × $' + unit.toFixed(2) + '</span><span>$' + gross.toFixed(2) + '</span></div>' +
+          '<div class="w1w-math-row"><span>' + n + ' band' + (n > 1 ? 's' : '') + ' × $' + BASE_PRICE.toFixed(2) + '</span><span>$' + gross.toFixed(2) + '</span></div>' +
           (discPct ? '<div class="w1w-math-row w1w-math-disc"><span>Stack discount (' + discPct + '%)</span><span>−$' + disc.toFixed(2) + '</span></div>' : '') +
-          (nextTier ? '<div class="w1w-math-hint">+' + (nextTier.qty-n) + ' more for ' + nextTier.pct + '% off</div>' : '') +
+          (nextTier ? '<div class="w1w-math-hint">+' + (nextTier.qty - n) + ' more for ' + nextTier.pct + '% off</div>' : '') +
           '<div class="w1w-math-row w1w-math-tot"><span>Total</span><span>$' + total.toFixed(2) + '</span></div>'
         ) : '';
       }
@@ -194,20 +255,54 @@ document.addEventListener('DOMContentLoaded', function () {
       if (addBtn) addBtn.textContent = n ? 'ADD ' + n + ' TO BAG →' : 'PICK NATIONS →';
     }
 
-    var clearBtn = document.getElementById('w1wClearBundle');
-    if (clearBtn) clearBtn.addEventListener('click', function () {
-      picked.clear(); renderGrid(); renderSummary();
+    document.getElementById('w1wClearBundle').addEventListener('click', function () {
+      picked.clear();
+      renderGrid();
+      renderSummary();
     });
 
-    var addBtn = document.getElementById('w1wAddBundle');
-    if (addBtn) addBtn.addEventListener('click', function () {
+    document.getElementById('w1wAddBundle').addEventListener('click', function () {
       if (!picked.size) return;
+
       var n = picked.size;
-      var discPct = n>=8?20:n>=5?15:n>=3?10:0;
-      var effPrice = BASE_PRICE * (1 - discPct/100);
-      picked.forEach(function (s) {
-        var c = COUNTRIES.find(function (x) { return x.slug === s; });
-        if (c && window.W1W) window.W1W.addToCart({ slug:s, name:c.name, size:'M', qty:1, price:effPrice });
+      var discPct = 0;
+      for (var i = TIERS.length - 1; i >= 0; i--) {
+        if (n >= TIERS[i].qty) { discPct = TIERS[i].pct; break; }
+      }
+
+      // Build items array for cart
+      var items = [];
+      picked.forEach(function (h) {
+        var nation = NATIONS.find(function (x) { return x.handle === h; });
+        if (nation && nation.variantId) {
+          items.push({ id: nation.variantId, quantity: 1 });
+        }
+      });
+
+      if (!items.length) return;
+
+      var btn = document.getElementById('w1wAddBundle');
+      btn.disabled = true;
+      btn.textContent = 'ADDING…';
+
+      fetch('/cart/add.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items: items })
+      })
+      .then(function (r) { return r.json(); })
+      .then(function () {
+        btn.textContent = 'ADDED ✓';
+        // Open cart drawer if available, else redirect to cart
+        if (window.W1W && window.W1W.openDrawer) {
+          window.W1W.openDrawer();
+        } else {
+          window.location.href = '/cart';
+        }
+      })
+      .catch(function () {
+        btn.disabled = false;
+        btn.textContent = 'ADD ' + picked.size + ' TO BAG →';
       });
     });
 
@@ -217,28 +312,33 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // ── Related Nations ──
   var relatedGrid = document.getElementById('w1wRelatedGrid');
-  if (relatedGrid) {
-    var related = country
-      ? COUNTRIES.filter(function (c) { return c.region === country.region && c.slug !== country.slug; }).slice(0,4)
-      : COUNTRIES.filter(function (c) { return c.slug !== slug; }).slice(0,4);
-    relatedGrid.innerHTML = related.map(function (c) {
-      return '<a class="product-card reveal" href="/products/' + c.slug + '">' +
-        '<div class="product-card-media">' +
-          (c.host ? '<span class="product-card-tag" style="background:var(--lime-hot)">2026 HOST</span>' :
-           c.featured ? '<span class="product-card-tag">FEATURED</span>' : '') +
-          braceletHTML(c) +
-        '</div>' +
+  if (relatedGrid && NATIONS.length) {
+    var currentNation = NATIONS.find(function (n) { return n.handle === CURRENT_HANDLE; });
+    var related = currentNation
+      ? NATIONS.filter(function (n) { return n.vendor === currentNation.vendor && n.handle !== CURRENT_HANDLE; }).slice(0, 4)
+      : NATIONS.filter(function (n) { return n.handle !== CURRENT_HANDLE; }).slice(0, 4);
+
+    relatedGrid.innerHTML = related.map(function (n) {
+      var imgHtml = n.image
+        ? '<img src="' + n.image + '" alt="' + n.title + '" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block">'
+        : '<div style="width:100%;height:100%;' + swatchStyle(n) + '"></div>';
+      return '<a class="product-card reveal" href="' + n.url + '">' +
+        '<div class="product-card-media">' + imgHtml + '</div>' +
         '<div class="product-card-body">' +
-          '<div><div class="product-card-country">' + c.name.toUpperCase() + '</div>' +
-          '<div class="product-card-sub">' + c.sub + '</div></div>' +
-          '<div class="product-card-price">$' + (window.W1W_PRICE||5) + '</div>' +
+          '<div>' +
+            '<div class="product-card-country">' + n.title.toUpperCase() + '</div>' +
+            '<div class="product-card-sub">' + (n.vendor || '') + '</div>' +
+          '</div>' +
+          '<div class="product-card-price">$' + BASE_PRICE.toFixed(2) + '</div>' +
         '</div>' +
         '</a>';
     }).join('');
 
     if ('IntersectionObserver' in window) {
       var obs = new IntersectionObserver(function (entries) {
-        entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); obs.unobserve(e.target); } });
+        entries.forEach(function (e) {
+          if (e.isIntersecting) { e.target.classList.add('in'); obs.unobserve(e.target); }
+        });
       }, { threshold: 0.1 });
       relatedGrid.querySelectorAll('.reveal').forEach(function (el) { obs.observe(el); });
     } else {
@@ -277,7 +377,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 /* Picker layout */
 .w1w-upsell-picker { display: grid; grid-template-columns: 1fr 320px; gap: 32px; align-items: start; }
-.w1w-upsell-grid-wrap {}
 
 /* Region tabs */
 .w1w-region-tabs { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 12px; }
@@ -299,19 +398,19 @@ document.addEventListener('DOMContentLoaded', function () {
 }
 .w1w-upsell-card:hover { border-color: var(--line-strong); transform: translateY(-2px); }
 .w1w-upsell-card.picked { border-color: var(--lime); background: var(--lime-softer); }
-.w1w-upsell-swatch { aspect-ratio: 3/2; border-radius: 2px; }
+.w1w-upsell-swatch { aspect-ratio: 3/2; border-radius: 2px; overflow: hidden; }
 .w1w-upsell-nm { font-family: var(--font-display); font-weight: 700; font-size: 9px; letter-spacing: 0.05em; color: var(--ink-0); text-transform: uppercase; line-height: 1.2; }
 .w1w-upsell-check { position: absolute; top: 6px; right: 6px; width: 18px; height: 18px; background: var(--lime); color: var(--lime-dark) !important; border-radius: 50%; display: none; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; }
 .w1w-upsell-card.picked .w1w-upsell-check { display: inline-flex; }
 
 /* Summary sidebar */
-.w1w-upsell-summary { background: var(--bg-2); border: 1px solid var(--line); padding: 24px; position: sticky; top: calc(var(--nav-h, 72px) + 24px); }
+.w1w-upsell-summary { background: var(--bg-2); border: 1px solid var(--line); padding: 24px; position: sticky; top: calc(var(--header-height, 72px) + 24px); }
 .w1w-upsell-summary-title { font-family: var(--font-display); font-size: 11px; letter-spacing: 0.2em; color: var(--lime); margin-bottom: 16px; text-transform: uppercase; font-weight: 700; }
 .w1w-squad-count { color: var(--ink-3); }
 .w1w-upsell-picked { display: flex; flex-wrap: wrap; gap: 4px; min-height: 48px; margin-bottom: 16px; padding: 8px; border: 1px dashed var(--line); }
 .w1w-upsell-pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 8px; background: var(--bg-3); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; font-family: var(--font-display); font-weight: 700; color: var(--ink-0); transition: background .12s; }
-.w1w-upsell-pill:hover { background: var(--red); color: white; }
-.w1w-pill-swatch { display: inline-block; width: 16px; height: 10px; border-radius: 1px; flex-shrink: 0; }
+.w1w-upsell-pill:hover { background: #ef4444; color: white; }
+.w1w-pill-swatch { display: inline-block; width: 16px; height: 10px; border-radius: 1px; flex-shrink: 0; overflow: hidden; }
 .w1w-upsell-empty { color: var(--ink-3); font-size: 12px; padding: 12px; letter-spacing: 0.1em; text-transform: uppercase; font-family: var(--font-display); }
 .w1w-upsell-math { display: grid; gap: 8px; font-size: 13px; margin-bottom: 16px; padding: 16px 0; border-top: 1px solid var(--line); }
 .w1w-math-row { display: flex; justify-content: space-between; color: var(--ink-1); }
@@ -343,44 +442,49 @@ document.addEventListener('DOMContentLoaded', function () {
   "settings": [
     {
       "type": "header",
-      "content": "Discount Banner"
+      "content": "Nations collection"
     },
-    { "type": "checkbox", "id": "show_banner", "label": "Show discount banner", "default": true },
-    { "type": "text", "id": "banner_heading", "label": "Banner heading", "default": "Stack 3+ nations and save up to 20%." },
-    { "type": "text", "id": "banner_body", "label": "Banner body text", "default": "Discount applied automatically at checkout — no code needed." },
+    { "type": "collection", "id": "nations_collection", "label": "Nations collection", "info": "Select the collection that contains all nation products (e.g. 'All Nations')" },
     {
       "type": "header",
-      "content": "Tier 1"
+      "content": "Color metafields (optional)"
+    },
+    { "type": "text", "id": "mf_namespace", "label": "Metafield namespace", "default": "custom", "info": "The namespace of your color metafields (usually 'custom')" },
+    { "type": "text", "id": "mf_color_1",   "label": "Color 1 metafield key", "default": "color_1", "info": "Key for the first band color (hex, e.g. #009c3b)" },
+    { "type": "text", "id": "mf_color_2",   "label": "Color 2 metafield key", "default": "color_2" },
+    { "type": "text", "id": "mf_color_3",   "label": "Color 3 metafield key", "default": "color_3" },
+    {
+      "type": "header",
+      "content": "Discount Banner"
+    },
+    { "type": "checkbox", "id": "show_banner",     "label": "Show discount banner", "default": true },
+    { "type": "text",     "id": "banner_heading",  "label": "Banner heading",       "default": "Stack 3+ nations and save up to 20%." },
+    { "type": "text",     "id": "banner_body",     "label": "Banner body text",     "default": "Discount applied automatically at checkout — no code needed." },
+    {
+      "type": "header",
+      "content": "Discount Tiers"
     },
     { "type": "number", "id": "tier_1_qty", "label": "Tier 1 quantity", "default": 3 },
     { "type": "number", "id": "tier_1_pct", "label": "Tier 1 discount %", "default": 10 },
-    {
-      "type": "header",
-      "content": "Tier 2"
-    },
     { "type": "number", "id": "tier_2_qty", "label": "Tier 2 quantity", "default": 5 },
     { "type": "number", "id": "tier_2_pct", "label": "Tier 2 discount %", "default": 15 },
-    {
-      "type": "header",
-      "content": "Tier 3"
-    },
     { "type": "number", "id": "tier_3_qty", "label": "Tier 3 quantity", "default": 8 },
     { "type": "number", "id": "tier_3_pct", "label": "Tier 3 discount %", "default": 20 },
     {
       "type": "header",
       "content": "Bundle Builder"
     },
-    { "type": "text", "id": "eyebrow", "label": "Eyebrow label", "default": "Build Your Squad" },
-    { "type": "text", "id": "title", "label": "Section title", "default": "STACK THE NATIONS." },
-    { "type": "textarea", "id": "hint", "label": "Hint text", "default": "Pick up to 11 nations. Build the starting XI, gift the supporters, dress the group chat." },
+    { "type": "text",     "id": "eyebrow", "label": "Eyebrow label", "default": "Build Your Squad" },
+    { "type": "text",     "id": "title",   "label": "Section title",  "default": "STACK THE NATIONS." },
+    { "type": "textarea", "id": "hint",    "label": "Hint text",      "default": "Pick up to 11 nations. Build the starting XI, gift the supporters, dress the group chat." },
     {
       "type": "header",
       "content": "Related Nations"
     },
-    { "type": "text", "id": "related_eyebrow", "label": "Eyebrow label", "default": "More From This Region" },
-    { "type": "text", "id": "related_title", "label": "Section title", "default": "RELATED NATIONS" },
-    { "type": "text", "id": "related_cta_label", "label": "CTA button label", "default": "VIEW ALL →" },
-    { "type": "url", "id": "related_cta_url", "label": "CTA button URL", "default": "/collections/all" }
+    { "type": "text", "id": "related_eyebrow",  "label": "Eyebrow label",    "default": "More From This Region" },
+    { "type": "text", "id": "related_title",    "label": "Section title",    "default": "RELATED NATIONS" },
+    { "type": "text", "id": "related_cta_label","label": "CTA button label", "default": "VIEW ALL →" },
+    { "type": "url",  "id": "related_cta_url",  "label": "CTA button URL",   "default": "/collections/all" }
   ],
   "presets": [{ "name": "W1W PDP Upsell" }]
 }
