@@ -136,8 +136,8 @@
 
     if (free) {
       free.innerHTML = remaining > 0
-        ? 'Add <strong style="color:var(--lime)">$' + remaining.toFixed(2) + '</strong> for free worldwide shipping.<div class="w1w-free-bar"><div class="w1w-free-bar-fill" style="width:' + pct + '%"></div></div>'
-        : '<strong style="color:var(--lime)">★ Free worldwide shipping unlocked</strong><div class="w1w-free-bar"><div class="w1w-free-bar-fill" style="width:100%"></div></div>';
+        ? 'Add <strong style="color:var(--lime)">$' + remaining.toFixed(2) + '</strong> for free shipping.<div class="w1w-free-bar"><div class="w1w-free-bar-fill" style="width:' + pct + '%"></div></div>'
+        : '<strong style="color:var(--lime)">★ Free shipping unlocked</strong><div class="w1w-free-bar"><div class="w1w-free-bar-fill" style="width:100%"></div></div>';
     }
 
     body.innerHTML = cachedCart.items.map(function (it) {

@@ -20,7 +20,7 @@
         "show_glow": true,
         "drop_tag": "DROP 03",
         "show_corner_labels": true,
-        "corner_tl": "N° 2026",
+        "corner_tl": "W1W · 2026",
         "corner_br": "product_title",
         "show_edition_strip": true,
         "edition_1_label": "Material",
@@ -29,7 +29,7 @@
         "edition_2_val": "Drop 03",
         "edition_3_label": "Year",
         "edition_3_val": "2026",
-        "default_sub": "WORLD 1 WORLD EDITION",
+        "default_sub": "2026 WORLD CUP EDITION",
         "show_vendor": true,
         "meta_confederation_label": "Confederation",
         "edition_label": "N°/2026",
@@ -38,9 +38,9 @@
         "meta_status_label": "Status",
         "in_stock_label": "In Stock",
         "sold_out_label": "Sold Out",
-        "price_note": "Free shipping on 3+",
+        "price_note": "Free shipping over $35",
         "size_label": "Size",
-        "size_guide_label": "Size guide →",
+        "size_guide_label": "",
         "show_tier_pricing": true,
         "tier_label": "Stack & Save",
         "tier_note": "More = Less",
@@ -57,7 +57,7 @@
         "total_label": "Total",
         "show_quantity": true,
         "quantity_label": "Quantity",
-        "ships_note": "Ships in 24h · Worldwide",
+        "ships_note": "Ships in 24h · Nationwide",
         "add_to_cart_label": "ADD TO BAG",
         "sold_out_button_label": "SOLD OUT",
         "secondary_cta_label": "STACK MORE NATIONS",
@@ -68,7 +68,7 @@
         "feat_2_title": "Never Take It Off",
         "feat_2_desc": "Waterproof. Sweatproof. Game-proof.",
         "feat_3_title": "Ships in 24h",
-        "feat_3_desc": "To 73 countries worldwide",
+        "feat_3_desc": "Nationwide across the US",
         "feat_4_title": "30-Day Returns",
         "feat_4_desc": "No questions asked"
       }
@@ -76,7 +76,7 @@
     "strip": {
       "type": "w1w-marquee",
       "settings": {
-        "text": "WEAR YOUR NATION · DROP 03 · 2026 WORLD EDITION · 50+ NATIONS · $5 EACH · SHIPS WORLDWIDE",
+        "text": "WEAR YOUR NATION · DROP 03 · 2026 WORLD CUP EDITION · 50+ NATIONS · $5 EACH · FREE SHIPPING OVER $35",
         "style": "secondary"
       }
     },
@@ -85,10 +85,10 @@
       "settings": {
         "feature_1_title": "COMFORT-FIT TECH",
         "feature_1_desc": "Built for 90 minutes and everything after. Your nation never leaves your wrist.",
-        "feature_2_title": "RIO ENERGY SOUL",
-        "feature_2_desc": "Signature 5-star embroidery celebrating the legacy of world football icons.",
-        "feature_3_title": "WORLDWIDE DELIVERY",
-        "feature_3_desc": "Every order ships within 24 hours to 73 countries. Track it from pitch to doorstep."
+        "feature_2_title": "TRUE COLOURS",
+        "feature_2_desc": "Every shade pulled straight from the national flag. Molded in, not printed — colours that last as long as your support.",
+        "feature_3_title": "NATIONWIDE DELIVERY",
+        "feature_3_desc": "Every order ships within 24 hours. Nationwide delivery, tracked from warehouse to doorstep."
       }
     },
     "upsell": {
@@ -106,7 +106,7 @@
         "tier_3_pct": 20,
         "eyebrow": "Build Your Squad",
         "title": "STACK THE NATIONS.",
-        "hint": "Pick up to 11 nations. Build the starting XI, gift the supporters, dress the group chat.",
+        "hint": "Pick your nations. Build your starting XI, or gift them to the squad.",
         "related_eyebrow": "More From This Region",
         "related_title": "RELATED NATIONS",
         "related_cta_label": "VIEW ALL →",

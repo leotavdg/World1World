@@ -30,7 +30,7 @@
           "type": "faq_item",
           "settings": {
             "question": "How long is shipping?",
-            "answer": "<p>We ship in 24 hours from our Toronto facility. US/Canada: 3–5 business days. UK/EU: 5–8 days. Rest of world: 7–14 days. Free over $35.</p>"
+            "answer": "<p>We ship within 24 hours. Standard shipping is $8 (5–7 business days). Express is $15 (2–3 business days). Free standard shipping on orders over $35.</p>"
           }
         },
         "faq_3": {
@@ -44,14 +44,14 @@
           "type": "faq_item",
           "settings": {
             "question": "What if my country isn't listed?",
-            "answer": "<p>Drop 04 is already in production. Email <a href=\"mailto:hello@world1world.com\">hello@world1world.com</a> with your flag and we'll tell you when it's live.</p>"
+            "answer": "<p>More nations are on the way. Email <a href=\"mailto:info@world1world.com\">info@world1world.com</a> with your flag and we'll let you know when it drops.</p>"
           }
         },
         "faq_5": {
           "type": "faq_item",
           "settings": {
             "question": "Do you do custom or team orders?",
-            "answer": "<p>Yes — for orders of 25+ with custom color-ways or club crests, reach out to <a href=\"mailto:teams@world1world.com\">teams@world1world.com</a>. Lead time is typically 3 weeks.</p>"
+            "answer": "<p>Yes — for orders of 25+ with custom colour-ways or club crests, reach out to <a href=\"mailto:info@world1world.com\">info@world1world.com</a>. Lead time is typically 3 weeks.</p>"
           }
         },
         "faq_6": {
@@ -64,73 +64,28 @@
         "ship_1": {
           "type": "shipping_zone",
           "settings": {
-            "zone_name": "NORTH AMERICA",
-            "timing": "3–5 business days",
-            "price_text": "$6 · FREE over $35"
+            "zone_name": "STANDARD",
+            "timing": "5–7 business days",
+            "price_text": "$8 · FREE over $35"
           }
         },
         "ship_2": {
           "type": "shipping_zone",
           "settings": {
-            "zone_name": "UK & EUROPE",
-            "timing": "5–8 business days",
-            "price_text": "$9 · FREE over $50"
-          }
-        },
-        "ship_3": {
-          "type": "shipping_zone",
-          "settings": {
-            "zone_name": "REST OF WORLD",
-            "timing": "7–14 business days",
-            "price_text": "$12 · FREE over $60"
-          }
-        },
-        "size_s": {
-          "type": "size_row",
-          "settings": {
-            "size": "S",
-            "wrist": "6.0–7.0\"",
-            "band": "7.5\"",
-            "fits": "Kids / small wrists"
-          }
-        },
-        "size_m": {
-          "type": "size_row",
-          "settings": {
-            "size": "M",
-            "wrist": "7.0–8.0\"",
-            "band": "8.5\"",
-            "fits": "Most adults"
-          }
-        },
-        "size_l": {
-          "type": "size_row",
-          "settings": {
-            "size": "L",
-            "wrist": "8.0–9.0\"",
-            "band": "9.5\"",
-            "fits": "Larger wrists"
-          }
-        },
-        "size_xl": {
-          "type": "size_row",
-          "settings": {
-            "size": "XL",
-            "wrist": "9.0–10.0\"",
-            "band": "10.5\"",
-            "fits": "XL wrists / ankle wear"
+            "zone_name": "EXPRESS",
+            "timing": "2–3 business days",
+            "price_text": "$15"
           }
         }
       },
       "block_order": [
         "faq_1", "faq_2", "faq_3", "faq_4", "faq_5", "faq_6",
-        "ship_1", "ship_2", "ship_3",
-        "size_s", "size_m", "size_l", "size_xl"
+        "ship_1", "ship_2"
       ],
       "settings": {
         "show_shipping": true,
         "show_returns": true,
-        "show_sizing": true,
+        "show_sizing": false,
         "show_care": true
       }
     }

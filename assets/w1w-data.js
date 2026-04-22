@@ -9,7 +9,7 @@ window.W1W_COUNTRIES = [
   { slug: 'panama',       name: 'Panama',               sub: 'LA MAREA ROJA',         region: 'concacaf',     confed: 'CONCACAF',              colors: ['#DA121A','#FFFFFF','#005AA7'], flag: 'PA' },
   // CONMEBOL
   { slug: 'argentina',    name: 'Argentina',            sub: 'LA ALBICELESTE',        region: 'southamerica', confed: 'CONMEBOL',              colors: ['#75AADB','#FFFFFF','#75AADB'], flag: 'AR' },
-  { slug: 'brazil',       name: 'Brazil',               sub: 'SELECT EDITION',        region: 'southamerica', confed: 'CONMEBOL',              colors: ['#009C3B','#FFDF00','#009C3B'], flag: 'BR', featured: true },
+  { slug: 'brazil',       name: 'Brazil',               sub: 'A SELEÇÃO',             region: 'southamerica', confed: 'CONMEBOL',              colors: ['#009C3B','#FFDF00','#009C3B'], flag: 'BR', featured: true },
   { slug: 'colombia',     name: 'Colombia',             sub: 'LOS CAFETEROS',         region: 'southamerica', confed: 'CONMEBOL',              colors: ['#FCD116','#003893','#CE1126'], flag: 'CO' },
   { slug: 'ecuador',      name: 'Ecuador',              sub: 'LA TRI',                region: 'southamerica', confed: 'CONMEBOL',              colors: ['#FFDD00','#034EA2','#ED1C24'], flag: 'EC' },
   { slug: 'paraguay',     name: 'Paraguay',             sub: 'LA ALBIRROJA',          region: 'southamerica', confed: 'CONMEBOL',              colors: ['#D52B1E','#FFFFFF','#0038A8'], flag: 'PY' },
@@ -19,12 +19,12 @@ window.W1W_COUNTRIES = [
   { slug: 'belgium',      name: 'Belgium',              sub: 'RED DEVILS',            region: 'europe',       confed: 'UEFA',                  colors: ['#000000','#FAE042','#ED2939'], flag: 'BE' },
   { slug: 'bosnia',       name: 'Bosnia & Herzegovina', sub: 'ZMAJEVI',               region: 'europe',       confed: 'UEFA',                  colors: ['#002F6C','#FFCD00','#FFFFFF'], flag: 'BA' },
   { slug: 'croatia',      name: 'Croatia',              sub: 'VATRENI',               region: 'europe',       confed: 'UEFA',                  colors: ['#FF0000','#FFFFFF','#171796'], flag: 'HR' },
-  { slug: 'czechia',      name: 'Czechia',              sub: 'NÁRODÁK',               region: 'europe',       confed: 'UEFA',                  colors: ['#D7141A','#FFFFFF','#11457E'], flag: 'CZ' },
+  { slug: 'czechia',      name: 'Czechia',              sub: 'ČESKÍ LEVI',            region: 'europe',       confed: 'UEFA',                  colors: ['#D7141A','#FFFFFF','#11457E'], flag: 'CZ' },
   { slug: 'england',      name: 'England',              sub: 'THREE LIONS KIT',       region: 'europe',       confed: 'UEFA', featured: true,  colors: ['#FFFFFF','#CF081F','#FFFFFF'], flag: 'EN' },
   { slug: 'france',       name: 'France',               sub: 'LES BLEUS',             region: 'europe',       confed: 'UEFA', featured: true,  colors: ['#002395','#FFFFFF','#ED2939'], flag: 'FR' },
-  { slug: 'germany',      name: 'Germany',              sub: 'DIE MANNSCHAFT',        region: 'europe',       confed: 'UEFA',                  colors: ['#000000','#DD0000','#FFCE00'], flag: 'DE' },
+  { slug: 'germany',      name: 'Germany',              sub: 'DIE NATIONALELF',       region: 'europe',       confed: 'UEFA',                  colors: ['#000000','#DD0000','#FFCE00'], flag: 'DE' },
   { slug: 'netherlands',  name: 'Netherlands',          sub: 'ORANJE',                region: 'europe',       confed: 'UEFA',                  colors: ['#FF6600','#FFFFFF','#21468B'], flag: 'NL' },
-  { slug: 'norway',       name: 'Norway',               sub: 'DRILLOS',               region: 'europe',       confed: 'UEFA',                  colors: ['#EF2B2D','#FFFFFF','#002868'], flag: 'NO' },
+  { slug: 'norway',       name: 'Norway',               sub: 'LANDSLAGET',            region: 'europe',       confed: 'UEFA',                  colors: ['#EF2B2D','#FFFFFF','#002868'], flag: 'NO' },
   { slug: 'portugal',     name: 'Portugal',             sub: 'A SELEÇÃO',             region: 'europe',       confed: 'UEFA',                  colors: ['#006600','#FF0000','#FFD700'], flag: 'PT' },
   { slug: 'scotland',     name: 'Scotland',             sub: 'TARTAN ARMY',           region: 'europe',       confed: 'UEFA',                  colors: ['#0065BD','#FFFFFF','#0065BD'], flag: 'SC' },
   { slug: 'spain',        name: 'Spain',                sub: 'LA ROJA',               region: 'europe',       confed: 'UEFA',                  colors: ['#AA151B','#F1BF00','#AA151B'], flag: 'ES' },
@@ -57,19 +57,19 @@ window.W1W_COUNTRIES = [
 ];
 
 window.W1W_REGIONS = [
-  { id: 'concacaf',     name: 'CONCACAF', label: 'North & Central America', tag: 'HOSTS',      blurb: 'Home soil. The continent that lifts the curtain.' },
-  { id: 'southamerica', name: 'CONMEBOL', label: 'South America',           tag: 'THE CORE',   blurb: 'Where the game was perfected. Pure rhythm.' },
-  { id: 'europe',       name: 'UEFA',     label: 'Europe',                  tag: 'THE ENGINE', blurb: 'Tactical, technical, relentless. The modern machine.' },
-  { id: 'africa',       name: 'CAF',      label: 'Africa',                  tag: 'UNTAMED',    blurb: 'Raw speed. Rising force. Nothing fears nothing.' },
-  { id: 'asia',         name: 'AFC',      label: 'Asia',                    tag: 'RISING',     blurb: 'Discipline meets dream. The fastest-climbing continent.' },
-  { id: 'oceania',      name: 'OFC',      label: 'Oceania',                 tag: 'FRONTIER',   blurb: 'The long journey. Every tournament earned twice over.' },
+  { id: 'concacaf',     name: 'CONCACAF', label: 'North & Central America', tag: 'HOSTS',      blurb: 'Three host nations. Where it all kicks off in 2026.' },
+  { id: 'southamerica', name: 'CONMEBOL', label: 'South America',           tag: 'THE CORE',   blurb: 'Where football is religion. Passion on every pitch.' },
+  { id: 'europe',       name: 'UEFA',     label: 'Europe',                  tag: 'THE ENGINE', blurb: 'History, tradition, and the biggest stages in the game.' },
+  { id: 'africa',       name: 'CAF',      label: 'Africa',                  tag: 'RISING',     blurb: 'Talent and passion on the rise. The future is here.' },
+  { id: 'asia',         name: 'AFC',      label: 'Asia',                    tag: 'GROWING',    blurb: 'New frontiers. The game is growing fast across the continent.' },
+  { id: 'oceania',      name: 'OFC',      label: 'Oceania',                 tag: 'FRONTIER',   blurb: 'The long road to qualify. Every cap hard-earned.' },
 ];
 
 window.W1W_COLLECTIONS = [
-  { slug: 'legacy',     name: 'World Cup Legacy',    tagline: 'Commemorating the greatest stages in football history.', blurb: 'Every winning nation. Every final. Woven into one thread.', count: 22, color: '#F3FFCA' },
+  { slug: 'legacy',     name: 'World Cup Legacy',    tagline: 'Commemorating the greatest stages in football history.', blurb: 'Every winning nation. Every final. One collection.', count: 22, color: '#F3FFCA' },
   { slug: 'host',       name: 'Host Nations 2026',   tagline: 'Three countries. One tournament.',                       blurb: 'Canada, Mexico, United States. The first 48-team stage.',  count: 3,  color: '#CAFD00' },
-  { slug: 'underdogs',  name: 'The Underdogs',        tagline: 'Nations punching up.',                                   blurb: 'The sides nobody expected — and the supporters who did.', count: 8,  color: '#D72638' },
-  { slug: 'player',     name: 'Player Edition',       tagline: 'Lightweight. Breathable. Pro-grade.',                   blurb: 'The match-wear build. Designed for 90+ minutes.',           count: 12, color: '#F3FFCA' },
+  { slug: 'underdogs',  name: 'The Dark Horses',      tagline: 'Nations on the rise.',                                   blurb: 'The sides turning heads — and the fans who believed first.', count: 8,  color: '#D72638' },
+  { slug: 'player',     name: 'Player Edition',       tagline: 'Lightweight. Durable. Match-ready.',                    blurb: 'Built for the 90 minutes and everything after.',            count: 12, color: '#F3FFCA' },
 ];
 
 window.W1W_PRICE = 5;
