@@ -33,6 +33,7 @@
             {%- if form.posted_successfully? -%}
               <p class="w1w-promo-newsletter__success">{{ section.settings.success_message }}</p>
             {%- endif -%}
+            <p class="w1w-recaptcha-notice">This site is protected by reCAPTCHA and the Google <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Privacy Policy</a> and <a href="https://policies.google.com/terms" target="_blank" rel="noopener">Terms of Service</a> apply.</p>
           {%- endform -%}
         </div>
       </div>
@@ -157,25 +158,26 @@
     border-color: rgba(243,255,202,0.4);
     background: #222;
   }
-  .w1w-promo-newsletter__input {
-    background: transparent;
-    border: none;
-    color: #fff;
+  .w1w-promo-newsletter__input,
+  .w1w-promo-newsletter__input:hover,
+  .w1w-promo-newsletter__input:focus {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    color: #fff !important;
     font-family: "Inter", sans-serif;
     font-size: 0.8125rem;
     padding: 10px 0;
     flex: 1;
-    outline: none;
+    outline: none !important;
+    box-shadow: none !important;
     width: 100%;
     border-radius: 0;
     -webkit-appearance: none;
     appearance: none;
   }
   .w1w-promo-newsletter__input::placeholder {
-    color: rgba(255,255,255,0.3);
-  }
-  .w1w-promo-newsletter__input:focus {
-    outline: none;
+    color: rgba(255,255,255,0.3) !important;
   }
   .w1w-promo-newsletter__submit {
     background: var(--lime-hot, #CAFD00);

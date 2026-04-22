@@ -260,7 +260,7 @@
               {%- endif -%}
             </button>
             {%- if section.settings.secondary_cta_label != blank -%}
-              <a href="{{ section.settings.secondary_cta_url }}" class="btn btn-ghost btn-block">
+              <a href="#w1w-stack-nations" class="btn btn-ghost btn-block" onclick="event.preventDefault();document.getElementById('w1w-stack-nations').scrollIntoView({behavior:'smooth',block:'start'})">
                 {{ section.settings.secondary_cta_label }}
               </a>
             {%- endif -%}
