@@ -13,9 +13,11 @@
       "type": "w1w-hero",
       "settings": {
         "bg_image": "shopify://shop_images/World1World.jpg",
+        "overlay_opacity": 15,
         "badge_text": "",
         "headline_line1": "WEAR YOUR",
         "headline_line2": "COUNTRY.",
+        "headline_size": 120,
         "subtext": "50+ nations. One wrist. Wear the country you love, stack the squad you ride with - $8 a band, free shipping over $35.",
         "primary_button_label": "Shop Collection",
         "primary_button_link": "/collections/all",
@@ -32,7 +34,7 @@
       "settings": {
         "text": "WEAR YOUR COUNTRY",
         "style": "primary",
-        "direction": "forward"
+        "direction": "reverse"
       }
     },
     "w1w_featured_products": {
