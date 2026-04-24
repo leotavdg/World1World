@@ -154,7 +154,7 @@
       "type": "w1w-marquee",
       "settings": {
         "text": "CANADA · MEXICO · USA  ·  ARGENTINA · BRAZIL · URUGUAY  ·  ENGLAND · FRANCE · GERMANY  ·  FOR THE BEAUTIFUL GAME",
-        "style": "secondary",
+        "style": "primary",
         "direction": "forward"
       }
     },
