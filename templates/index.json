@@ -19,23 +19,20 @@
         "subtext": "50+ nations. One wrist. Wear the country you love, stack the squad you ride with - $8 a band, free shipping over $35.",
         "primary_button_label": "Shop Collection",
         "primary_button_link": "/collections/all",
-        "secondary_button_label": "The Story",
-        "secondary_button_link": "shopify://pages/story",
         "corner_tl": "W1W · 2026",
         "corner_br": "$8 · 50+ NATIONS",
         "stat1_label": "50+ Nations",
         "stat1_value": "Every Continent",
         "stat2_label": "Ships Nationwide",
-        "stat2_value": "All 50 States",
-        "stat3_label": "Kick-Off",
-        "stat3_value": "June 11, 2026"
+        "stat2_value": "All 50 States"
       }
     },
     "w1w_marquee_1": {
       "type": "w1w-marquee",
       "settings": {
         "text": "WEAR YOUR COUNTRY",
-        "style": "primary"
+        "style": "primary",
+        "direction": "forward"
       }
     },
     "w1w_featured_products": {
@@ -154,7 +151,8 @@
       "type": "w1w-marquee",
       "settings": {
         "text": "CANADA · MEXICO · USA  ·  ARGENTINA · BRAZIL · URUGUAY  ·  ENGLAND · FRANCE · GERMANY  ·  FOR THE BEAUTIFUL GAME",
-        "style": "secondary"
+        "style": "secondary",
+        "direction": "reverse"
       }
     },
     "w1w_bento": {

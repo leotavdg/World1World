@@ -1,4 +1,4 @@
-<div class="w1w-strip w1w-strip--{{ section.settings.style }}">
+<div class="w1w-strip w1w-strip--{{ section.settings.style }} w1w-strip--{{ section.settings.direction }}">
   <div class="w1w-strip__track">
     {%- for i in (1..8) -%}
       <span>{{ section.settings.text }}</span>
@@ -27,9 +27,11 @@
     color: #fff;
   }
   .w1w-strip--secondary .w1w-strip__track {
-    animation-direction: reverse;
     animation-duration: 60s;
     color: #737373;
+  }
+  .w1w-strip--reverse .w1w-strip__track {
+    animation-direction: reverse;
   }
   .w1w-strip__track span {
     display: inline-flex;
@@ -70,6 +72,16 @@
         { "value": "secondary", "label": "Secondary (dim, reverse)" }
       ],
       "default": "primary"
+    },
+    {
+      "type": "select",
+      "id": "direction",
+      "label": "Slide direction",
+      "options": [
+        { "value": "forward", "label": "Left (forward)" },
+        { "value": "reverse", "label": "Right (reverse)" }
+      ],
+      "default": "forward"
     }
   ],
   "presets": [

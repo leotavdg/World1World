@@ -26,10 +26,15 @@
             {{ section.settings.primary_button_label }}
           </a>
         {%- endif -%}
-        {%- if section.settings.secondary_button_label != blank -%}
-          <a href="{{ section.settings.secondary_button_link }}" class="w1w-btn w1w-btn--ghost w1w-btn--lg">
-            {{ section.settings.secondary_button_label }}
-          </a>
+        {%- if section.settings.stat1_label != blank -%}
+          <div class="w1w-hero__stat">
+            {{ section.settings.stat1_label }}<strong>{{ section.settings.stat1_value }}</strong>
+          </div>
+        {%- endif -%}
+        {%- if section.settings.stat2_label != blank -%}
+          <div class="w1w-hero__stat">
+            {{ section.settings.stat2_label }}<strong>{{ section.settings.stat2_value }}</strong>
+          </div>
         {%- endif -%}
       </div>
     </div>
@@ -47,26 +52,6 @@
       </div>
     {%- endif -%}
   </div>
-
-  {%- if section.settings.stat1_label != blank or section.settings.stat2_label != blank or section.settings.stat3_label != blank -%}
-    <div class="w1w-hero__meta">
-      {%- if section.settings.stat1_label != blank -%}
-        <div class="w1w-hero__stat">
-          {{ section.settings.stat1_label }}<strong>{{ section.settings.stat1_value }}</strong>
-        </div>
-      {%- endif -%}
-      {%- if section.settings.stat2_label != blank -%}
-        <div class="w1w-hero__stat">
-          {{ section.settings.stat2_label }}<strong>{{ section.settings.stat2_value }}</strong>
-        </div>
-      {%- endif -%}
-      {%- if section.settings.stat3_label != blank -%}
-        <div class="w1w-hero__stat">
-          {{ section.settings.stat3_label }}<strong>{{ section.settings.stat3_value }}</strong>
-        </div>
-      {%- endif -%}
-    </div>
-  {%- endif -%}
 </section>
 
 <script>
@@ -83,9 +68,10 @@
 {% stylesheet %}
   .w1w-hero {
     position: relative;
-    min-height: clamp(680px, 82vh, 920px);
+    height: calc(100vh - var(--header-group-height, 112px));
+    min-height: 500px;
     overflow: hidden;
-    background: #000;
+    background: #000; 
     isolation: isolate;
   }
 
@@ -163,7 +149,7 @@
     max-width: 1440px;
     margin: 0 auto;
     padding: 96px clamp(24px, 4vw, 64px);
-    padding-bottom: 120px;
+    padding-bottom: 48px;
     display: grid;
     grid-template-columns: 1.05fr 1fr;
     gap: 48px;
@@ -202,7 +188,7 @@
     max-width: 440px;
     margin: 0 0 40px;
   }
-  .w1w-hero__actions { display: flex; gap: 16px; flex-wrap: wrap; }
+  .w1w-hero__actions { display: flex; gap: 32px; flex-wrap: wrap; align-items: center; }
 
   /* Buttons (shared across W1W sections) */
   .w1w-btn {
@@ -300,21 +286,16 @@
     color: #516700;
   }
 
-  /* Stats bar */
-  .w1w-hero__meta {
-    position: absolute;
-    left: clamp(24px, 4vw, 64px);
-    bottom: 32px;
+  /* Stats (inline with button) */
+  .w1w-hero__stat {
     display: flex;
-    gap: 48px;
+    flex-direction: column;
     font-family: "Space Grotesk", sans-serif;
     font-size: 11px;
     letter-spacing: 0.2em;
     color: #737373;
     text-transform: uppercase;
-    z-index: 3;
   }
-  .w1w-hero__stat { display: flex; flex-direction: column; }
   .w1w-hero__stat strong {
     color: #f3ffca;
     display: block;
@@ -332,10 +313,9 @@
       padding-bottom: 96px;
     }
     .w1w-hero__product-wrap { max-width: 100%; }
-    .w1w-hero__meta { gap: 24px; }
   }
   @media (max-width: 600px) {
-    .w1w-hero__meta { display: none; }
+    .w1w-hero__stat { display: none; }
   }
 {% endstylesheet %}
 
@@ -397,21 +377,6 @@
     },
     {
       "type": "header",
-      "content": "Secondary button"
-    },
-    {
-      "type": "text",
-      "id": "secondary_button_label",
-      "label": "Label",
-      "default": "The Story"
-    },
-    {
-      "type": "url",
-      "id": "secondary_button_link",
-      "label": "Link"
-    },
-    {
-      "type": "header",
       "content": "Product image (right side)"
     },
     {
@@ -458,18 +423,6 @@
       "id": "stat2_value",
       "label": "Stat 2 value",
       "default": "All 50 States"
-    },
-    {
-      "type": "text",
-      "id": "stat3_label",
-      "label": "Stat 3 label",
-      "default": "Kick-Off"
-    },
-    {
-      "type": "text",
-      "id": "stat3_value",
-      "label": "Stat 3 value",
-      "default": "June 11, 2026"
     }
   ],
   "presets": [
