@@ -1,7 +1,3 @@
-{%- liquid
-  assign current_variant = product.selected_or_first_available_variant
--%}
-
 <section class="w1w-colors" id="w1w-pdp-colors">
   <div class="wrap">
     {%- if section.settings.eyebrow != blank -%}
@@ -14,16 +10,13 @@
       <p class="w1w-colors__desc">{{ section.settings.description }}</p>
     {%- endif -%}
 
-    <div class="w1w-colors__grid" id="w1wColorGrid">
-      <!-- JS populates color variant cards from W1W_COUNTRIES data -->
+    <div class="w1w-colors__row" id="w1wColorGrid">
+      <!-- JS populates color swatches -->
     </div>
 
-    <div class="w1w-colors__active" id="w1wColorActive">
-      <div class="w1w-colors__active-swatch" id="w1wColorActiveSwatch"></div>
-      <div class="w1w-colors__active-info">
-        <span class="w1w-colors__active-name" id="w1wColorActiveName"></span>
-        <span class="w1w-colors__active-tag" id="w1wColorActiveTag"></span>
-      </div>
+    <div class="w1w-colors__selected" id="w1wColorSelected">
+      <span class="w1w-colors__selected-name" id="w1wColorName"></span>
+      <span class="w1w-colors__selected-tag" id="w1wColorTag"></span>
     </div>
   </div>
 </section>
@@ -44,42 +37,35 @@ document.addEventListener('DOMContentLoaded', function () {
   ];
 
   var grid = document.getElementById('w1wColorGrid');
-  var activeSwatch = document.getElementById('w1wColorActiveSwatch');
-  var activeName = document.getElementById('w1wColorActiveName');
-  var activeTag = document.getElementById('w1wColorActiveTag');
+  var nameEl = document.getElementById('w1wColorName');
+  var tagEl = document.getElementById('w1wColorTag');
   if (!grid) return;
 
   function setActive(idx) {
     var v = variants[idx];
-    grid.querySelectorAll('.w1w-colors__card').forEach(function (c, i) {
-      c.classList.toggle('active', i === idx);
+    grid.querySelectorAll('.w1w-colors__swatch').forEach(function (s, i) {
+      s.classList.toggle('active', i === idx);
     });
-    if (activeSwatch) activeSwatch.style.background = 'linear-gradient(135deg, ' + v.colors[0] + ' 33%, ' + v.colors[1] + ' 33%, ' + v.colors[1] + ' 66%, ' + v.colors[2] + ' 66%)';
-    if (activeName) activeName.textContent = v.name;
-    if (activeTag) activeTag.textContent = v.tag;
+    if (nameEl) nameEl.textContent = v.name;
+    if (tagEl) tagEl.textContent = v.tag;
   }
 
   grid.innerHTML = variants.map(function (v, i) {
-    return '<button class="w1w-colors__card' + (i === 0 ? ' active' : '') + '" data-ci="' + i + '">' +
-      '<div class="w1w-colors__swatch">' +
-        '<span style="background:' + v.colors[0] + '"></span>' +
-        '<span style="background:' + v.colors[1] + '"></span>' +
-        '<span style="background:' + v.colors[2] + '"></span>' +
-      '</div>' +
-      '<div class="w1w-colors__card-name">' + v.name + '</div>' +
-      '<div class="w1w-colors__card-tag">' + v.tag + '</div>' +
+    return '<button class="w1w-colors__swatch' + (i === 0 ? ' active' : '') + '" data-ci="' + i + '" aria-label="' + v.name + '">' +
+      '<span class="w1w-colors__dot" style="background:' + v.colors[0] + '"></span>' +
+      '<span class="w1w-colors__dot" style="background:' + v.colors[1] + '"></span>' +
+      '<span class="w1w-colors__dot" style="background:' + v.colors[2] + '"></span>' +
     '</button>';
   }).join('');
 
   setActive(0);
 
-  grid.querySelectorAll('.w1w-colors__card').forEach(function (card) {
-    card.addEventListener('click', function () {
-      setActive(parseInt(card.dataset.ci));
-      // Also sync with gallery thumbs if they exist
+  grid.querySelectorAll('.w1w-colors__swatch').forEach(function (swatch) {
+    swatch.addEventListener('click', function () {
+      setActive(parseInt(swatch.dataset.ci));
       var thumbs = document.getElementById('w1wThumbs');
       if (thumbs) {
-        var thumb = thumbs.querySelectorAll('.w1w-pdp-thumb')[parseInt(card.dataset.ci)];
+        var thumb = thumbs.querySelectorAll('.w1w-pdp-thumb')[parseInt(swatch.dataset.ci)];
         if (thumb) thumb.click();
       }
     });
@@ -120,78 +106,48 @@ document.addEventListener('DOMContentLoaded', function () {
   margin: 0 0 40px;
 }
 
-.w1w-colors__grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 6px;
-  margin-bottom: 32px;
-}
-
-.w1w-colors__card {
-  background: var(--bg-1, #131313);
-  border: 1px solid var(--line, rgba(243,255,202,0.12));
-  padding: 24px 16px;
-  cursor: pointer;
-  text-align: center;
-  transition: border-color .2s, background .2s;
+.w1w-colors__row {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-}
-.w1w-colors__card:hover {
-  border-color: rgba(243,255,202,0.3);
-  background: var(--bg-2, #1C1C1C);
-}
-.w1w-colors__card.active {
-  border-color: var(--lime, #F3FFCA);
-  background: var(--bg-2, #1C1C1C);
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
 }
 
 .w1w-colors__swatch {
   display: flex;
-  gap: 3px;
-  width: 48px;
-  height: 48px;
+  gap: 6px;
+  align-items: center;
+  padding: 12px 20px;
+  background: var(--bg-1, #131313);
+  border: 2px solid transparent;
+  border-radius: 40px;
+  cursor: pointer;
+  transition: border-color .2s, background .2s, transform .15s;
+}
+.w1w-colors__swatch:hover {
+  border-color: rgba(243,255,202,0.3);
+  background: var(--bg-2, #1C1C1C);
+}
+.w1w-colors__swatch.active {
+  border-color: var(--lime, #F3FFCA);
+  background: var(--bg-2, #1C1C1C);
+  transform: scale(1.05);
+}
+
+.w1w-colors__dot {
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
-  overflow: hidden;
-}
-.w1w-colors__swatch span {
-  flex: 1;
   display: block;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1);
 }
 
-.w1w-colors__card-name {
-  font-family: var(--font-display, 'Space Grotesk', sans-serif);
-  font-weight: 700;
-  font-size: 12px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--ink-0, #fff);
-}
-.w1w-colors__card-tag {
-  font-size: 10px;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: var(--ink-3, #737373);
-}
-
-.w1w-colors__active {
+.w1w-colors__selected {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 16px 20px;
-  background: var(--bg-1, #131313);
-  border: 1px solid var(--line, rgba(243,255,202,0.12));
+  gap: 12px;
 }
-.w1w-colors__active-swatch {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  flex-shrink: 0;
-  transition: background .3s;
-}
-.w1w-colors__active-name {
+.w1w-colors__selected-name {
   font-family: var(--font-display, 'Space Grotesk', sans-serif);
   font-weight: 700;
   font-size: 14px;
@@ -199,23 +155,18 @@ document.addEventListener('DOMContentLoaded', function () {
   text-transform: uppercase;
   color: var(--lime, #F3FFCA);
 }
-.w1w-colors__active-tag {
+.w1w-colors__selected-tag {
   font-size: 11px;
   letter-spacing: 0.15em;
   text-transform: uppercase;
   color: var(--ink-3, #737373);
-  margin-left: auto;
-}
-.w1w-colors__active-info {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex: 1;
 }
 
 @media (max-width: 600px) {
   .w1w-colors { padding: 48px 0; }
-  .w1w-colors__grid { grid-template-columns: repeat(2, 1fr); }
+  .w1w-colors__row { gap: 10px; }
+  .w1w-colors__swatch { padding: 10px 16px; }
+  .w1w-colors__dot { width: 20px; height: 20px; }
 }
 {% endstylesheet %}
 
