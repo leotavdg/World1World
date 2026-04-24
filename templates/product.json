@@ -39,7 +39,7 @@
         "in_stock_label": "In Stock",
         "sold_out_label": "Sold Out",
         "price_note": "Free shipping over $35",
-        "size_label": "Size",
+        "variant_label": "Color",
         "size_guide_label": "",
         "show_tier_pricing": true,
         "tier_label": "Stack & Save",
