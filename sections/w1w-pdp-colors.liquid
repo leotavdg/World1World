@@ -1,3 +1,15 @@
+{%- liquid
+  assign color_option = nil
+  for option in product.options_with_values
+    assign option_name_down = option.name | downcase
+    if option_name_down == 'color' or option_name_down == 'colour' or option_name_down == 'style'
+      assign color_option = option
+      break
+    endif
+  endfor
+-%}
+
+{%- if color_option != nil and color_option.values.size > 1 -%}
 <section class="w1w-colors" id="w1w-pdp-colors">
   <div class="wrap">
     {%- if section.settings.eyebrow != blank -%}
@@ -10,68 +22,75 @@
       <p class="w1w-colors__desc">{{ section.settings.description }}</p>
     {%- endif -%}
 
-    <div class="w1w-colors__row" id="w1wColorGrid">
-      <!-- JS populates color swatches -->
+    <div class="w1w-colors__row">
+      {%- for value in color_option.values -%}
+        {%- assign is_selected = false -%}
+        {%- if value.selected -%}{%- assign is_selected = true -%}{%- endif -%}
+        {%- assign swatch_bg = nil -%}
+        {%- if value.swatch.color -%}
+          {%- assign swatch_bg = 'rgb(' | append: value.swatch.color.rgb | append: ')' -%}
+        {%- elsif value.swatch.image -%}
+          {%- assign swatch_bg = 'url(' | append: value.swatch.image | image_url: width: 80 | append: ')' -%}
+        {%- endif -%}
+        <button
+          class="w1w-colors__swatch{% if is_selected %} active{% endif %}"
+          data-color-value="{{ value | escape }}"
+          aria-label="{{ value | escape }}"
+          type="button"
+        >
+          <span class="w1w-colors__dot" style="{% if swatch_bg %}background: {{ swatch_bg }};{% else %}background: #737373;{% endif %}"></span>
+          <span class="w1w-colors__label">{{ value }}</span>
+        </button>
+      {%- endfor -%}
     </div>
 
-    <div class="w1w-colors__selected" id="w1wColorSelected">
-      <span class="w1w-colors__selected-name" id="w1wColorName"></span>
-      <span class="w1w-colors__selected-tag" id="w1wColorTag"></span>
+    <div class="w1w-colors__selected">
+      <span class="w1w-colors__selected-name">{{ color_option.selected_value }}</span>
     </div>
   </div>
 </section>
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-  var COUNTRIES = window.W1W_COUNTRIES || [];
-  var slug = {{ product.handle | json }};
-  var country = COUNTRIES.find(function (c) { return c.slug === slug; });
-  if (!country || !country.colors) return;
+(function () {
+  var section = document.getElementById('w1w-pdp-colors');
+  if (!section) return;
 
-  var colors = country.colors;
-  var variants = [
-    { name: '{{ section.settings.variant_1_name }}', tag: '{{ section.settings.variant_1_tag }}', colors: colors },
-    { name: '{{ section.settings.variant_2_name }}', tag: '{{ section.settings.variant_2_tag }}', colors: [colors[1], colors[2], colors[0]] },
-    { name: '{{ section.settings.variant_3_name }}', tag: '{{ section.settings.variant_3_tag }}', colors: [colors[2], colors[0], colors[1]] },
-    { name: '{{ section.settings.variant_4_name }}', tag: '{{ section.settings.variant_4_tag }}', colors: ['#0E0E0E', colors[0], colors[1]] }
-  ];
+  var swatches = section.querySelectorAll('.w1w-colors__swatch');
+  var nameEl = section.querySelector('.w1w-colors__selected-name');
 
-  var grid = document.getElementById('w1wColorGrid');
-  var nameEl = document.getElementById('w1wColorName');
-  var tagEl = document.getElementById('w1wColorTag');
-  if (!grid) return;
-
-  function setActive(idx) {
-    var v = variants[idx];
-    grid.querySelectorAll('.w1w-colors__swatch').forEach(function (s, i) {
-      s.classList.toggle('active', i === idx);
-    });
-    if (nameEl) nameEl.textContent = v.name;
-    if (tagEl) tagEl.textContent = v.tag;
-  }
-
-  grid.innerHTML = variants.map(function (v, i) {
-    return '<button class="w1w-colors__swatch' + (i === 0 ? ' active' : '') + '" data-ci="' + i + '" aria-label="' + v.name + '">' +
-      '<span class="w1w-colors__dot" style="background:' + v.colors[0] + '"></span>' +
-      '<span class="w1w-colors__dot" style="background:' + v.colors[1] + '"></span>' +
-      '<span class="w1w-colors__dot" style="background:' + v.colors[2] + '"></span>' +
-    '</button>';
-  }).join('');
-
-  setActive(0);
-
-  grid.querySelectorAll('.w1w-colors__swatch').forEach(function (swatch) {
+  swatches.forEach(function (swatch) {
     swatch.addEventListener('click', function () {
-      setActive(parseInt(swatch.dataset.ci));
-      var thumbs = document.getElementById('w1wThumbs');
-      if (thumbs) {
-        var thumb = thumbs.querySelectorAll('.w1w-pdp-thumb')[parseInt(swatch.dataset.ci)];
-        if (thumb) thumb.click();
+      var colorVal = swatch.dataset.colorValue;
+
+      // Update active state
+      swatches.forEach(function (s) { s.classList.remove('active'); });
+      swatch.classList.add('active');
+      if (nameEl) nameEl.textContent = colorVal;
+
+      // Find and click matching variant option in the main product form
+      var mainForm = document.getElementById('w1w-product-form');
+      if (!mainForm) return;
+      var inputs = mainForm.querySelectorAll('input[type="radio"], button[data-variant-id]');
+      inputs.forEach(function (input) {
+        if (input.value === colorVal || input.textContent.trim() === colorVal) {
+          input.click();
+        }
+      });
+
+      // Also try Shopify's variant picker
+      var variantPicker = document.querySelector('variant-picker');
+      if (variantPicker) {
+        var optionInput = variantPicker.querySelector('input[value="' + colorVal + '"]');
+        if (optionInput) {
+          optionInput.checked = true;
+          optionInput.dispatchEvent(new Event('change', { bubbles: true }));
+        }
       }
     });
   });
-});
+})();
 </script>
+{%- endif -%}
 
 {% stylesheet %}
 .w1w-colors {
@@ -108,16 +127,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
 .w1w-colors__row {
   display: flex;
-  gap: 16px;
+  gap: 12px;
   flex-wrap: wrap;
   margin-bottom: 24px;
 }
 
 .w1w-colors__swatch {
   display: flex;
-  gap: 6px;
   align-items: center;
-  padding: 12px 20px;
+  gap: 10px;
+  padding: 10px 20px 10px 10px;
   background: var(--bg-1, #131313);
   border: 2px solid transparent;
   border-radius: 40px;
@@ -135,11 +154,26 @@ document.addEventListener('DOMContentLoaded', function () {
 }
 
 .w1w-colors__dot {
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   display: block;
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1);
+  flex-shrink: 0;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12);
+  background-size: cover;
+  background-position: center;
+}
+
+.w1w-colors__label {
+  font-family: var(--font-display, 'Space Grotesk', sans-serif);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-1, #D4D4D4);
+}
+.w1w-colors__swatch.active .w1w-colors__label {
+  color: var(--lime, #F3FFCA);
 }
 
 .w1w-colors__selected {
@@ -155,18 +189,13 @@ document.addEventListener('DOMContentLoaded', function () {
   text-transform: uppercase;
   color: var(--lime, #F3FFCA);
 }
-.w1w-colors__selected-tag {
-  font-size: 11px;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: var(--ink-3, #737373);
-}
 
 @media (max-width: 600px) {
   .w1w-colors { padding: 48px 0; }
-  .w1w-colors__row { gap: 10px; }
-  .w1w-colors__swatch { padding: 10px 16px; }
-  .w1w-colors__dot { width: 20px; height: 20px; }
+  .w1w-colors__row { gap: 8px; }
+  .w1w-colors__swatch { padding: 8px 14px 8px 8px; }
+  .w1w-colors__dot { width: 22px; height: 22px; }
+  .w1w-colors__label { font-size: 10px; }
 }
 {% endstylesheet %}
 
@@ -191,19 +220,7 @@ document.addEventListener('DOMContentLoaded', function () {
       "id": "description",
       "label": "Description",
       "default": "Four colorways per nation — choose the one that matches your game day fit."
-    },
-    {
-      "type": "header",
-      "content": "Variant names"
-    },
-    { "type": "text", "id": "variant_1_name", "label": "Variant 1 name", "default": "Home" },
-    { "type": "text", "id": "variant_1_tag",  "label": "Variant 1 tag",  "default": "DROP 03" },
-    { "type": "text", "id": "variant_2_name", "label": "Variant 2 name", "default": "Away" },
-    { "type": "text", "id": "variant_2_tag",  "label": "Variant 2 tag",  "default": "ALTERNATE" },
-    { "type": "text", "id": "variant_3_name", "label": "Variant 3 name", "default": "Reverse" },
-    { "type": "text", "id": "variant_3_tag",  "label": "Variant 3 tag",  "default": "INVERTED" },
-    { "type": "text", "id": "variant_4_name", "label": "Variant 4 name", "default": "Blackout" },
-    { "type": "text", "id": "variant_4_tag",  "label": "Variant 4 tag",  "default": "STEALTH" }
+    }
   ],
   "presets": [{ "name": "W1W Color Variants" }]
 }
