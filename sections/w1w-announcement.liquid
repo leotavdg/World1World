@@ -1,4 +1,4 @@
-<div class="w1w-announce">
+<div class="w1w-announce w1w-announce--{{ section.settings.direction }}">
   <div class="w1w-announce__ticker">
     {%- assign messages = section.settings.messages | split: '|' -%}
     {%- comment -%}Repeat 3× for seamless loop{%- endcomment -%}
@@ -46,6 +46,9 @@
   color: rgba(81,103,0,0.5);
   font-size: 8px;
 }
+.w1w-announce--reverse .w1w-announce__ticker {
+  animation-direction: reverse;
+}
 @keyframes w1wAnnounceTick {
   from { transform: translateX(0); }
   to   { transform: translateX(-33.333%); }
@@ -61,6 +64,16 @@
       "id": "messages",
       "label": "Messages (separate with |)",
       "default": "FREE US SHIPPING OVER $35 | DROP 03 — HOST NATIONS LIVE NOW | STACK 3 FOR 10% OFF · 5 FOR 15% · 8 FOR 20% | 50+ NATIONS | KICK-OFF: 2026"
+    },
+    {
+      "type": "select",
+      "id": "direction",
+      "label": "Slide direction",
+      "options": [
+        { "value": "forward", "label": "Left (forward)" },
+        { "value": "reverse", "label": "Right (reverse)" }
+      ],
+      "default": "forward"
     }
   ],
   "enabled_on": {
