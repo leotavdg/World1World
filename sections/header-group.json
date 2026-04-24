@@ -15,16 +15,16 @@
       "type": "w1w-announcement",
       "settings": {
         "messages": "FREE US SHIPPING OVER $35 | DROP 03 — HOST NATIONS LIVE NOW | STACK 3 FOR 10% OFF · 5 FOR 15% · 8 FOR 20% | 50+ NATIONS | KICK-OFF: 2026",
-        "direction": "reverse"
+        "direction": "forward"
       }
     },
     "header_section": {
       "type": "w1w-nav",
       "settings": {
+        "menu": "main-menu",
         "brand_text_1": "WORLD",
         "brand_text_2": "1",
         "brand_text_3": "WORLD",
-        "menu": "main-menu",
         "show_search": true,
         "show_account": true
       }

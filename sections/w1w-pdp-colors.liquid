@@ -1,0 +1,259 @@
+{%- liquid
+  assign current_variant = product.selected_or_first_available_variant
+-%}
+
+<section class="w1w-colors" id="w1w-pdp-colors">
+  <div class="wrap">
+    {%- if section.settings.eyebrow != blank -%}
+      <span class="w1w-colors__eyebrow">{{ section.settings.eyebrow }}</span>
+    {%- endif -%}
+    {%- if section.settings.heading != blank -%}
+      <h2 class="w1w-colors__heading">{{ section.settings.heading }}</h2>
+    {%- endif -%}
+    {%- if section.settings.description != blank -%}
+      <p class="w1w-colors__desc">{{ section.settings.description }}</p>
+    {%- endif -%}
+
+    <div class="w1w-colors__grid" id="w1wColorGrid">
+      <!-- JS populates color variant cards from W1W_COUNTRIES data -->
+    </div>
+
+    <div class="w1w-colors__active" id="w1wColorActive">
+      <div class="w1w-colors__active-swatch" id="w1wColorActiveSwatch"></div>
+      <div class="w1w-colors__active-info">
+        <span class="w1w-colors__active-name" id="w1wColorActiveName"></span>
+        <span class="w1w-colors__active-tag" id="w1wColorActiveTag"></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var COUNTRIES = window.W1W_COUNTRIES || [];
+  var slug = {{ product.handle | json }};
+  var country = COUNTRIES.find(function (c) { return c.slug === slug; });
+  if (!country || !country.colors) return;
+
+  var colors = country.colors;
+  var variants = [
+    { name: '{{ section.settings.variant_1_name }}', tag: '{{ section.settings.variant_1_tag }}', colors: colors },
+    { name: '{{ section.settings.variant_2_name }}', tag: '{{ section.settings.variant_2_tag }}', colors: [colors[1], colors[2], colors[0]] },
+    { name: '{{ section.settings.variant_3_name }}', tag: '{{ section.settings.variant_3_tag }}', colors: [colors[2], colors[0], colors[1]] },
+    { name: '{{ section.settings.variant_4_name }}', tag: '{{ section.settings.variant_4_tag }}', colors: ['#0E0E0E', colors[0], colors[1]] }
+  ];
+
+  var grid = document.getElementById('w1wColorGrid');
+  var activeSwatch = document.getElementById('w1wColorActiveSwatch');
+  var activeName = document.getElementById('w1wColorActiveName');
+  var activeTag = document.getElementById('w1wColorActiveTag');
+  if (!grid) return;
+
+  function setActive(idx) {
+    var v = variants[idx];
+    grid.querySelectorAll('.w1w-colors__card').forEach(function (c, i) {
+      c.classList.toggle('active', i === idx);
+    });
+    if (activeSwatch) activeSwatch.style.background = 'linear-gradient(135deg, ' + v.colors[0] + ' 33%, ' + v.colors[1] + ' 33%, ' + v.colors[1] + ' 66%, ' + v.colors[2] + ' 66%)';
+    if (activeName) activeName.textContent = v.name;
+    if (activeTag) activeTag.textContent = v.tag;
+  }
+
+  grid.innerHTML = variants.map(function (v, i) {
+    return '<button class="w1w-colors__card' + (i === 0 ? ' active' : '') + '" data-ci="' + i + '">' +
+      '<div class="w1w-colors__swatch">' +
+        '<span style="background:' + v.colors[0] + '"></span>' +
+        '<span style="background:' + v.colors[1] + '"></span>' +
+        '<span style="background:' + v.colors[2] + '"></span>' +
+      '</div>' +
+      '<div class="w1w-colors__card-name">' + v.name + '</div>' +
+      '<div class="w1w-colors__card-tag">' + v.tag + '</div>' +
+    '</button>';
+  }).join('');
+
+  setActive(0);
+
+  grid.querySelectorAll('.w1w-colors__card').forEach(function (card) {
+    card.addEventListener('click', function () {
+      setActive(parseInt(card.dataset.ci));
+      // Also sync with gallery thumbs if they exist
+      var thumbs = document.getElementById('w1wThumbs');
+      if (thumbs) {
+        var thumb = thumbs.querySelectorAll('.w1w-pdp-thumb')[parseInt(card.dataset.ci)];
+        if (thumb) thumb.click();
+      }
+    });
+  });
+});
+</script>
+
+{% stylesheet %}
+.w1w-colors {
+  padding: 80px 0;
+  background: var(--bg-0, #0E0E0E);
+  border-top: 1px solid var(--line, rgba(243,255,202,0.12));
+}
+.w1w-colors__eyebrow {
+  display: block;
+  font-family: var(--font-display, 'Space Grotesk', sans-serif);
+  font-size: 11px;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--lime, #F3FFCA);
+  margin-bottom: 12px;
+}
+.w1w-colors__heading {
+  font-family: var(--font-display, 'Space Grotesk', sans-serif);
+  font-size: clamp(32px, 5vw, 56px);
+  font-weight: 700;
+  color: var(--ink-0, #fff);
+  line-height: 0.92;
+  letter-spacing: -0.03em;
+  margin: 0 0 16px;
+  text-transform: uppercase;
+}
+.w1w-colors__desc {
+  color: var(--ink-2, #ADAAAA);
+  font-size: 14px;
+  line-height: 1.6;
+  max-width: 480px;
+  margin: 0 0 40px;
+}
+
+.w1w-colors__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-bottom: 32px;
+}
+
+.w1w-colors__card {
+  background: var(--bg-1, #131313);
+  border: 1px solid var(--line, rgba(243,255,202,0.12));
+  padding: 24px 16px;
+  cursor: pointer;
+  text-align: center;
+  transition: border-color .2s, background .2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.w1w-colors__card:hover {
+  border-color: rgba(243,255,202,0.3);
+  background: var(--bg-2, #1C1C1C);
+}
+.w1w-colors__card.active {
+  border-color: var(--lime, #F3FFCA);
+  background: var(--bg-2, #1C1C1C);
+}
+
+.w1w-colors__swatch {
+  display: flex;
+  gap: 3px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  overflow: hidden;
+}
+.w1w-colors__swatch span {
+  flex: 1;
+  display: block;
+}
+
+.w1w-colors__card-name {
+  font-family: var(--font-display, 'Space Grotesk', sans-serif);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-0, #fff);
+}
+.w1w-colors__card-tag {
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ink-3, #737373);
+}
+
+.w1w-colors__active {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  background: var(--bg-1, #131313);
+  border: 1px solid var(--line, rgba(243,255,202,0.12));
+}
+.w1w-colors__active-swatch {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  transition: background .3s;
+}
+.w1w-colors__active-name {
+  font-family: var(--font-display, 'Space Grotesk', sans-serif);
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--lime, #F3FFCA);
+}
+.w1w-colors__active-tag {
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ink-3, #737373);
+  margin-left: auto;
+}
+.w1w-colors__active-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+@media (max-width: 600px) {
+  .w1w-colors { padding: 48px 0; }
+  .w1w-colors__grid { grid-template-columns: repeat(2, 1fr); }
+}
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "W1W Color Variants",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Colorway"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "PICK YOUR EDITION."
+    },
+    {
+      "type": "text",
+      "id": "description",
+      "label": "Description",
+      "default": "Four colorways per nation — choose the one that matches your game day fit."
+    },
+    {
+      "type": "header",
+      "content": "Variant names"
+    },
+    { "type": "text", "id": "variant_1_name", "label": "Variant 1 name", "default": "Home" },
+    { "type": "text", "id": "variant_1_tag",  "label": "Variant 1 tag",  "default": "DROP 03" },
+    { "type": "text", "id": "variant_2_name", "label": "Variant 2 name", "default": "Away" },
+    { "type": "text", "id": "variant_2_tag",  "label": "Variant 2 tag",  "default": "ALTERNATE" },
+    { "type": "text", "id": "variant_3_name", "label": "Variant 3 name", "default": "Reverse" },
+    { "type": "text", "id": "variant_3_tag",  "label": "Variant 3 tag",  "default": "INVERTED" },
+    { "type": "text", "id": "variant_4_name", "label": "Variant 4 name", "default": "Blackout" },
+    { "type": "text", "id": "variant_4_tag",  "label": "Variant 4 tag",  "default": "STEALTH" }
+  ],
+  "presets": [{ "name": "W1W Color Variants" }]
+}
+{% endschema %}

@@ -91,6 +91,22 @@
         "feature_3_desc": "Every order ships within 24 hours. Nationwide delivery, tracked from warehouse to doorstep."
       }
     },
+    "colors": {
+      "type": "w1w-pdp-colors",
+      "settings": {
+        "eyebrow": "Colorway",
+        "heading": "PICK YOUR EDITION.",
+        "description": "Four colorways per nation — choose the one that matches your game day fit.",
+        "variant_1_name": "Home",
+        "variant_1_tag": "DROP 03",
+        "variant_2_name": "Away",
+        "variant_2_tag": "ALTERNATE",
+        "variant_3_name": "Reverse",
+        "variant_3_tag": "INVERTED",
+        "variant_4_name": "Blackout",
+        "variant_4_tag": "STEALTH"
+      }
+    },
     "upsell": {
       "type": "w1w-pdp-upsell",
       "settings": {
@@ -118,6 +134,7 @@
     "main",
     "strip",
     "features",
+    "colors",
     "upsell"
   ]
 }
