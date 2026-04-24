@@ -166,6 +166,7 @@
           <input type="hidden" name="id" id="w1wVariantId" value="{{ current_variant.id }}">
 
           {%- unless product.has_only_default_variant -%}
+            {%- assign color_option = product.options_with_values | first -%}
             <div class="w1w-field">
               <div class="w1w-field-label">
                 <span>{{ section.settings.variant_label }}</span>
@@ -175,17 +176,29 @@
               </div>
               <div class="w1w-variant-row">
                 {%- for variant in product.variants -%}
-                  {%- assign color_name = variant.title | downcase | strip -%}
+                  {%- comment -%}Get the swatch color from the option value{%- endcomment -%}
+                  {%- assign swatch_bg = '' -%}
+                  {%- if color_option -%}
+                    {%- for opt_val in color_option.values -%}
+                      {%- if opt_val.name == variant.title or opt_val == variant.title -%}
+                        {%- if opt_val.swatch.color -%}
+                          {%- assign swatch_bg = 'rgb(' | append: opt_val.swatch.color.rgb | append: ')' -%}
+                        {%- elsif opt_val.swatch.image -%}
+                          {%- assign swatch_bg = 'url(' | append: opt_val.swatch.image | image_url: width: 80 | append: ')' -%}
+                        {%- endif -%}
+                        {%- break -%}
+                      {%- endif -%}
+                    {%- endfor -%}
+                  {%- endif -%}
                   <button
                     type="button"
                     class="w1w-variant-swatch{% if variant == current_variant %} active{% endif %}{% unless variant.available %} w1w-variant-swatch--na{% endunless %}"
                     data-variant-id="{{ variant.id }}"
                     data-variant-price="{{ variant.price }}"
-                    data-color-name="{{ color_name }}"
                     {% unless variant.available %}aria-disabled="true"{% endunless %}
                     title="{{ variant.title }}"
                   >
-                    <span class="w1w-variant-dot" style="background: {{ color_name }};"></span>
+                    <span class="w1w-variant-dot" style="{% if swatch_bg != '' %}background: {{ swatch_bg }};{% endif %}{% if swatch_bg contains 'url(' %}background-size:cover;background-position:center;{% endif %}"></span>
                     <span class="w1w-variant-name">{{ variant.title }}</span>
                   </button>
                 {%- endfor -%}
