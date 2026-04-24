@@ -35,7 +35,7 @@
       "settings": {
         "text": "WEAR YOUR COUNTRY",
         "style": "primary",
-        "direction": "reverse"
+        "direction": "forward"
       }
     },
     "w1w_featured_products": {
@@ -155,7 +155,7 @@
       "settings": {
         "text": "CANADA · MEXICO · USA  ·  ARGENTINA · BRAZIL · URUGUAY  ·  ENGLAND · FRANCE · GERMANY  ·  FOR THE BEAUTIFUL GAME",
         "style": "secondary",
-        "direction": "reverse"
+        "direction": "forward"
       }
     },
     "w1w_bento": {
