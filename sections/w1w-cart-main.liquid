@@ -19,7 +19,7 @@
         <div class="w1w-cart-lines" id="w1wCartLines">
           {%- for item in cart.items -%}
             {%- assign is_donation = false -%}
-            {%- if item.properties._donation == 'true' -%}
+            {%- if item.properties.Donation == 'true' -%}
               {%- assign is_donation = true -%}
             {%- endif -%}
 
@@ -143,9 +143,6 @@
                   <span class="w1w-donation__price" id="w1wDonationPrice"></span>
                   <button type="button" class="w1w-donation__submit" id="w1wDonationAdd" disabled>DONATE</button>
                 </div>
-                <div class="w1w-donation__success" id="w1wDonationAdded" style="display:none;">
-                  ✓ {{ section.settings.donation_success }}
-                </div>
                 {%- if section.settings.donation_link_url != blank -%}
                   <a href="{{ section.settings.donation_link_url }}" class="w1w-donation__learn" target="_blank" rel="noopener">{{ section.settings.donation_link_label }} →</a>
                 {%- endif -%}
@@ -247,18 +244,41 @@ document.addEventListener('DOMContentLoaded', function () {
     submitBtn.disabled = true;
     submitBtn.textContent = 'ADDING…';
 
+    /* Step 1: get donation product variant ID */
     fetch('/products/donation.js')
     .then(function (resp) {
-      if (!resp.ok) throw new Error('Donation product not found — check it is published');
+      if (!resp.ok) throw new Error('Donation product not found — is it published?');
       return resp.json();
     })
     .then(function (prod) {
-      return fetch('/cart/add.js', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          items: [{ id: prod.variants[0].id, quantity: amt, properties: { '_donation': 'true' } }]
-        })
+      var vid = prod.variants[0].id;
+
+      /* Step 2: get current cart to find & remove any existing donation */
+      return fetch('/cart.js').then(function (r) { return r.json(); })
+      .then(function (cart) {
+        var removes = [];
+        for (var i = 0; i < cart.items.length; i++) {
+          if (cart.items[i].product_id === prod.id || (cart.items[i].properties && cart.items[i].properties.Donation === 'true')) {
+            removes.push(fetch('/cart/change.js', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ id: cart.items[i].key, quantity: 0 })
+            }));
+          }
+        }
+        if (removes.length > 0) {
+          return removes.reduce(function (chain, p) { return chain.then(function () { return p; }); }, Promise.resolve());
+        }
+      })
+      .then(function () {
+        /* Step 3: add fresh donation */
+        return fetch('/cart/add.js', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            items: [{ id: vid, quantity: amt, properties: { 'Donation': 'true' } }]
+          })
+        });
       });
     })
     .then(function (resp) {
@@ -266,10 +286,7 @@ document.addEventListener('DOMContentLoaded', function () {
       return resp.json();
     })
     .then(function () {
-      submitBtn.style.display = 'none';
-      var msg = document.getElementById('w1wDonationAdded');
-      if (msg) msg.style.display = 'flex';
-      setTimeout(function () { window.location.reload(); }, 600);
+      window.location.reload();
     })
     .catch(function (err) {
       window.alert('Donation error: ' + err.message);
