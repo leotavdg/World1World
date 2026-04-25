@@ -1,86 +1,53 @@
 {%- liquid
   assign products_per_page = section.settings.products_per_page | default: 24
   assign sort_by = collection.sort_by | default: collection.default_sort_by
+
+  assign continent_filter = nil
+  assign country_filter = nil
+  assign sport_filter = nil
+
+  for filter in collection.filters
+    if filter.label == 'Continent'
+      assign continent_filter = filter
+    elsif filter.label == 'Country'
+      assign country_filter = filter
+    elsif filter.label == 'Sport'
+      assign sport_filter = filter
+    endif
+  endfor
+
+  assign active_count = 0
+  for filter in collection.filters
+    for v in filter.active_values
+      assign active_count = active_count | plus: 1
+    endfor
+  endfor
 -%}
 
 {%- paginate collection.products by products_per_page -%}
 
-{%- comment -%} Collect unique continents dynamically from metafields — strip JSON brackets/quotes {%- endcomment -%}
-{%- liquid
-  assign continent_list = ''
-  for product in collection.products
-    assign cont_raw = product.metafields.custom.continent | strip
-    assign cont = cont_raw | remove: '[' | remove: ']' | remove: '"' | strip
-    if cont != blank
-      if continent_list == ''
-        assign continent_list = cont
-      else
-        assign continent_arr = continent_list | split: '|||'
-        assign found = false
-        for c in continent_arr
-          if c == cont
-            assign found = true
-            break
-          endif
-        endfor
-        unless found
-          assign continent_list = continent_list | append: '|||' | append: cont
-        endunless
-      endif
-    endif
-  endfor
-  assign continents = continent_list | split: '|||' | sort
--%}
-
-{%- comment -%} Collect unique countries dynamically from metafields {%- endcomment -%}
-{%- liquid
-  assign country_list = ''
-  for product in collection.products
-    assign cntry_raw = product.metafields.custom.country | default: product.title | strip
-    assign cntry = cntry_raw | remove: '[' | remove: ']' | remove: '"' | strip
-    if cntry != blank
-      if country_list == ''
-        assign country_list = cntry
-      else
-        assign country_arr = country_list | split: '|||'
-        assign found_c = false
-        for cc in country_arr
-          if cc == cntry
-            assign found_c = true
-            break
-          endif
-        endfor
-        unless found_c
-          assign country_list = country_list | append: '|||' | append: cntry
-        endunless
-      endif
-    endif
-  endfor
-  assign countries_sorted = country_list | split: '|||' | sort
--%}
-
 <section class="w1w-shop">
 
-  <!-- Dynamic Continent chips from metafields -->
-  <div class="w1w-shop-chips-bar">
-    <div class="w1w-shop-chips-bar__inner">
-      <button class="w1w-chip w1w-chip--active" data-continent="all">
-        ALL <span class="w1w-chip__count">{{ collection.products_count }}</span>
-      </button>
-      {%- for cont in continents -%}
-        {%- assign cont_count = 0 -%}
-        {%- for product in collection.products -%}
-          {%- assign check_cont = product.metafields.custom.continent | remove: '[' | remove: ']' | remove: '"' | strip -%}
-          {%- if check_cont == cont -%}
-            {%- assign cont_count = cont_count | plus: 1 -%}
-          {%- endif -%}
-        {%- endfor -%}
-        <button class="w1w-chip" data-continent="{{ cont | handleize }}">
-          {{ cont | upcase }} <span class="w1w-chip__count">{{ cont_count }}</span>
+  <!-- Continent chips (server-side filter) -->
+  {%- if continent_filter -%}
+    {%- assign has_active_continent = false -%}
+    {%- for v in continent_filter.active_values -%}
+      {%- assign has_active_continent = true -%}
+    {%- endfor -%}
+    <div class="w1w-shop-chips-bar" data-continent-param="{{ continent_filter.param_name }}">
+      <div class="w1w-shop-chips-bar__inner">
+        <button class="w1w-chip{% unless has_active_continent %} w1w-chip--active{% endunless %}" data-continent-value="all">
+          ALL <span class="w1w-chip__count">{{ collection.products_count }}</span>
         </button>
-      {%- endfor -%}
+        {%- for value in continent_filter.values -%}
+          {%- assign clean_label = value.label | remove: '[' | remove: ']' | remove: '"' | strip -%}
+          <button class="w1w-chip{% if value.active %} w1w-chip--active{% endif %}" data-continent-value="{{ value.value }}">
+            {{ clean_label | upcase }} <span class="w1w-chip__count">{{ value.count }}</span>
+          </button>
+        {%- endfor -%}
+      </div>
     </div>
-  </div>
+  {%- endif -%}
 
   <div class="w1w-shop__inner">
 
@@ -93,7 +60,7 @@
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
         </button>
 
-        <!-- Search -->
+        <!-- Search (client-side, current page only) -->
         <div class="w1w-shop-filter-group">
           <div class="w1w-shop-search">
             <svg class="w1w-shop-search__icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
@@ -101,18 +68,57 @@
           </div>
         </div>
 
-        <!-- Country filter (dynamic from metafields) -->
-        {%- if countries_sorted.size > 0 -%}
+        <!-- Country filter (server-side via Shopify storefront filtering) -->
+        {%- if country_filter and country_filter.values.size > 0 -%}
           <div class="w1w-shop-filter-group">
             <h3 class="w1w-shop-filter-label">COUNTRY</h3>
-            <div class="w1w-shop-filter-scroll" id="w1w-country-filter">
+            <div class="w1w-shop-filter-scroll">
               <ul class="w1w-shop-filter-list">
-                {%- for cntry in countries_sorted -%}
+                {%- for value in country_filter.values -%}
+                  {%- assign clean_label = value.label | remove: '[' | remove: ']' | remove: '"' | strip -%}
                   <li>
-                    <button class="w1w-shop-filter-btn" data-filter-country="{{ cntry | handleize }}" data-filter-label="{{ cntry }}">
-                      <span class="w1w-shop-filter-check"></span>
-                      <span>{{ cntry }}</span>
-                    </button>
+                    {%- if value.active -%}
+                      <a href="{{ value.url_to_remove }}" class="w1w-shop-filter-link active">
+                        <span class="w1w-shop-filter-check w1w-shop-filter-check--on"></span>
+                        <span>{{ clean_label }}</span>
+                        <span class="w1w-shop-filter-cnt">{{ value.count }}</span>
+                      </a>
+                    {%- else -%}
+                      <a href="{{ value.url_to_add }}" class="w1w-shop-filter-link{% if value.count == 0 %} disabled{% endif %}">
+                        <span class="w1w-shop-filter-check"></span>
+                        <span>{{ clean_label }}</span>
+                        <span class="w1w-shop-filter-cnt">{{ value.count }}</span>
+                      </a>
+                    {%- endif -%}
+                  </li>
+                {%- endfor -%}
+              </ul>
+            </div>
+          </div>
+        {%- endif -%}
+
+        <!-- Theme filter (from Sport metafield, labeled as THEME) -->
+        {%- if sport_filter and sport_filter.values.size > 0 -%}
+          <div class="w1w-shop-filter-group">
+            <h3 class="w1w-shop-filter-label">THEME</h3>
+            <div class="w1w-shop-filter-scroll">
+              <ul class="w1w-shop-filter-list">
+                {%- for value in sport_filter.values -%}
+                  {%- assign clean_label = value.label | remove: '[' | remove: ']' | remove: '"' | strip -%}
+                  <li>
+                    {%- if value.active -%}
+                      <a href="{{ value.url_to_remove }}" class="w1w-shop-filter-link active">
+                        <span class="w1w-shop-filter-check w1w-shop-filter-check--on"></span>
+                        <span>{{ clean_label }}</span>
+                        <span class="w1w-shop-filter-cnt">{{ value.count }}</span>
+                      </a>
+                    {%- else -%}
+                      <a href="{{ value.url_to_add }}" class="w1w-shop-filter-link{% if value.count == 0 %} disabled{% endif %}">
+                        <span class="w1w-shop-filter-check"></span>
+                        <span>{{ clean_label }}</span>
+                        <span class="w1w-shop-filter-cnt">{{ value.count }}</span>
+                      </a>
+                    {%- endif -%}
                   </li>
                 {%- endfor -%}
               </ul>
@@ -133,55 +139,52 @@
           </div>
         </div>
 
-        <!-- Shopify native filters -->
-        {%- if collection.filters.size > 0 -%}
-          {%- for filter in collection.filters -%}
-            <div class="w1w-shop-filter-group">
-              <h3 class="w1w-shop-filter-label">{{ filter.label | upcase }}</h3>
-              {%- if filter.type == 'price_range' -%}
-                <div class="w1w-shop-price-row">
-                  <input type="number" name="{{ filter.min_value.param_name }}"
-                    value="{{ filter.min_value.value | divided_by: 100.0 }}"
-                    placeholder="Min" class="w1w-shop-price-input" min="0"
-                    max="{{ filter.range_max | divided_by: 100.0 }}">
-                  <span class="w1w-shop-price-dash">&ndash;</span>
-                  <input type="number" name="{{ filter.max_value.param_name }}"
-                    value="{{ filter.max_value.value | divided_by: 100.0 }}"
-                    placeholder="Max" class="w1w-shop-price-input" min="0"
-                    max="{{ filter.range_max | divided_by: 100.0 }}">
-                </div>
-              {%- elsif filter.type == 'boolean' or filter.type == 'list' -%}
-                <ul class="w1w-shop-filter-list">
-                  {%- for value in filter.values -%}
-                    {%- assign clean_label = value.label | remove: '[' | remove: ']' | remove: '"' | strip -%}
-                    <li>
-                      {%- if value.active -%}
-                        <a href="{{ value.url_to_remove }}" class="w1w-shop-filter-link active">
-                          <span class="w1w-shop-filter-check w1w-shop-filter-check--on"></span>
-                          <span>{{ clean_label }}</span>
-                          <span class="w1w-shop-filter-cnt">{{ value.count }}</span>
-                        </a>
-                      {%- else -%}
-                        <a href="{{ value.url_to_add }}" class="w1w-shop-filter-link{% if value.count == 0 %} disabled{% endif %}">
-                          <span class="w1w-shop-filter-check"></span>
-                          <span>{{ clean_label }}</span>
-                          <span class="w1w-shop-filter-cnt">{{ value.count }}</span>
-                        </a>
-                      {%- endif -%}
-                    </li>
-                  {%- endfor -%}
-                </ul>
-              {%- endif -%}
-            </div>
-          {%- endfor -%}
-
-          {%- assign active_count = 0 -%}
-          {%- for filter in collection.filters -%}
-            {%- for v in filter.active_values -%}{%- assign active_count = active_count | plus: 1 -%}{%- endfor -%}
-          {%- endfor -%}
-          {%- if active_count > 0 -%}
-            <a href="{{ collection.url }}" class="w1w-shop-clear">Clear all filters</a>
+        <!-- Other Shopify native filters (price, availability, etc.) -->
+        {%- for filter in collection.filters -%}
+          {%- if filter.label == 'Continent' or filter.label == 'Country' or filter.label == 'Sport' -%}
+            {%- continue -%}
           {%- endif -%}
+          <div class="w1w-shop-filter-group">
+            <h3 class="w1w-shop-filter-label">{{ filter.label | upcase }}</h3>
+            {%- if filter.type == 'price_range' -%}
+              <div class="w1w-shop-price-row">
+                <input type="number" name="{{ filter.min_value.param_name }}"
+                  value="{{ filter.min_value.value | divided_by: 100.0 }}"
+                  placeholder="Min" class="w1w-shop-price-input" min="0"
+                  max="{{ filter.range_max | divided_by: 100.0 }}">
+                <span class="w1w-shop-price-dash">&ndash;</span>
+                <input type="number" name="{{ filter.max_value.param_name }}"
+                  value="{{ filter.max_value.value | divided_by: 100.0 }}"
+                  placeholder="Max" class="w1w-shop-price-input" min="0"
+                  max="{{ filter.range_max | divided_by: 100.0 }}">
+              </div>
+            {%- elsif filter.type == 'boolean' or filter.type == 'list' -%}
+              <ul class="w1w-shop-filter-list">
+                {%- for value in filter.values -%}
+                  {%- assign clean_label = value.label | remove: '[' | remove: ']' | remove: '"' | strip -%}
+                  <li>
+                    {%- if value.active -%}
+                      <a href="{{ value.url_to_remove }}" class="w1w-shop-filter-link active">
+                        <span class="w1w-shop-filter-check w1w-shop-filter-check--on"></span>
+                        <span>{{ clean_label }}</span>
+                        <span class="w1w-shop-filter-cnt">{{ value.count }}</span>
+                      </a>
+                    {%- else -%}
+                      <a href="{{ value.url_to_add }}" class="w1w-shop-filter-link{% if value.count == 0 %} disabled{% endif %}">
+                        <span class="w1w-shop-filter-check"></span>
+                        <span>{{ clean_label }}</span>
+                        <span class="w1w-shop-filter-cnt">{{ value.count }}</span>
+                      </a>
+                    {%- endif -%}
+                  </li>
+                {%- endfor -%}
+              </ul>
+            {%- endif -%}
+          </div>
+        {%- endfor -%}
+
+        {%- if active_count > 0 -%}
+          <a href="{{ collection.url }}" class="w1w-shop-clear">Clear all filters</a>
         {%- endif -%}
 
       </div>
@@ -193,10 +196,20 @@
       <!-- Top bar -->
       <div class="w1w-shop-topbar">
         <span class="w1w-shop-topbar__count">
-          <span id="w1w-visible-count">{{ collection.products_count }}</span> NATIONS
+          <span id="w1w-visible-count">{{ paginate.items }}</span> NATIONS
         </span>
-        <!-- Active filter tags -->
-        <div class="w1w-shop-active-filters" id="w1w-active-filters"></div>
+        <!-- Active filter tags (server-side rendered) -->
+        <div class="w1w-shop-active-filters" id="w1w-active-filters">
+          {%- for filter in collection.filters -%}
+            {%- for value in filter.active_values -%}
+              {%- assign tag_label = value.label | remove: '[' | remove: ']' | remove: '"' | strip -%}
+              <a href="{{ value.url_to_remove }}" class="w1w-shop-active-tag">
+                {{ tag_label }}
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+              </a>
+            {%- endfor -%}
+          {%- endfor -%}
+        </div>
         <button class="w1w-shop-topbar__filter-toggle" id="w1w-filter-toggle" aria-label="Toggle filters">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/></svg>
           FILTERS
@@ -210,16 +223,10 @@
         {%- else -%}
           {%- for product in collection.products -%}
             {%- assign p_continent = product.metafields.custom.continent | remove: '[' | remove: ']' | remove: '"' | strip | default: '' -%}
-            {%- assign p_country = product.metafields.custom.country | remove: '[' | remove: ']' | remove: '"' | strip -%}
-            {%- if p_country == blank -%}{%- assign p_country = product.title | strip -%}{%- endif -%}
             <div
               class="w1w-nation-card"
               data-handle="{{ product.handle }}"
               data-title="{{ product.title | downcase | escape }}"
-              data-available="{{ product.available }}"
-              data-tags="{{ product.tags | join: ',' | downcase }}"
-              data-continent="{{ p_continent | handleize }}"
-              data-country="{{ p_country | handleize }}"
             >
               <a href="{{ product.url }}" class="w1w-nation-card__link">
                 <div class="w1w-nation-card__scene" data-bracelet-handle="{{ product.handle }}">
@@ -266,11 +273,22 @@
       </div>
 
       <!-- No results message -->
+      {%- if collection.products.size == 0 and active_count > 0 -%}
+        <div class="w1w-shop-no-results">
+          <div class="w1w-shop-no-results__inner">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(243,255,202,0.3)" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <p>No nations match your filters.</p>
+            <a href="{{ collection.url }}" class="w1w-shop-no-results__reset">Reset all filters</a>
+          </div>
+        </div>
+      {%- endif -%}
+
+      <!-- Client-side search no-results (hidden by default) -->
       <div class="w1w-shop-no-results" id="w1w-shop-no-results" style="display:none">
         <div class="w1w-shop-no-results__inner">
           <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(243,255,202,0.3)" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-          <p>No nations match your filters.</p>
-          <button class="w1w-shop-no-results__reset" id="w1w-reset-filters">Reset all filters</button>
+          <p>No nations match your search.</p>
+          <button class="w1w-shop-no-results__reset" id="w1w-reset-search">Clear search</button>
         </div>
       </div>
 
@@ -466,41 +484,6 @@
 
 /* Filter list & buttons */
 .w1w-shop-filter-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 4px; }
-.w1w-shop-filter-btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  width: 100%;
-  background: none;
-  border: none;
-  padding: 6px 4px;
-  color: rgba(255,255,255,0.5);
-  font-family: 'Inter', sans-serif;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-  border-radius: 4px;
-  text-align: left;
-}
-.w1w-shop-filter-btn:hover {
-  color: #FFF;
-  background: rgba(255,255,255,0.04);
-}
-.w1w-shop-filter-btn.active {
-  color: #F3FFCA;
-}
-.w1w-shop-filter-btn.active .w1w-shop-filter-check {
-  background: #F3FFCA;
-  border-color: #F3FFCA;
-}
-.w1w-shop-filter-btn.active .w1w-shop-filter-check::after {
-  content: '';
-  width: 6px;
-  height: 6px;
-  background: #0E0E0E;
-  border-radius: 1px;
-}
 .w1w-shop-filter-check {
   width: 14px;
   height: 14px;
@@ -654,6 +637,7 @@
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
+  text-decoration: none;
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -875,6 +859,7 @@
   text-transform: uppercase;
   padding: 10px 20px;
   transition: all 0.2s;
+  text-decoration: none;
 }
 .w1w-shop-no-results__reset:hover {
   background: rgba(243,255,202,0.2);
@@ -966,9 +951,8 @@
     var cards = document.querySelectorAll('.w1w-nation-card');
     var noResults = document.getElementById('w1w-shop-no-results');
     var visibleCount = document.getElementById('w1w-visible-count');
-    var activeFiltersEl = document.getElementById('w1w-active-filters');
 
-    // Map handle -> country data
+    // Map handle -> country data for swatches
     var countryByHandle = {};
     countries.forEach(function(c) { countryByHandle[c.slug] = c; });
 
@@ -999,133 +983,52 @@
       }
     });
 
-    // Filter state
-    var state = { continent: 'all', countries: [], search: '' };
-
-    function renderActiveTags() {
-      if (!activeFiltersEl) return;
-      var html = '';
-      if (state.continent !== 'all') {
-        var chipBtn = document.querySelector('.w1w-chip[data-continent="' + state.continent + '"]');
-        var label = chipBtn ? chipBtn.textContent.replace(/\d+/g, '').trim() : state.continent;
-        html += '<button class="w1w-shop-active-tag" data-remove="continent">' + label + ' <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>';
-      }
-      state.countries.forEach(function(c) {
-        var btn = document.querySelector('[data-filter-country="' + c + '"]');
-        var label = btn ? btn.dataset.filterLabel : c;
-        html += '<button class="w1w-shop-active-tag" data-remove-country="' + c + '">' + label + ' <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>';
-      });
-      activeFiltersEl.innerHTML = html;
-
-      // Bind remove handlers
-      activeFiltersEl.querySelectorAll('[data-remove="continent"]').forEach(function(tag) {
-        tag.addEventListener('click', function() {
-          state.continent = 'all';
-          document.querySelectorAll('.w1w-chip').forEach(function(b) { b.classList.remove('w1w-chip--active'); });
-          var allChip = document.querySelector('.w1w-chip[data-continent="all"]');
-          if (allChip) allChip.classList.add('w1w-chip--active');
-          applyFilters();
-        });
-      });
-      activeFiltersEl.querySelectorAll('[data-remove-country]').forEach(function(tag) {
-        tag.addEventListener('click', function() {
-          var val = tag.dataset.removeCountry;
-          state.countries = state.countries.filter(function(c) { return c !== val; });
-          var btn = document.querySelector('[data-filter-country="' + val + '"]');
-          if (btn) btn.classList.remove('active');
-          applyFilters();
+    // Continent chips — single-select, navigates via URL params (server-side filtering)
+    var chipsBar = document.querySelector('[data-continent-param]');
+    if (chipsBar) {
+      var continentParam = chipsBar.dataset.continentParam;
+      chipsBar.querySelectorAll('.w1w-chip').forEach(function(chip) {
+        chip.addEventListener('click', function(e) {
+          e.preventDefault();
+          var url = new URL(window.location.href);
+          // Remove all continent params
+          url.searchParams.delete(continentParam);
+          var val = chip.dataset.continentValue;
+          if (val && val !== 'all') {
+            url.searchParams.set(continentParam, val);
+          }
+          // Reset to page 1 when changing filters
+          url.searchParams.delete('page');
+          window.location.href = url.toString();
         });
       });
     }
 
-    function applyFilters() {
-      var visible = 0;
-
-      cards.forEach(function(card) {
-        var title = card.dataset.title || '';
-        var cardContinent = card.dataset.continent || '';
-        var cardCountry = card.dataset.country || '';
-        var show = true;
-
-        // Continent filter
-        if (state.continent !== 'all' && cardContinent !== state.continent) {
-          show = false;
-        }
-
-        // Country filter (multi-select)
-        if (show && state.countries.length > 0) {
-          if (state.countries.indexOf(cardCountry) === -1) show = false;
-        }
-
-        // Search
-        if (show && state.search) {
-          var q = state.search.toLowerCase();
-          show = title.indexOf(q) !== -1;
-        }
-
-        card.classList.toggle('w1w-nation-card--hidden', !show);
-        if (show) visible++;
-      });
-
-      if (visibleCount) visibleCount.textContent = visible;
-      if (noResults) noResults.style.display = visible === 0 ? 'block' : 'none';
-
-      // Hide pagination when any client-side filter is active
-      var paginationEl = document.getElementById('w1w-shop-pagination');
-      if (paginationEl) {
-        var hasFilter = state.continent !== 'all' || state.countries.length > 0 || state.search !== '';
-        paginationEl.style.display = hasFilter ? 'none' : '';
-      }
-
-      renderActiveTags();
-    }
-
-    // Continent chips (top bar only)
-    document.querySelectorAll('.w1w-chip').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        document.querySelectorAll('.w1w-chip').forEach(function(b) { b.classList.remove('w1w-chip--active'); });
-        btn.classList.add('w1w-chip--active');
-        state.continent = btn.dataset.continent;
-        applyFilters();
-      });
-    });
-
-    // Country filter buttons (multi-select)
-    document.querySelectorAll('[data-filter-country]').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        var val = btn.dataset.filterCountry;
-        var idx = state.countries.indexOf(val);
-        if (idx !== -1) {
-          state.countries.splice(idx, 1);
-          btn.classList.remove('active');
-        } else {
-          state.countries.push(val);
-          btn.classList.add('active');
-        }
-        applyFilters();
-      });
-    });
-
-    // Search
+    // Client-side search (filters current page only)
     var searchInput = document.getElementById('w1w-shop-search-input');
     if (searchInput) {
       searchInput.addEventListener('input', function() {
-        state.search = this.value.trim();
-        applyFilters();
+        var q = this.value.trim().toLowerCase();
+        var visible = 0;
+
+        cards.forEach(function(card) {
+          var title = card.dataset.title || '';
+          var show = !q || title.indexOf(q) !== -1;
+          card.classList.toggle('w1w-nation-card--hidden', !show);
+          if (show) visible++;
+        });
+
+        if (visibleCount) visibleCount.textContent = visible;
+        if (noResults) noResults.style.display = (visible === 0 && q) ? 'block' : 'none';
       });
     }
 
-    // Reset
-    var resetBtn = document.getElementById('w1w-reset-filters');
-    if (resetBtn) {
-      resetBtn.addEventListener('click', function() {
-        state = { continent: 'all', countries: [], search: '' };
-        if (searchInput) searchInput.value = '';
-        document.querySelectorAll('.w1w-chip').forEach(function(b) { b.classList.remove('w1w-chip--active'); });
-        var allChip = document.querySelector('.w1w-chip[data-continent="all"]');
-        if (allChip) allChip.classList.add('w1w-chip--active');
-        document.querySelectorAll('[data-filter-country]').forEach(function(b) { b.classList.remove('active'); });
-        applyFilters();
+    // Clear search button
+    var resetSearch = document.getElementById('w1w-reset-search');
+    if (resetSearch && searchInput) {
+      resetSearch.addEventListener('click', function() {
+        searchInput.value = '';
+        searchInput.dispatchEvent(new Event('input'));
       });
     }
 
@@ -1152,7 +1055,7 @@
       });
     }
 
-    // ATC buttons — use variant ID for Shopify AJAX Cart API
+    // ATC buttons
     document.querySelectorAll('.w1w-nation-card__atc').forEach(function(btn) {
       btn.addEventListener('click', function(e) {
         e.preventDefault();
