@@ -203,109 +203,92 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
-  // ── Donation ──
-  var donationBox = document.getElementById('w1wDonation');
-  if (donationBox) {
-    var selectedAmount = 0;
-    var amountBtns = donationBox.querySelectorAll('.w1w-donation__pick');
-    var customRow = document.getElementById('w1wDonationCustom');
-    var customInput = document.getElementById('w1wDonationInput');
-    var addBtn = document.getElementById('w1wDonationAdd');
-    var addedMsg = document.getElementById('w1wDonationAdded');
-    var priceDisplay = document.getElementById('w1wDonationPrice');
-
-    function updatePrice() {
-      if (priceDisplay) {
-        priceDisplay.textContent = selectedAmount > 0 ? '$' + selectedAmount + '.00' : '';
-      }
-      addBtn.disabled = selectedAmount < 1;
-    }
-
-    amountBtns.forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        amountBtns.forEach(function (b) { b.classList.remove('active'); });
-        btn.classList.add('active');
-
-        if (btn.dataset.amount === 'custom') {
-          customRow.style.display = 'flex';
-          customInput.focus();
-          selectedAmount = parseInt(customInput.value) || 0;
-        } else {
-          customRow.style.display = 'none';
-          selectedAmount = parseInt(btn.dataset.amount);
-        }
-        updatePrice();
-      });
-    });
-
-    if (customInput) {
-      customInput.addEventListener('input', function () {
-        selectedAmount = parseInt(customInput.value) || 0;
-        updatePrice();
-      });
-    }
-
-    addBtn.addEventListener('click', function () {
-      if (selectedAmount < 1) return;
-      var amt = selectedAmount;
-      addBtn.disabled = true;
-      addBtn.textContent = 'ADDING…';
-
-      var vid = null;
-
-      fetch('/products/donation.js')
-      .then(function (r) {
-        if (!r.ok) throw new Error('Product not found at /products/donation.js — is it published to Online Store?');
-        return r.json();
-      })
-      .then(function (product) {
-        vid = product.variants[0].id;
-        return fetch('/cart.js', { credentials: 'same-origin' });
-      })
-      .then(function (r) { return r.json(); })
-      .then(function (cart) {
-        var existing = null;
-        for (var i = 0; i < cart.items.length; i++) {
-          if (cart.items[i].properties && cart.items[i].properties._donation === 'true') {
-            existing = cart.items[i];
-            break;
-          }
-        }
-        if (existing) {
-          return fetch('/cart/change.js', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: existing.key, quantity: 0 })
-          }).then(function (r) { return r.json(); });
-        }
-      })
-      .then(function () {
-        return fetch('/cart/add.js', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            items: [{ id: vid, quantity: amt, properties: { '_donation': 'true' } }]
-          })
-        });
-      })
-      .then(function (r) {
-        if (!r.ok) throw new Error('Failed to add to cart');
-        return r.json();
-      })
-      .then(function () {
-        addBtn.style.display = 'none';
-        addedMsg.style.display = 'flex';
-        setTimeout(function () { location.reload(); }, 600);
-      })
-      .catch(function (err) {
-        console.error('Donation error:', err);
-        alert('Could not add donation: ' + err.message);
-        addBtn.disabled = false;
-        addBtn.textContent = 'DONATE';
-      });
-    });
-  }
 });
+</script>
+
+<script>
+/* ── Donation — standalone script ── */
+(function () {
+  var w1wDonationAmount = 0;
+
+  document.addEventListener('click', function (e) {
+    /* Amount pick buttons */
+    var pick = e.target.closest('.w1w-donation__pick');
+    if (pick) {
+      document.querySelectorAll('.w1w-donation__pick').forEach(function (b) { b.classList.remove('active'); });
+      pick.classList.add('active');
+
+      var customRow = document.getElementById('w1wDonationCustom');
+      var customInput = document.getElementById('w1wDonationInput');
+
+      if (pick.dataset.amount === 'custom') {
+        if (customRow) customRow.style.display = 'flex';
+        if (customInput) customInput.focus();
+        w1wDonationAmount = parseInt(customInput ? customInput.value : 0) || 0;
+      } else {
+        if (customRow) customRow.style.display = 'none';
+        w1wDonationAmount = parseInt(pick.dataset.amount);
+      }
+
+      var priceEl = document.getElementById('w1wDonationPrice');
+      if (priceEl) priceEl.textContent = w1wDonationAmount > 0 ? '$' + w1wDonationAmount + '.00' : '';
+
+      var addBtn = document.getElementById('w1wDonationAdd');
+      if (addBtn) addBtn.disabled = w1wDonationAmount < 1;
+      return;
+    }
+
+    /* Donate submit button */
+    var submitBtn = e.target.closest('#w1wDonationAdd');
+    if (!submitBtn || submitBtn.disabled) return;
+    if (w1wDonationAmount < 1) return;
+
+    var amt = w1wDonationAmount;
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'ADDING…';
+
+    fetch('/products/donation.js')
+    .then(function (resp) {
+      if (!resp.ok) throw new Error('Donation product not found — check it is published');
+      return resp.json();
+    })
+    .then(function (prod) {
+      return fetch('/cart/add.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: [{ id: prod.variants[0].id, quantity: amt, properties: { '_donation': 'true' } }]
+        })
+      });
+    })
+    .then(function (resp) {
+      if (!resp.ok) throw new Error('Cart add failed');
+      return resp.json();
+    })
+    .then(function () {
+      submitBtn.style.display = 'none';
+      var msg = document.getElementById('w1wDonationAdded');
+      if (msg) msg.style.display = 'flex';
+      setTimeout(function () { window.location.reload(); }, 600);
+    })
+    .catch(function (err) {
+      window.alert('Donation error: ' + err.message);
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'DONATE';
+    });
+  });
+
+  /* Custom input listener */
+  document.addEventListener('input', function (e) {
+    if (e.target.id === 'w1wDonationInput') {
+      w1wDonationAmount = parseInt(e.target.value) || 0;
+      var priceEl = document.getElementById('w1wDonationPrice');
+      if (priceEl) priceEl.textContent = w1wDonationAmount > 0 ? '$' + w1wDonationAmount + '.00' : '';
+      var addBtn = document.getElementById('w1wDonationAdd');
+      if (addBtn) addBtn.disabled = w1wDonationAmount < 1;
+    }
+  });
+})();
 </script>
 
 {% stylesheet %}
