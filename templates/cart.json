@@ -21,27 +21,58 @@
       "blocks": {
         "trust_1": {
           "type": "trust_badge",
-          "settings": { "text": "30-DAY RETURNS" }
+          "settings": {
+            "text": "30-DAY RETURNS"
+          }
         },
         "trust_2": {
           "type": "trust_badge",
-          "settings": { "text": "SHIPS 24H" }
+          "settings": {
+            "text": "SHIPS 24H"
+          }
         },
         "trust_3": {
           "type": "trust_badge",
-          "settings": { "text": "SECURE CHECKOUT" }
+          "settings": {
+            "text": "SECURE CHECKOUT"
+          }
         }
       },
-      "block_order": ["trust_1", "trust_2", "trust_3"],
+      "block_order": [
+        "trust_1",
+        "trust_2",
+        "trust_3"
+      ],
       "settings": {
+        "empty_heading": "YOUR BAG IS EMPTY.",
+        "empty_subtext": "Pick a nation. Wear it proud.",
+        "empty_cta_label": "BROWSE ALL NATIONS",
+        "empty_cta_url": "shopify://collections/all",
+        "summary_heading": "SUMMARY",
+        "subtotal_label": "Subtotal",
+        "discount_label": "Stack discount",
+        "shipping_label": "Shipping",
+        "tax_label": "Tax",
+        "tax_text": "Calculated at checkout",
+        "total_label": "Total",
         "free_ship_threshold": 35,
+        "free_shipping_text": "FREE",
+        "shipping_cost_text": "Calculated at checkout",
+        "checkout_label": "CHECKOUT →",
+        "keep_shopping_label": "KEEP SHOPPING",
+        "keep_shopping_url": "shopify://collections/all",
+        "remove_label": "Remove",
         "show_donation": true,
         "donation_heading": "Support Soccer Athletes",
         "donation_description": "Support soccer athletes and the sport with your donation. Every dollar helps fund grassroots programs and player development.",
         "donation_success": "Thank you for your donation!",
-        "donation_link_label": "Learn more about our mission"
+        "donation_link_label": "Learn more about our mission",
+        "donation_link_url": "shopify://products/donation"
       }
     }
   },
-  "order": ["hero", "main"]
+  "order": [
+    "hero",
+    "main"
+  ]
 }
