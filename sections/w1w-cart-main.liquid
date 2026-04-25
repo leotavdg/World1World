@@ -93,6 +93,38 @@
             </div>
           </div>
 
+          {%- if section.settings.show_donation -%}
+            <div class="w1w-donation" id="w1wDonation">
+              <div class="w1w-donation__head">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--lime, #F3FFCA)" stroke-width="1.8"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                <span class="w1w-donation__title">{{ section.settings.donation_heading }}</span>
+              </div>
+              <p class="w1w-donation__desc">{{ section.settings.donation_description }}</p>
+              <div class="w1w-donation__amounts">
+                <button type="button" class="w1w-donation__btn" data-amount="1">$1</button>
+                <button type="button" class="w1w-donation__btn" data-amount="3">$3</button>
+                <button type="button" class="w1w-donation__btn" data-amount="5">$5</button>
+                <button type="button" class="w1w-donation__btn w1w-donation__btn--custom" data-amount="custom">
+                  Other
+                </button>
+              </div>
+              <div class="w1w-donation__custom-row" id="w1wDonationCustom" style="display:none;">
+                <span class="w1w-donation__dollar">$</span>
+                <input type="number" class="w1w-donation__input" id="w1wDonationInput" min="1" max="500" placeholder="0" step="1">
+              </div>
+              <button type="button" class="w1w-donation__add" id="w1wDonationAdd" disabled>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+                ADD DONATION
+              </button>
+              <div class="w1w-donation__added" id="w1wDonationAdded" style="display:none;">
+                <span>✓ {{ section.settings.donation_success }}</span>
+              </div>
+              {%- if section.settings.donation_link_url != blank -%}
+                <a href="{{ section.settings.donation_link_url }}" class="w1w-donation__link" target="_blank" rel="noopener">{{ section.settings.donation_link_label }} →</a>
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+
           <a href="/checkout" class="btn btn-primary btn-lg w1w-sum-cta">{{ section.settings.checkout_label }}</a>
           <a href="{{ section.settings.keep_shopping_url }}" class="btn btn-ghost w1w-sum-cta w1w-sum-cta--ghost">{{ section.settings.keep_shopping_label }}</a>
 
@@ -142,6 +174,70 @@ document.addEventListener('DOMContentLoaded', function () {
       updateItem(btn.dataset.key, 0, btn);
     });
   });
+
+  // ── Donation ──
+  var donationBox = document.getElementById('w1wDonation');
+  if (donationBox) {
+    var selectedAmount = 0;
+    var amountBtns = donationBox.querySelectorAll('.w1w-donation__btn');
+    var customRow = document.getElementById('w1wDonationCustom');
+    var customInput = document.getElementById('w1wDonationInput');
+    var addBtn = document.getElementById('w1wDonationAdd');
+    var addedMsg = document.getElementById('w1wDonationAdded');
+    var donationVariantId = {{ section.settings.donation_variant_id | default: 0 }};
+
+    amountBtns.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        amountBtns.forEach(function (b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+
+        if (btn.dataset.amount === 'custom') {
+          customRow.style.display = 'flex';
+          customInput.focus();
+          selectedAmount = parseInt(customInput.value) || 0;
+        } else {
+          customRow.style.display = 'none';
+          selectedAmount = parseInt(btn.dataset.amount);
+        }
+        addBtn.disabled = selectedAmount < 1;
+      });
+    });
+
+    if (customInput) {
+      customInput.addEventListener('input', function () {
+        selectedAmount = parseInt(customInput.value) || 0;
+        addBtn.disabled = selectedAmount < 1;
+      });
+    }
+
+    addBtn.addEventListener('click', function () {
+      if (selectedAmount < 1 || !donationVariantId) return;
+      addBtn.disabled = true;
+      addBtn.textContent = 'ADDING…';
+
+      fetch('/cart/add.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: [{
+            id: donationVariantId,
+            quantity: selectedAmount,
+            properties: { '_donation': 'true' }
+          }]
+        })
+      })
+      .then(function (r) { return r.json(); })
+      .then(function () {
+        addBtn.style.display = 'none';
+        addedMsg.style.display = 'flex';
+        setTimeout(function () { location.reload(); }, 800);
+      })
+      .catch(function () {
+        addBtn.disabled = false;
+        addBtn.textContent = 'ADD DONATION';
+      });
+    });
+  }
 });
 </script>
 
@@ -378,6 +474,151 @@ document.addEventListener('DOMContentLoaded', function () {
   font-weight: 700;
 }
 
+/* ── Donation ── */
+.w1w-donation {
+  margin-top: 20px;
+  padding: 20px;
+  background: var(--bg-0);
+  border: 1px solid var(--line);
+  border-radius: 2px;
+}
+.w1w-donation__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.w1w-donation__title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--lime);
+}
+.w1w-donation__desc {
+  font-size: 12px;
+  color: var(--ink-2);
+  line-height: 1.5;
+  margin: 0 0 14px;
+  font-family: var(--font-body);
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.w1w-donation__amounts {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.w1w-donation__btn {
+  padding: 10px 0;
+  border: 1px solid var(--line);
+  background: var(--bg-1);
+  color: var(--ink-1);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all .15s;
+  text-align: center;
+}
+.w1w-donation__btn:hover {
+  border-color: rgba(243,255,202,0.3);
+  background: var(--bg-2);
+}
+.w1w-donation__btn.active {
+  background: var(--lime);
+  color: var(--lime-dark) !important;
+  border-color: var(--lime);
+}
+.w1w-donation__btn--custom {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.w1w-donation__custom-row {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 12px;
+  border: 1px solid var(--line);
+}
+.w1w-donation__dollar {
+  padding: 0 10px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--ink-2);
+}
+.w1w-donation__input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--ink-0);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 16px;
+  padding: 10px 10px 10px 0;
+  outline: none;
+  -moz-appearance: textfield;
+}
+.w1w-donation__input::-webkit-outer-spin-button,
+.w1w-donation__input::-webkit-inner-spin-button { -webkit-appearance: none; }
+.w1w-donation__add {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  background: transparent;
+  border: 1px solid var(--lime);
+  color: var(--lime);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all .15s;
+}
+.w1w-donation__add:hover:not(:disabled) {
+  background: var(--lime);
+  color: var(--lime-dark);
+}
+.w1w-donation__add:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+.w1w-donation__added {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  color: var(--lime);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+.w1w-donation__link {
+  display: block;
+  margin-top: 10px;
+  font-size: 11px;
+  color: var(--lime);
+  text-decoration: none;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-family: var(--font-display);
+  font-weight: 700;
+  transition: opacity .15s;
+}
+.w1w-donation__link:hover { opacity: 0.7; }
+
 /* ── Responsive ── */
 @media (max-width: 1000px) {
   .w1w-cart-grid { grid-template-columns: 1fr 300px; gap: 32px; }
@@ -435,7 +676,18 @@ document.addEventListener('DOMContentLoaded', function () {
     { "type": "text", "id": "checkout_label",      "label": "Checkout button label",  "default": "CHECKOUT →" },
     { "type": "text", "id": "keep_shopping_label", "label": "Keep shopping label",    "default": "KEEP SHOPPING" },
     { "type": "url",  "id": "keep_shopping_url",   "label": "Keep shopping URL",      "default": "/collections/all" },
-    { "type": "text", "id": "remove_label",        "label": "Remove item label",      "default": "Remove" }
+    { "type": "text", "id": "remove_label",        "label": "Remove item label",      "default": "Remove" },
+    {
+      "type": "header",
+      "content": "Donation"
+    },
+    { "type": "checkbox", "id": "show_donation", "label": "Show donation box", "default": true },
+    { "type": "text", "id": "donation_heading", "label": "Donation heading", "default": "Support Soccer Athletes" },
+    { "type": "textarea", "id": "donation_description", "label": "Donation description", "default": "Support soccer athletes and the sport with your donation. Every dollar helps fund grassroots programs and player development." },
+    { "type": "text", "id": "donation_variant_id", "label": "Donation product variant ID (create a $1 product and paste its variant ID here)", "default": "" },
+    { "type": "text", "id": "donation_success", "label": "Success message", "default": "Thank you for your donation!" },
+    { "type": "text", "id": "donation_link_label", "label": "Learn more link label", "default": "Learn more about our mission" },
+    { "type": "url", "id": "donation_link_url", "label": "Learn more link URL" }
   ],
   "blocks": [
     {
