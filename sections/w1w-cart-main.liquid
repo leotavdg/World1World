@@ -245,55 +245,61 @@ document.addEventListener('DOMContentLoaded', function () {
       });
     }
 
-    var donationHandle = '{{ section.settings.donation_product_handle }}';
-
     addBtn.addEventListener('click', function () {
-      if (selectedAmount < 1 || !donationHandle) return;
+      if (selectedAmount < 1) return;
+      var amt = selectedAmount;
       addBtn.disabled = true;
       addBtn.textContent = 'ADDING…';
 
-      // Fetch donation product to get its variant ID
-      fetch('/products/' + donationHandle + '.js')
-      .then(function (r) { return r.json(); })
-      .then(function (product) {
-        var variantId = product.variants[0].id;
+      var vid = null;
 
-        // Remove any existing donation item first
-        return fetch('/cart.js', { credentials: 'same-origin' })
-        .then(function (r) { return r.json(); })
-        .then(function (cart) {
-          var existingDonation = cart.items.find(function (item) {
-            return item.properties && item.properties._donation === 'true';
-          });
-          if (existingDonation) {
-            return fetch('/cart/change.js', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ id: existingDonation.key, quantity: 0 })
-            }).then(function (r) { return r.json(); });
-          }
-        })
-        .then(function () {
-          return fetch('/cart/add.js', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              items: [{
-                id: variantId,
-                quantity: selectedAmount,
-                properties: { '_donation': 'true' }
-              }]
-            })
-          });
-        });
+      fetch('/products/donation.js')
+      .then(function (r) {
+        if (!r.ok) throw new Error('Product not found at /products/donation.js — is it published to Online Store?');
+        return r.json();
+      })
+      .then(function (product) {
+        vid = product.variants[0].id;
+        return fetch('/cart.js', { credentials: 'same-origin' });
       })
       .then(function (r) { return r.json(); })
+      .then(function (cart) {
+        var existing = null;
+        for (var i = 0; i < cart.items.length; i++) {
+          if (cart.items[i].properties && cart.items[i].properties._donation === 'true') {
+            existing = cart.items[i];
+            break;
+          }
+        }
+        if (existing) {
+          return fetch('/cart/change.js', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: existing.key, quantity: 0 })
+          }).then(function (r) { return r.json(); });
+        }
+      })
+      .then(function () {
+        return fetch('/cart/add.js', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            items: [{ id: vid, quantity: amt, properties: { '_donation': 'true' } }]
+          })
+        });
+      })
+      .then(function (r) {
+        if (!r.ok) throw new Error('Failed to add to cart');
+        return r.json();
+      })
       .then(function () {
         addBtn.style.display = 'none';
         addedMsg.style.display = 'flex';
         setTimeout(function () { location.reload(); }, 600);
       })
-      .catch(function () {
+      .catch(function (err) {
+        console.error('Donation error:', err);
+        alert('Could not add donation: ' + err.message);
         addBtn.disabled = false;
         addBtn.textContent = 'DONATE';
       });
