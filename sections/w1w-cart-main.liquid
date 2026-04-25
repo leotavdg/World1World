@@ -153,6 +153,14 @@
             </div>
           {%- endif -%}
 
+          <!-- DEBUG: remove after testing -->
+          <div style="background:#ff0;color:#000;padding:8px;font-size:11px;margin-bottom:8px;border:2px solid red;">
+            DEBUG — donation_product: {{ donation_product.title | default: 'NOT FOUND' }}
+            | ID: {{ donation_product_id | default: 'nil' }}
+            | variant: {{ donation_variant_id | default: 'nil' }}
+            | handle setting: "{{ section.settings.donation_product_handle }}"
+          </div>
+
           <a href="/checkout" class="btn btn-primary btn-lg w1w-sum-cta">{{ section.settings.checkout_label }}</a>
           <a href="{{ section.settings.keep_shopping_url }}" class="btn btn-ghost w1w-sum-cta w1w-sum-cta--ghost">{{ section.settings.keep_shopping_label }}</a>
 
