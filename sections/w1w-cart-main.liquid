@@ -1,4 +1,7 @@
 {%- assign threshold_cents = section.settings.free_ship_threshold | times: 100 -%}
+{%- assign donation_product = all_products[section.settings.donation_product_handle] -%}
+{%- assign donation_variant_id = donation_product.variants.first.id -%}
+{%- assign donation_product_id = donation_product.id -%}
 
 <div class="w1w-cart-section">
   <div class="wrap">
@@ -19,7 +22,7 @@
         <div class="w1w-cart-lines" id="w1wCartLines">
           {%- for item in cart.items -%}
             {%- assign is_donation = false -%}
-            {%- if item.product.handle == 'donation' -%}
+            {%- if donation_product_id and item.product.id == donation_product_id -%}
               {%- assign is_donation = true -%}
             {%- endif -%}
 
@@ -246,20 +249,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
     (async function () {
       try {
-        /* 1. Get donation product */
-        var prodResp = await fetch('/products/donation.js');
-        if (!prodResp.ok) throw new Error('Product /products/donation.js returned ' + prodResp.status + '. Is it published to Online Store?');
-        var prod = await prodResp.json();
-        var vid = prod.variants[0].id;
+        /* 1. Donation product resolved via Liquid */
+        var donationProductId = {{ donation_product_id | default: 0 }};
+        var vid = {{ donation_variant_id | default: 0 }};
 
-        if (!prod.variants[0].available) throw new Error('Donation product variant is not available. Check inventory is set to "not tracked" or has stock.');
+        if (!donationProductId || !vid) throw new Error('Donation product not found. Check the donation_product_handle setting and ensure the product is published to Online Store.');
 
         /* 2. Remove existing donations from cart */
         var cartResp = await fetch('/cart.js');
         var cart = await cartResp.json();
         for (var i = 0; i < cart.items.length; i++) {
           var item = cart.items[i];
-          if (item.product_id === prod.id) {
+          if (item.product_id === donationProductId) {
             await fetch('/cart/change.js', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
