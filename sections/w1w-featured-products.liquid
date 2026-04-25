@@ -235,6 +235,48 @@
   }
 {% endstylesheet %}
 
+<script>
+(function () {
+  document.querySelectorAll('.w1w-product-card__quick-add').forEach(function (btn) {
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      var variantId = btn.dataset.productId;
+      if (!variantId) return;
+
+      var origText = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = 'ADDING…';
+
+      fetch('/cart/add.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ items: [{ id: parseInt(variantId), quantity: 1 }] })
+      })
+      .then(function (r) { return r.json(); })
+      .then(function () {
+        btn.textContent = 'ADDED ✓';
+        if (window.W1W) {
+          window.W1W.fetchCart(function () {
+            if (window.W1W.renderDrawer) window.W1W.renderDrawer();
+            if (window.W1W.renderBadge) window.W1W.renderBadge();
+            window.W1W.openDrawer();
+          });
+        }
+        setTimeout(function () {
+          btn.disabled = false;
+          btn.textContent = origText;
+        }, 1500);
+      })
+      .catch(function () {
+        btn.disabled = false;
+        btn.textContent = origText;
+      });
+    });
+  });
+})();
+</script>
+
 {% schema %}
 {
   "name": "W1W Featured Products",
