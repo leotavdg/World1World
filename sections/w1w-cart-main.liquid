@@ -87,6 +87,13 @@
               <span class="w1w-sum-val">{{ section.settings.tax_text }}</span>
             </div>
 
+            {%- if cart.attributes['Donation'] != blank -%}
+              <div class="w1w-sum-row w1w-sum-row--donation">
+                <span class="w1w-sum-label">Donation</span>
+                <span class="w1w-sum-val">{{ cart.attributes['Donation'] }}</span>
+              </div>
+            {%- endif -%}
+
             <div class="w1w-sum-row w1w-sum-row--total">
               <span class="w1w-sum-label w1w-sum-label--total">{{ section.settings.total_label }}</span>
               <span class="w1w-sum-val w1w-sum-val--total">{{ cart.total_price | money }}</span>
@@ -112,10 +119,13 @@
                 <span class="w1w-donation__dollar">$</span>
                 <input type="number" class="w1w-donation__input" id="w1wDonationInput" min="1" max="500" placeholder="0" step="1">
               </div>
-              <button type="button" class="w1w-donation__add" id="w1wDonationAdd" disabled>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
-                ADD DONATION
-              </button>
+              <div class="w1w-donation__footer">
+                <span class="w1w-donation__price" id="w1wDonationPrice"></span>
+                <button type="button" class="w1w-donation__add" id="w1wDonationAdd" disabled>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+                  ADD DONATION
+                </button>
+              </div>
               <div class="w1w-donation__added" id="w1wDonationAdded" style="display:none;">
                 <span>✓ {{ section.settings.donation_success }}</span>
               </div>
@@ -184,7 +194,14 @@ document.addEventListener('DOMContentLoaded', function () {
     var customInput = document.getElementById('w1wDonationInput');
     var addBtn = document.getElementById('w1wDonationAdd');
     var addedMsg = document.getElementById('w1wDonationAdded');
-    var donationVariantId = {{ section.settings.donation_variant_id | default: 0 }};
+    var priceDisplay = document.getElementById('w1wDonationPrice');
+
+    function updatePrice() {
+      if (priceDisplay) {
+        priceDisplay.textContent = selectedAmount > 0 ? '$' + selectedAmount + '.00' : '';
+      }
+      addBtn.disabled = selectedAmount < 1;
+    }
 
     amountBtns.forEach(function (btn) {
       btn.addEventListener('click', function () {
@@ -199,38 +216,33 @@ document.addEventListener('DOMContentLoaded', function () {
           customRow.style.display = 'none';
           selectedAmount = parseInt(btn.dataset.amount);
         }
-        addBtn.disabled = selectedAmount < 1;
+        updatePrice();
       });
     });
 
     if (customInput) {
       customInput.addEventListener('input', function () {
         selectedAmount = parseInt(customInput.value) || 0;
-        addBtn.disabled = selectedAmount < 1;
+        updatePrice();
       });
     }
 
     addBtn.addEventListener('click', function () {
-      if (selectedAmount < 1 || !donationVariantId) return;
+      if (selectedAmount < 1) return;
       addBtn.disabled = true;
-      addBtn.textContent = 'ADDING…';
+      addBtn.textContent = 'SAVING…';
 
-      fetch('/cart/add.js', {
+      fetch('/cart/update.js', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          items: [{
-            id: donationVariantId,
-            quantity: selectedAmount,
-            properties: { '_donation': 'true' }
-          }]
+          attributes: { 'Donation': '$' + selectedAmount + '.00' }
         })
       })
       .then(function (r) { return r.json(); })
       .then(function () {
         addBtn.style.display = 'none';
         addedMsg.style.display = 'flex';
-        setTimeout(function () { location.reload(); }, 800);
       })
       .catch(function () {
         addBtn.disabled = false;
@@ -417,6 +429,8 @@ document.addEventListener('DOMContentLoaded', function () {
 .w1w-sum-row:last-child { border-bottom: none; }
 .w1w-sum-row--disc .w1w-sum-label,
 .w1w-sum-row--disc .w1w-sum-val { color: var(--lime); }
+.w1w-sum-row--donation .w1w-sum-label,
+.w1w-sum-row--donation .w1w-sum-val { color: var(--lime); }
 .w1w-sum-label {
   font-size: 12px;
   color: var(--ink-2);
@@ -567,8 +581,21 @@ document.addEventListener('DOMContentLoaded', function () {
 }
 .w1w-donation__input::-webkit-outer-spin-button,
 .w1w-donation__input::-webkit-inner-spin-button { -webkit-appearance: none; }
+.w1w-donation__footer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.w1w-donation__price {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 24px;
+  color: var(--lime);
+  letter-spacing: -0.02em;
+  min-width: 60px;
+}
 .w1w-donation__add {
-  width: 100%;
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -684,7 +711,6 @@ document.addEventListener('DOMContentLoaded', function () {
     { "type": "checkbox", "id": "show_donation", "label": "Show donation box", "default": true },
     { "type": "text", "id": "donation_heading", "label": "Donation heading", "default": "Support Soccer Athletes" },
     { "type": "textarea", "id": "donation_description", "label": "Donation description", "default": "Support soccer athletes and the sport with your donation. Every dollar helps fund grassroots programs and player development." },
-    { "type": "text", "id": "donation_variant_id", "label": "Donation product variant ID (create a $1 product and paste its variant ID here)", "default": "" },
     { "type": "text", "id": "donation_success", "label": "Success message", "default": "Thank you for your donation!" },
     { "type": "text", "id": "donation_link_label", "label": "Learn more link label", "default": "Learn more about our mission" },
     { "type": "url", "id": "donation_link_url", "label": "Learn more link URL" }
