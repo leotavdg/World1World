@@ -102,36 +102,46 @@
 
           {%- if section.settings.show_donation -%}
             <div class="w1w-donation" id="w1wDonation">
-              <div class="w1w-donation__head">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--lime, #F3FFCA)" stroke-width="1.8"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-                <span class="w1w-donation__title">{{ section.settings.donation_heading }}</span>
+              <div class="w1w-donation__stripe"></div>
+              <div class="w1w-donation__body">
+                <div class="w1w-donation__top">
+                  <div class="w1w-donation__icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                  </div>
+                  <div>
+                    <span class="w1w-donation__eyebrow">{{ section.settings.donation_heading }}</span>
+                    <p class="w1w-donation__desc">{{ section.settings.donation_description }}</p>
+                  </div>
+                </div>
+                <div class="w1w-donation__picks">
+                  <button type="button" class="w1w-donation__pick" data-amount="1">
+                    <span class="w1w-donation__pick-amt">$1</span>
+                  </button>
+                  <button type="button" class="w1w-donation__pick" data-amount="3">
+                    <span class="w1w-donation__pick-amt">$3</span>
+                  </button>
+                  <button type="button" class="w1w-donation__pick" data-amount="5">
+                    <span class="w1w-donation__pick-amt">$5</span>
+                  </button>
+                  <button type="button" class="w1w-donation__pick w1w-donation__pick--other" data-amount="custom">
+                    <span class="w1w-donation__pick-amt">···</span>
+                  </button>
+                </div>
+                <div class="w1w-donation__custom" id="w1wDonationCustom" style="display:none;">
+                  <span class="w1w-donation__dollar">$</span>
+                  <input type="number" class="w1w-donation__input" id="w1wDonationInput" min="1" max="500" placeholder="0" step="1">
+                </div>
+                <div class="w1w-donation__action">
+                  <span class="w1w-donation__price" id="w1wDonationPrice"></span>
+                  <button type="button" class="w1w-donation__submit" id="w1wDonationAdd" disabled>DONATE</button>
+                </div>
+                <div class="w1w-donation__success" id="w1wDonationAdded" style="display:none;">
+                  ✓ {{ section.settings.donation_success }}
+                </div>
+                {%- if section.settings.donation_link_url != blank -%}
+                  <a href="{{ section.settings.donation_link_url }}" class="w1w-donation__learn" target="_blank" rel="noopener">{{ section.settings.donation_link_label }} →</a>
+                {%- endif -%}
               </div>
-              <p class="w1w-donation__desc">{{ section.settings.donation_description }}</p>
-              <div class="w1w-donation__amounts">
-                <button type="button" class="w1w-donation__btn" data-amount="1">$1</button>
-                <button type="button" class="w1w-donation__btn" data-amount="3">$3</button>
-                <button type="button" class="w1w-donation__btn" data-amount="5">$5</button>
-                <button type="button" class="w1w-donation__btn w1w-donation__btn--custom" data-amount="custom">
-                  Other
-                </button>
-              </div>
-              <div class="w1w-donation__custom-row" id="w1wDonationCustom" style="display:none;">
-                <span class="w1w-donation__dollar">$</span>
-                <input type="number" class="w1w-donation__input" id="w1wDonationInput" min="1" max="500" placeholder="0" step="1">
-              </div>
-              <div class="w1w-donation__footer">
-                <span class="w1w-donation__price" id="w1wDonationPrice"></span>
-                <button type="button" class="w1w-donation__add" id="w1wDonationAdd" disabled>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
-                  ADD DONATION
-                </button>
-              </div>
-              <div class="w1w-donation__added" id="w1wDonationAdded" style="display:none;">
-                <span>✓ {{ section.settings.donation_success }}</span>
-              </div>
-              {%- if section.settings.donation_link_url != blank -%}
-                <a href="{{ section.settings.donation_link_url }}" class="w1w-donation__link" target="_blank" rel="noopener">{{ section.settings.donation_link_label }} →</a>
-              {%- endif -%}
             </div>
           {%- endif -%}
 
@@ -189,7 +199,7 @@ document.addEventListener('DOMContentLoaded', function () {
   var donationBox = document.getElementById('w1wDonation');
   if (donationBox) {
     var selectedAmount = 0;
-    var amountBtns = donationBox.querySelectorAll('.w1w-donation__btn');
+    var amountBtns = donationBox.querySelectorAll('.w1w-donation__pick');
     var customRow = document.getElementById('w1wDonationCustom');
     var customInput = document.getElementById('w1wDonationInput');
     var addBtn = document.getElementById('w1wDonationAdd');
@@ -491,81 +501,112 @@ document.addEventListener('DOMContentLoaded', function () {
 /* ── Donation ── */
 .w1w-donation {
   margin-top: 20px;
-  padding: 20px;
   background: var(--bg-0);
   border: 1px solid var(--line);
-  border-radius: 2px;
+  overflow: hidden;
 }
-.w1w-donation__head {
+.w1w-donation__stripe {
+  height: 3px;
+  background: linear-gradient(90deg, var(--lime-hot, #CAFD00), var(--lime, #F3FFCA));
+}
+.w1w-donation__body {
+  padding: 20px;
+}
+.w1w-donation__top {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+.w1w-donation__icon {
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
+  justify-content: center;
+  background: rgba(243,255,202,0.08);
+  color: var(--lime);
+  flex-shrink: 0;
 }
-.w1w-donation__title {
+.w1w-donation__eyebrow {
+  display: block;
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 12px;
-  letter-spacing: 0.15em;
+  font-size: 11px;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--lime);
+  color: var(--ink-0);
+  margin-bottom: 4px;
 }
 .w1w-donation__desc {
-  font-size: 12px;
-  color: var(--ink-2);
+  font-size: 11px;
+  color: var(--ink-3);
   line-height: 1.5;
-  margin: 0 0 14px;
+  margin: 0;
   font-family: var(--font-body);
   font-weight: 400;
   text-transform: none;
   letter-spacing: 0;
 }
-.w1w-donation__amounts {
+.w1w-donation__picks {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 6px;
+  gap: 4px;
   margin-bottom: 12px;
 }
-.w1w-donation__btn {
-  padding: 10px 0;
+.w1w-donation__pick {
+  padding: 14px 0;
   border: 1px solid var(--line);
-  background: var(--bg-1);
-  color: var(--ink-1);
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 13px;
-  letter-spacing: 0.05em;
+  background: transparent;
   cursor: pointer;
   transition: all .15s;
   text-align: center;
+  position: relative;
 }
-.w1w-donation__btn:hover {
-  border-color: rgba(243,255,202,0.3);
-  background: var(--bg-2);
+.w1w-donation__pick:hover {
+  border-color: rgba(243,255,202,0.25);
+  background: rgba(243,255,202,0.04);
 }
-.w1w-donation__btn.active {
-  background: var(--lime);
-  color: var(--lime-dark) !important;
+.w1w-donation__pick.active {
   border-color: var(--lime);
+  background: rgba(243,255,202,0.06);
 }
-.w1w-donation__btn--custom {
-  font-size: 11px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+.w1w-donation__pick.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--lime);
 }
-.w1w-donation__custom-row {
+.w1w-donation__pick-amt {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--ink-1);
+  letter-spacing: -0.01em;
+}
+.w1w-donation__pick.active .w1w-donation__pick-amt {
+  color: var(--lime);
+}
+.w1w-donation__pick--other .w1w-donation__pick-amt {
+  font-size: 18px;
+  letter-spacing: 0.15em;
+}
+.w1w-donation__custom {
   display: flex;
   align-items: center;
-  gap: 0;
-  margin-bottom: 12px;
   border: 1px solid var(--line);
+  margin-bottom: 12px;
+  background: rgba(243,255,202,0.03);
 }
 .w1w-donation__dollar {
   padding: 0 10px;
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 16px;
-  color: var(--ink-2);
+  font-size: 18px;
+  color: var(--lime);
 }
 .w1w-donation__input {
   flex: 1;
@@ -574,14 +615,14 @@ document.addEventListener('DOMContentLoaded', function () {
   color: var(--ink-0);
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 16px;
-  padding: 10px 10px 10px 0;
+  font-size: 18px;
+  padding: 12px 12px 12px 0;
   outline: none;
   -moz-appearance: textfield;
 }
 .w1w-donation__input::-webkit-outer-spin-button,
 .w1w-donation__input::-webkit-inner-spin-button { -webkit-appearance: none; }
-.w1w-donation__footer {
+.w1w-donation__action {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -589,42 +630,37 @@ document.addEventListener('DOMContentLoaded', function () {
 .w1w-donation__price {
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 24px;
+  font-size: 22px;
   color: var(--lime);
   letter-spacing: -0.02em;
-  min-width: 60px;
+  min-width: 50px;
 }
-.w1w-donation__add {
+.w1w-donation__submit {
   flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
   padding: 12px;
-  background: transparent;
-  border: 1px solid var(--lime);
+  background: linear-gradient(180deg, rgba(243,255,202,0.12) 0%, rgba(243,255,202,0.04) 100%);
+  border: 1px solid rgba(243,255,202,0.2);
   color: var(--lime);
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 11px;
-  letter-spacing: 0.15em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   cursor: pointer;
-  transition: all .15s;
+  transition: all .18s;
 }
-.w1w-donation__add:hover:not(:disabled) {
+.w1w-donation__submit:hover:not(:disabled) {
   background: var(--lime);
   color: var(--lime-dark);
+  border-color: var(--lime);
 }
-.w1w-donation__add:disabled {
-  opacity: 0.35;
+.w1w-donation__submit:disabled {
+  opacity: 0.25;
   cursor: not-allowed;
 }
-.w1w-donation__added {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.w1w-donation__success {
   padding: 12px;
+  text-align: center;
   color: var(--lime);
   font-family: var(--font-display);
   font-weight: 700;
@@ -632,19 +668,20 @@ document.addEventListener('DOMContentLoaded', function () {
   letter-spacing: 0.15em;
   text-transform: uppercase;
 }
-.w1w-donation__link {
+.w1w-donation__learn {
   display: block;
-  margin-top: 10px;
-  font-size: 11px;
-  color: var(--lime);
+  margin-top: 12px;
+  font-size: 10px;
+  color: var(--ink-3);
   text-decoration: none;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   font-family: var(--font-display);
   font-weight: 700;
-  transition: opacity .15s;
+  text-align: center;
+  transition: color .15s;
 }
-.w1w-donation__link:hover { opacity: 0.7; }
+.w1w-donation__learn:hover { color: var(--lime); }
 
 /* ── Responsive ── */
 @media (max-width: 1000px) {
