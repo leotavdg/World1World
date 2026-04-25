@@ -76,8 +76,9 @@
     "strip": {
       "type": "w1w-marquee",
       "settings": {
-        "text": "WEAR YOUR NATION · DROP 03 · 2026 WORLD CUP EDITION · 50+ NATIONS · $5 EACH · FREE SHIPPING OVER $35",
-        "style": "secondary"
+        "text": "WEAR YOUR NATION · DROP 03 · 2026 WORLD CUP EDITION · 50+ NATIONS · $8 EACH · FREE SHIPPING OVER $35",
+        "style": "secondary",
+        "direction": "forward"
       }
     },
     "features": {
@@ -98,13 +99,9 @@
         "heading": "PICK YOUR EDITION.",
         "description": "Four colorways per nation — choose the one that matches your game day fit.",
         "variant_1_name": "Home",
-        "variant_1_tag": "DROP 03",
         "variant_2_name": "Away",
-        "variant_2_tag": "ALTERNATE",
         "variant_3_name": "Reverse",
-        "variant_3_tag": "INVERTED",
-        "variant_4_name": "Blackout",
-        "variant_4_tag": "STEALTH"
+        "variant_4_name": "Blackout"
       }
     },
     "upsell": {
