@@ -65,6 +65,7 @@
         "show_donation": true,
         "donation_heading": "Support Soccer Athletes",
         "donation_description": "Support soccer athletes and the sport with your donation. Every dollar helps fund grassroots programs and player development.",
+        "donation_product_handle": "donation",
         "donation_success": "Thank you for your donation!",
         "donation_link_label": "Learn more about our mission",
         "donation_link_url": "shopify://products/donation"

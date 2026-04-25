@@ -18,39 +18,54 @@
         <!-- ── Left: Line items ── -->
         <div class="w1w-cart-lines" id="w1wCartLines">
           {%- for item in cart.items -%}
-            <div class="w1w-cart-item" data-key="{{ item.key }}" data-qty="{{ item.quantity }}">
+            {%- assign is_donation = false -%}
+            {%- if item.properties._donation == 'true' -%}
+              {%- assign is_donation = true -%}
+            {%- endif -%}
 
-              <div class="w1w-cart-item-img">
-                {%- if item.image -%}
-                  {{ item.image | image_url: width: 300 | image_tag: loading: 'lazy', alt: item.title, class: 'w1w-cart-item-photo' }}
-                {%- else -%}
-                  <div class="bracelet-scene" style="aspect-ratio:1;height:100%">
-                    <div class="floor"></div>
-                    <div class="bracelet-ph" style="width:88%"></div>
-                  </div>
-                {%- endif -%}
-              </div>
-
-              <div class="w1w-cart-item-body">
-                  <h3 class="w1w-cart-item-name">{{ item.product.title | upcase }}</h3>
-                <p class="w1w-cart-item-meta">
-                  {%- if item.variant_title and item.variant_title != 'Default Title' -%}
-                    Size {{ item.variant_title }}
-                  {%- endif -%}
-                </p>
-                <div class="w1w-cart-item-controls">
-                  <div class="w1w-cart-qty">
-                    <button class="w1w-cart-qty-btn" data-key="{{ item.key }}" data-delta="-1" aria-label="Decrease quantity">−</button>
-                    <span class="w1w-cart-qty-num">{{ item.quantity }}</span>
-                    <button class="w1w-cart-qty-btn" data-key="{{ item.key }}" data-delta="1" aria-label="Increase quantity">+</button>
-                  </div>
+            {%- if is_donation -%}
+              <div class="w1w-cart-item w1w-cart-item--donation" data-key="{{ item.key }}" data-qty="{{ item.quantity }}">
+                <div class="w1w-cart-item-img w1w-cart-donation-icon">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--lime)" stroke-width="1.6"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                </div>
+                <div class="w1w-cart-item-body">
+                  <h3 class="w1w-cart-item-name">DONATION</h3>
+                  <p class="w1w-cart-item-meta">Support soccer athletes</p>
                   <button class="w1w-cart-remove" data-key="{{ item.key }}">{{ section.settings.remove_label }}</button>
                 </div>
+                <div class="w1w-cart-item-price">{{ item.line_price | money }}</div>
               </div>
-
-              <div class="w1w-cart-item-price">{{ item.line_price | money }}</div>
-
-            </div>
+            {%- else -%}
+              <div class="w1w-cart-item" data-key="{{ item.key }}" data-qty="{{ item.quantity }}">
+                <div class="w1w-cart-item-img">
+                  {%- if item.image -%}
+                    {{ item.image | image_url: width: 300 | image_tag: loading: 'lazy', alt: item.title, class: 'w1w-cart-item-photo' }}
+                  {%- else -%}
+                    <div class="bracelet-scene" style="aspect-ratio:1;height:100%">
+                      <div class="floor"></div>
+                      <div class="bracelet-ph" style="width:88%"></div>
+                    </div>
+                  {%- endif -%}
+                </div>
+                <div class="w1w-cart-item-body">
+                  <h3 class="w1w-cart-item-name">{{ item.product.title | upcase }}</h3>
+                  <p class="w1w-cart-item-meta">
+                    {%- if item.variant_title and item.variant_title != 'Default Title' -%}
+                      {{ item.variant_title }}
+                    {%- endif -%}
+                  </p>
+                  <div class="w1w-cart-item-controls">
+                    <div class="w1w-cart-qty">
+                      <button class="w1w-cart-qty-btn" data-key="{{ item.key }}" data-delta="-1" aria-label="Decrease quantity">−</button>
+                      <span class="w1w-cart-qty-num">{{ item.quantity }}</span>
+                      <button class="w1w-cart-qty-btn" data-key="{{ item.key }}" data-delta="1" aria-label="Increase quantity">+</button>
+                    </div>
+                    <button class="w1w-cart-remove" data-key="{{ item.key }}">{{ section.settings.remove_label }}</button>
+                  </div>
+                </div>
+                <div class="w1w-cart-item-price">{{ item.line_price | money }}</div>
+              </div>
+            {%- endif -%}
           {%- endfor -%}
         </div>
 
@@ -86,13 +101,6 @@
               <span class="w1w-sum-label">{{ section.settings.tax_label }}</span>
               <span class="w1w-sum-val">{{ section.settings.tax_text }}</span>
             </div>
-
-            {%- if cart.attributes['Donation'] != blank -%}
-              <div class="w1w-sum-row w1w-sum-row--donation">
-                <span class="w1w-sum-label">Donation</span>
-                <span class="w1w-sum-val">{{ cart.attributes['Donation'] }}</span>
-              </div>
-            {%- endif -%}
 
             <div class="w1w-sum-row w1w-sum-row--total">
               <span class="w1w-sum-label w1w-sum-label--total">{{ section.settings.total_label }}</span>
@@ -237,26 +245,57 @@ document.addEventListener('DOMContentLoaded', function () {
       });
     }
 
-    addBtn.addEventListener('click', function () {
-      if (selectedAmount < 1) return;
-      addBtn.disabled = true;
-      addBtn.textContent = 'SAVING…';
+    var donationHandle = '{{ section.settings.donation_product_handle }}';
 
-      fetch('/cart/update.js', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          attributes: { 'Donation': '$' + selectedAmount + '.00' }
+    addBtn.addEventListener('click', function () {
+      if (selectedAmount < 1 || !donationHandle) return;
+      addBtn.disabled = true;
+      addBtn.textContent = 'ADDING…';
+
+      // Fetch donation product to get its variant ID
+      fetch('/products/' + donationHandle + '.js')
+      .then(function (r) { return r.json(); })
+      .then(function (product) {
+        var variantId = product.variants[0].id;
+
+        // Remove any existing donation item first
+        return fetch('/cart.js', { credentials: 'same-origin' })
+        .then(function (r) { return r.json(); })
+        .then(function (cart) {
+          var existingDonation = cart.items.find(function (item) {
+            return item.properties && item.properties._donation === 'true';
+          });
+          if (existingDonation) {
+            return fetch('/cart/change.js', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ id: existingDonation.key, quantity: 0 })
+            }).then(function (r) { return r.json(); });
+          }
         })
+        .then(function () {
+          return fetch('/cart/add.js', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              items: [{
+                id: variantId,
+                quantity: selectedAmount,
+                properties: { '_donation': 'true' }
+              }]
+            })
+          });
+        });
       })
       .then(function (r) { return r.json(); })
       .then(function () {
         addBtn.style.display = 'none';
         addedMsg.style.display = 'flex';
+        setTimeout(function () { location.reload(); }, 600);
       })
       .catch(function () {
         addBtn.disabled = false;
-        addBtn.textContent = 'ADD DONATION';
+        addBtn.textContent = 'DONATE';
       });
     });
   }
@@ -405,6 +444,14 @@ document.addEventListener('DOMContentLoaded', function () {
   padding: 0;
 }
 .w1w-cart-remove:hover { color: #ef4444; }
+
+.w1w-cart-item--donation { border-bottom-style: dashed; }
+.w1w-cart-donation-icon {
+  background: rgba(243,255,202,0.06) !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
 /* ── Summary sidebar ── */
 .w1w-cart-summary {
@@ -749,6 +796,7 @@ document.addEventListener('DOMContentLoaded', function () {
     { "type": "checkbox", "id": "show_donation", "label": "Show donation box", "default": true },
     { "type": "text", "id": "donation_heading", "label": "Donation heading", "default": "Support Soccer Athletes" },
     { "type": "textarea", "id": "donation_description", "label": "Donation description", "default": "Support soccer athletes and the sport with your donation. Every dollar helps fund grassroots programs and player development." },
+    { "type": "text", "id": "donation_product_handle", "label": "Donation product handle (create a $1 product called 'Donation', enter: donation)", "default": "donation" },
     { "type": "text", "id": "donation_success", "label": "Success message", "default": "Thank you for your donation!" },
     { "type": "text", "id": "donation_link_label", "label": "Learn more link label", "default": "Learn more about our mission" },
     { "type": "url", "id": "donation_link_url", "label": "Learn more link URL" }
