@@ -4,7 +4,14 @@
 
       <!-- Brand -->
       <div class="w1w-footer-brand">
-        <h3 class="w1w-footer-logo">WORLD<span class="w1w-footer-dot"></span>1<span class="w1w-footer-dot"></span>WORLD</h3>
+        <div class="w1w-footer-brand-row">
+          {%- if section.settings.logo != blank -%}
+            {{ section.settings.logo | image_url: width: 240 | image_tag: alt: shop.name, class: 'w1w-footer-logo-img' }}
+          {%- endif -%}
+          {%- if section.settings.show_brand_text -%}
+            <h3 class="w1w-footer-logo">{{ section.settings.brand_text_1 }}<span class="w1w-footer-dot"></span>{{ section.settings.brand_text_2 }}<span class="w1w-footer-dot"></span>{{ section.settings.brand_text_3 }}</h3>
+          {%- endif -%}
+        </div>
         <p class="w1w-footer-tagline">{{ section.settings.tagline }}</p>
         <div class="w1w-footer-social">
           {%- if section.settings.instagram_url != blank -%}
@@ -120,6 +127,17 @@
 }
 
 /* Brand */
+.w1w-footer-brand-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.w1w-footer-logo-img {
+  height: 36px;
+  width: auto;
+  display: block;
+}
 .w1w-footer-logo {
   font-family: var(--font-display, 'Space Grotesk', sans-serif);
   font-size: 18px;
@@ -127,7 +145,7 @@
   color: var(--lime, #F3FFCA);
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  margin-bottom: 16px;
+  margin: 0;
   line-height: 0.95;
 }
 .w1w-footer-dot {
@@ -331,6 +349,11 @@
       "type": "header",
       "content": "Brand"
     },
+    { "type": "image_picker", "id": "logo", "label": "Logo image (optional)" },
+    { "type": "checkbox",     "id": "show_brand_text", "label": "Show brand text alongside logo", "default": true },
+    { "type": "text",         "id": "brand_text_1",  "label": "Brand text part 1", "default": "WORLD" },
+    { "type": "text",         "id": "brand_text_2",  "label": "Brand text part 2", "default": "1" },
+    { "type": "text",         "id": "brand_text_3",  "label": "Brand text part 3", "default": "WORLD" },
     {
       "type": "textarea",
       "id": "tagline",

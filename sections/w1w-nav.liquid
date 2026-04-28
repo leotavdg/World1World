@@ -9,8 +9,9 @@
     <a href="/" class="w1w-nav-brand">
       {%- if section.settings.logo != blank -%}
         {{ section.settings.logo | image_url: width: 200 | image_tag: alt: shop.name, class: 'w1w-nav-logo-img' }}
-      {%- else -%}
-        {{ section.settings.brand_text_1 }}<span class="w1w-nav-dot"></span>{{ section.settings.brand_text_2 }}<span class="w1w-nav-dot"></span>{{ section.settings.brand_text_3 }}
+      {%- endif -%}
+      {%- if section.settings.show_brand_text -%}
+        <span class="w1w-nav-brand-text">{{ section.settings.brand_text_1 }}<span class="w1w-nav-dot"></span>{{ section.settings.brand_text_2 }}<span class="w1w-nav-dot"></span>{{ section.settings.brand_text_3 }}</span>
       {%- endif -%}
     </a>
 
@@ -93,8 +94,9 @@
     <a href="/" class="w1w-nav-brand">
       {%- if section.settings.logo != blank -%}
         {{ section.settings.logo | image_url: width: 160 | image_tag: alt: shop.name, class: 'w1w-nav-logo-img' }}
-      {%- else -%}
-        {{ section.settings.brand_text_1 }}<span class="w1w-nav-dot"></span>{{ section.settings.brand_text_2 }}<span class="w1w-nav-dot"></span>{{ section.settings.brand_text_3 }}
+      {%- endif -%}
+      {%- if section.settings.show_brand_text -%}
+        <span class="w1w-nav-brand-text">{{ section.settings.brand_text_1 }}<span class="w1w-nav-dot"></span>{{ section.settings.brand_text_2 }}<span class="w1w-nav-dot"></span>{{ section.settings.brand_text_3 }}</span>
       {%- endif -%}
     </a>
     <button class="w1w-icon-btn" id="w1wMobileClose" aria-label="Close">
@@ -253,9 +255,13 @@ document.addEventListener('DOMContentLoaded', function () {
   color: var(--lime);
   white-space: nowrap;
   text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
 }
 .w1w-nav-brand:hover { color: var(--lime); }
-.w1w-nav-logo-img { height: 28px; width: auto; }
+.w1w-nav-logo-img { height: 28px; width: auto; display: block; }
+.w1w-nav-brand-text { display: inline-flex; align-items: center; }
 .w1w-nav-dot {
   display: inline-block;
   width: 6px;
@@ -510,7 +516,8 @@ document.addEventListener('DOMContentLoaded', function () {
       "type": "header",
       "content": "Brand"
     },
-    { "type": "image_picker", "id": "logo",         "label": "Logo image (optional — leave blank for text logo)" },
+    { "type": "image_picker", "id": "logo",         "label": "Logo image (optional)" },
+    { "type": "checkbox",     "id": "show_brand_text", "label": "Show brand text alongside logo", "default": true },
     { "type": "text",         "id": "brand_text_1",  "label": "Brand text part 1", "default": "WORLD" },
     { "type": "text",         "id": "brand_text_2",  "label": "Brand text part 2", "default": "1" },
     { "type": "text",         "id": "brand_text_3",  "label": "Brand text part 3", "default": "WORLD" },
