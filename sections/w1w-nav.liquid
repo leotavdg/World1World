@@ -2,7 +2,7 @@
   assign menu = linklists[section.settings.menu]
 -%}
 
-<nav class="w1w-nav" id="w1wNav">
+<nav class="w1w-nav" id="w1wNav" style="--nav-logo-h: {{ section.settings.logo_height | default: 28 }}px;">
   <div class="wrap w1w-nav-inner">
 
     <!-- Brand -->
@@ -256,12 +256,25 @@ document.addEventListener('DOMContentLoaded', function () {
   white-space: nowrap;
   text-decoration: none;
   display: inline-flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
   align-items: center;
   gap: 10px;
 }
 .w1w-nav-brand:hover { color: var(--lime); }
-.w1w-nav-logo-img { height: 28px; width: auto; display: block; }
-.w1w-nav-brand-text { display: inline-flex; align-items: center; }
+.w1w-nav-logo-img {
+  height: var(--nav-logo-h, 28px);
+  width: auto;
+  display: block;
+  flex-shrink: 0;
+}
+.w1w-nav-brand-text {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
 .w1w-nav-dot {
   display: inline-block;
   width: 6px;
@@ -517,6 +530,7 @@ document.addEventListener('DOMContentLoaded', function () {
       "content": "Brand"
     },
     { "type": "image_picker", "id": "logo",         "label": "Logo image (optional)" },
+    { "type": "range",        "id": "logo_height",  "label": "Logo height", "min": 16, "max": 80, "step": 2, "default": 28, "unit": "px" },
     { "type": "checkbox",     "id": "show_brand_text", "label": "Show brand text alongside logo", "default": true },
     { "type": "text",         "id": "brand_text_1",  "label": "Brand text part 1", "default": "WORLD" },
     { "type": "text",         "id": "brand_text_2",  "label": "Brand text part 2", "default": "1" },

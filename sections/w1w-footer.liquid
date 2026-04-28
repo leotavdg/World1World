@@ -1,4 +1,4 @@
-<footer class="w1w-footer">
+<footer class="w1w-footer" style="--footer-logo-h: {{ section.settings.logo_height | default: 36 }}px;">
   <div class="wrap">
     <div class="w1w-footer-top">
 
@@ -134,9 +134,10 @@
   margin-bottom: 16px;
 }
 .w1w-footer-logo-img {
-  height: 36px;
+  height: var(--footer-logo-h, 36px);
   width: auto;
   display: block;
+  flex-shrink: 0;
 }
 .w1w-footer-logo {
   font-family: var(--font-display, 'Space Grotesk', sans-serif);
@@ -350,6 +351,7 @@
       "content": "Brand"
     },
     { "type": "image_picker", "id": "logo", "label": "Logo image (optional)" },
+    { "type": "range",        "id": "logo_height", "label": "Logo height", "min": 20, "max": 120, "step": 2, "default": 36, "unit": "px" },
     { "type": "checkbox",     "id": "show_brand_text", "label": "Show brand text alongside logo", "default": true },
     { "type": "text",         "id": "brand_text_1",  "label": "Brand text part 1", "default": "WORLD" },
     { "type": "text",         "id": "brand_text_2",  "label": "Brand text part 2", "default": "1" },
