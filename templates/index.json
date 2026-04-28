@@ -14,6 +14,7 @@
       "settings": {
         "bg_image": "shopify://shop_images/World1World.jpg",
         "hero_height": 82,
+        "hero_height_mobile": 40,
         "overlay_opacity": 15,
         "badge_text": "",
         "headline_line1": "WEAR YOUR",
